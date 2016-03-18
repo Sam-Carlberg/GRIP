@@ -41,6 +41,7 @@ public class Operations {
                 ResizeOperation::new,
                 BlurOperation::new,
                 DesaturateOperation::new,
+                DrawContoursOperation::new,
                 RGBThresholdOperation::new,
                 HSVThresholdOperation::new,
                 HSLThresholdOperation::new,
