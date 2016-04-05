@@ -1,76 +1,85 @@
 package edu.wpi.grip.core.operations.composite;
 
-import com.google.common.eventbus.EventBus;
-import edu.wpi.grip.core.*;
+import edu.wpi.grip.core.Operation;
+import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.sockets.SocketHints;
+import edu.wpi.grip.core.util.Icons;
 
-import java.io.InputStream;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
  * Given a ListReport, filter only the lines that meet certain criteria.  This operation can be used to narrow down detected lines
  * to only relevant ones.
  */
-public class FilterLinesOperation implements Operation {
+public class FilterLinesOperation implements Operation<FilterLinesOperation> {
+
+    public static final OperationDescription<FilterLinesOperation> DESCRIPTION =
+            OperationDescription.builder(FilterLinesOperation.class)
+                    .constructor(FilterLinesOperation::new)
+                    .name("Filter Lines")
+                    .description("Filter only lines from a Find Lines operation that fit certain criteria")
+                    .category(OperationDescription.Category.FEATURE_DETECTION)
+                    .icon(Icons.iconStream("filter-lines"))
+                    .build();
+
     private final SocketHint<LinesReport> inputHint =
             new SocketHint.Builder<>(LinesReport.class).identifier("Lines").build();
 
     private final SocketHint<Number> minLengthHint = SocketHints.Inputs.createNumberSpinnerSocketHint("Min Length", 20);
 
-    private final SocketHint<List> angleHint = SocketHints.Inputs.createNumberListRangeSocketHint("Angle", 0, 360);
+    private final SocketHint<List<Number>> angleHint = SocketHints.Inputs.createNumberListRangeSocketHint("Angle", 0, 360);
 
     private final SocketHint<LinesReport> outputHint =
             new SocketHint.Builder<>(LinesReport.class)
                     .identifier("Lines").initialValueSupplier(LinesReport::new).build();
 
-    @Override
-    public String getName() {
-        return "Filter Lines";
+
+    private final InputSocket<LinesReport> inputSocket;
+    private final InputSocket<Number> minLengthSocket;
+    private final InputSocket<List<Number>> angleSocket;
+
+    private final OutputSocket<LinesReport> linesOutputSocket;
+
+    public FilterLinesOperation(InputSocket.Factory inputSocketFactory, OutputSocket.Factory outputSocketFactory) {
+        this.inputSocket = inputSocketFactory.create(inputHint);
+        this.minLengthSocket = inputSocketFactory.create(minLengthHint);
+        this.angleSocket = inputSocketFactory.create(angleHint);
+
+        this.linesOutputSocket = outputSocketFactory.create(outputHint);
     }
 
     @Override
-    public String getDescription() {
-        return "Filter only lines from a Find Lines operation that fit certain criteria.";
+    public OperationDescription<FilterLinesOperation> getDescription() {
+        return DESCRIPTION;
     }
 
     @Override
-    public Category getCategory() {
-        return Category.FEATURE_DETECTION;
-    }
-
-    @Override
-    public Optional<InputStream> getIcon() {
-        return Optional.of(getClass().getResourceAsStream("/edu/wpi/grip/ui/icons/filter-lines.png"));
-    }
-
-    @Override
-    public InputSocket<?>[] createInputSockets(EventBus eventBus) {
+    public InputSocket<?>[] createInputSockets() {
         return new InputSocket<?>[]{
-                new InputSocket<>(eventBus, inputHint),
-                new InputSocket<>(eventBus, minLengthHint),
-                new InputSocket<>(eventBus, angleHint),
+                inputSocket,
+                minLengthSocket,
+                angleSocket
         };
     }
 
     @Override
-    public OutputSocket<?>[] createOutputSockets(EventBus eventBus) {
-        return new OutputSocket<?>[]{new OutputSocket<>(eventBus, outputHint)};
+    public OutputSocket<?>[] createOutputSockets() {
+        return new OutputSocket<?>[]{
+                linesOutputSocket
+        };
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public void perform(InputSocket<?>[] inputs, OutputSocket<?>[] outputs) {
-        final LinesReport inputLines = (LinesReport) inputs[0].getValue().get();
-        final double minLengthSquared = Math.pow(((Number) inputs[1].getValue().get()).doubleValue(), 2);
-        final double minAngle = ((InputSocket<List<Number>>) inputs[2]).getValue().get().get(0).doubleValue();
-        final double maxAngle = ((InputSocket<List<Number>>) inputs[2]).getValue().get().get(1).doubleValue();
-
-        final OutputSocket<LinesReport> linesOutputSocket = (OutputSocket<LinesReport>) outputs[0];
+    public void perform() {
+        final LinesReport inputLines = inputSocket.getValue().get();
+        final double minLengthSquared = Math.pow(minLengthSocket.getValue().get().doubleValue(), 2);
+        final double minAngle = angleSocket.getValue().get().get(0).doubleValue();
+        final double maxAngle = angleSocket.getValue().get().get(1).doubleValue();
 
         List<LinesReport.Line> lines = inputLines.getLines().stream()
                 .filter(line -> line.lengthSquared() >= minLengthSquared)

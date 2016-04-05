@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
-import com.google.common.eventbus.EventBus;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import edu.wpi.grip.core.sockets.InputSocket;
@@ -13,7 +12,10 @@ import edu.wpi.grip.core.sockets.SocketHints;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -29,6 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <P> The type that each function in the {@link Publishable} should return
  */
 public abstract class PublishAnnotatedOperation<S, T extends Publishable, P> extends PublishOperation<S, MapNetworkPublisher<P>> {
+    private final InputSocket.Factory inputSocketFactory;
     private final MapNetworkPublisherFactory factory;
     private final TypeToken<S> socketType;
     private final TypeToken<P> publishType;
@@ -40,8 +43,8 @@ public abstract class PublishAnnotatedOperation<S, T extends Publishable, P> ext
      * Create a new publish operation for a socket socketType that implements {@link Publishable} directly
      */
     @SuppressWarnings("unchecked")
-    public PublishAnnotatedOperation(MapNetworkPublisherFactory factory) {
-        this(factory, value -> (T) value);
+    public PublishAnnotatedOperation(InputSocket.Factory inputSocketFactory, MapNetworkPublisherFactory publisherFactory) {
+        this(inputSocketFactory, publisherFactory, value -> (T) value);
     }
 
     /**
@@ -51,15 +54,17 @@ public abstract class PublishAnnotatedOperation<S, T extends Publishable, P> ext
      *
      * @param converter A function to convert socket values into publishable values
      */
-    public PublishAnnotatedOperation(MapNetworkPublisherFactory factory, Function<S, T> converter) {
+    public PublishAnnotatedOperation(InputSocket.Factory inputSocketFactory, MapNetworkPublisherFactory factory, Function<S, T> converter) {
+        super(inputSocketFactory);
+        this.inputSocketFactory = checkNotNull(inputSocketFactory, "InputSocket.Factory was null");
         this.factory = checkNotNull(factory, "MapNetworkPublisherFactory was null");
+        this.converter = checkNotNull(converter, "Converter was null");
         this.socketType = new TypeToken<S>(getClass()) {
         };
         this.publishType = new TypeToken<P>(getClass()) {
         };
         final TypeToken<T> reportType = new TypeToken<T>(getClass()) {
         };
-        this.converter = checkNotNull(converter, "Converter was null");
 
         final Comparator<Invokable<T, P>> byWeight = Comparator.comparing(method -> method.getAnnotation(PublishValue.class).weight());
 
@@ -133,13 +138,12 @@ public abstract class PublishAnnotatedOperation<S, T extends Publishable, P> ext
     }
 
     @Override
-    public List<InputSocket<?>> provideRemainingInputSockets(EventBus eventBus) {
+    public List<InputSocket<?>> provideRemainingInputSockets() {
         // Create a checkbox for every property of the object that might be published.  For example, for a
         // ContourReport, the user might wish to publish the x and y coordinates of the center of each contour.
         return valueMethods
                 .stream()
-                .map(method -> new InputSocket<>(eventBus,
-                        SocketHints.createBooleanSocketHint("Publish " + method.getAnnotation(PublishValue.class).key(), true)))
+                .map(method -> inputSocketFactory.create(SocketHints.createBooleanSocketHint("Publish " + method.getAnnotation(PublishValue.class).key(), true)))
                 .collect(Collectors.toList());
     }
 

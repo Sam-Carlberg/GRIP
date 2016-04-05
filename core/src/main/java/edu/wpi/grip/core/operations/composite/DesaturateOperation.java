@@ -1,62 +1,66 @@
 package edu.wpi.grip.core.operations.composite;
 
-import com.google.common.eventbus.EventBus;
-import edu.wpi.grip.core.*;
+import edu.wpi.grip.core.Operation;
+import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.sockets.SocketHints;
-
-import java.io.InputStream;
-import java.util.Optional;
+import edu.wpi.grip.core.util.Icons;
 
 import static org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_imgproc.*;
+import static org.bytedeco.javacpp.opencv_imgproc.COLOR_BGR2GRAY;
+import static org.bytedeco.javacpp.opencv_imgproc.COLOR_BGRA2GRAY;
+import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
 
 /**
  * An {@link Operation} that converts a color image into shades of gray
  */
-public class DesaturateOperation implements Operation {
+public class DesaturateOperation implements Operation<DesaturateOperation> {
+
+    public static final OperationDescription<DesaturateOperation> DESCRIPTION =
+            OperationDescription.builder(DesaturateOperation.class)
+                    .constructor(DesaturateOperation::new)
+                    .name("Desaturate")
+                    .description("Convert a color image into shades of gray.")
+                    .category(OperationDescription.Category.IMAGE_PROCESSING)
+                    .icon(Icons.iconStream("desaturate"))
+                    .build();
 
     private final SocketHint<Mat> inputHint = SocketHints.Inputs.createMatSocketHint("Input", false);
     private final SocketHint<Mat> outputHint = SocketHints.Outputs.createMatSocketHint("Output");
 
-    @Override
-    public String getName() {
-        return "Desaturate";
+    private final InputSocket<Mat> inputSocket;
+    private final OutputSocket<Mat> outputSocket;
+
+    public DesaturateOperation(InputSocket.Factory inputSocketFactory, OutputSocket.Factory outputSocketFactory) {
+        this.inputSocket = inputSocketFactory.create(inputHint);
+        this.outputSocket = outputSocketFactory.create(outputHint);
     }
 
     @Override
-    public String getDescription() {
-        return "Convert a color image into shades of gray.";
+    public OperationDescription<DesaturateOperation> getDescription() {
+        return DESCRIPTION;
     }
 
     @Override
-    public Category getCategory() {
-        return Category.IMAGE_PROCESSING;
+    public InputSocket<?>[] createInputSockets() {
+        return new InputSocket<?>[]{
+                inputSocket
+        };
     }
 
     @Override
-    public Optional<InputStream> getIcon() {
-        return Optional.of(getClass().getResourceAsStream("/edu/wpi/grip/ui/icons/desaturate.png"));
+    public OutputSocket<?>[] createOutputSockets() {
+        return new OutputSocket<?>[]{
+                outputSocket
+        };
     }
 
     @Override
-    public InputSocket<?>[] createInputSockets(EventBus eventBus) {
-        return new InputSocket<?>[]{new InputSocket<>(eventBus, inputHint)};
-    }
+    public void perform() {
+        final Mat input = inputSocket.getValue().get();
 
-    @Override
-    public OutputSocket<?>[] createOutputSockets(EventBus eventBus) {
-        return new OutputSocket<?>[]{new OutputSocket<>(eventBus, outputHint)};
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public void perform(InputSocket<?>[] inputs, OutputSocket<?>[] outputs) {
-        final Mat input = ((InputSocket<Mat>) inputs[0]).getValue().get();
-
-        final OutputSocket<Mat> outputSocket = (OutputSocket<Mat>) outputs[0];
         Mat output = outputSocket.getValue().get();
 
 

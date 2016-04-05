@@ -10,7 +10,6 @@ import edu.wpi.grip.core.events.ConnectionAddedEvent;
 import edu.wpi.grip.core.events.OperationAddedEvent;
 import edu.wpi.grip.core.events.ProjectSettingsChangedEvent;
 import edu.wpi.grip.core.events.SourceAddedEvent;
-import edu.wpi.grip.core.operations.PythonScriptOperation;
 import edu.wpi.grip.core.settings.ProjectSettings;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;

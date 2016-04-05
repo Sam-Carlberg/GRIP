@@ -1,8 +1,8 @@
 package edu.wpi.grip.core.operations.network.ros;
 
 
-import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.operations.network.PublishOperation;
+import edu.wpi.grip.core.sockets.InputSocket;
 
 import java.io.InputStream;
 import java.util.List;
@@ -19,8 +19,8 @@ public abstract class ROSPublishOperation<S> extends PublishOperation<S, ROSMess
     /*
      * Protected so type resolution can happen
      */
-    protected ROSPublishOperation(ROSNetworkPublisherFactory rosNetworkPublisherFactory, JavaToMessageConverter<S, ?> converter) {
-        super();
+    protected ROSPublishOperation(InputSocket.Factory inputSocketFactory, ROSNetworkPublisherFactory rosNetworkPublisherFactory, JavaToMessageConverter<S, ?> converter) {
+        super(inputSocketFactory);
         this.rosNetworkPublisherFactory = rosNetworkPublisherFactory;
         this.converter = converter;
     }
@@ -50,7 +50,7 @@ public abstract class ROSPublishOperation<S> extends PublishOperation<S, ROSMess
         publisher.publish((message, mFactory) -> converter.convert(socketValue, message, mFactory));
     }
 
-    @Override
+//    @Override
     public Optional<InputStream> getIcon() {
         return Optional.of(getClass().getResourceAsStream("/edu/wpi/grip/ui/icons/rosorg-logo.png"));
     }

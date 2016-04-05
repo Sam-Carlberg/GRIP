@@ -1,6 +1,7 @@
 package edu.wpi.grip.core.sockets;
 
 
+import com.google.common.reflect.TypeToken;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Point;
 import org.bytedeco.javacpp.opencv_core.Size;
@@ -52,7 +53,7 @@ public final class SocketHints {
             return createNumberSocketHintBuilder(identifier, number).view(SocketHint.View.TEXT).build();
         }
 
-        public static SocketHint<List> createNumberListRangeSocketHint(final String identifier, final Number low, final Number high) {
+        public static SocketHint<List<Number>> createNumberListRangeSocketHint(final String identifier, final Number low, final Number high) {
             return createNumberListSocketHintBuilder(identifier, new Number[]{low, high})
                     .view(SocketHint.View.RANGE)
                     .build();
@@ -127,8 +128,9 @@ public final class SocketHints {
         else return builder;
     }
 
-    private static SocketHint.Builder<List> createNumberListSocketHintBuilder(final String identifier, final Number[] domain) {
-        return new SocketHint.Builder<>(List.class).identifier(identifier)
+    @SuppressWarnings("unchecked")
+    private static SocketHint.Builder<List<Number>> createNumberListSocketHintBuilder(final String identifier, final Number[] domain) {
+        return new SocketHint.Builder<>((Class<List<Number>>) new TypeToken<List<Number>>(){}.getRawType()).identifier(identifier)
                 .initialValueSupplier(() -> new ArrayList<>(Arrays.asList(domain)))
                 .domain(new List[]{Arrays.asList(domain)});
     }

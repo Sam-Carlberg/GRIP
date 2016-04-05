@@ -1,22 +1,42 @@
 
 package edu.wpi.grip.core.operations.composite;
 
-import com.google.common.eventbus.EventBus;
-
-import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.Operation;
+import edu.wpi.grip.core.OperationDescription;
+import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.sockets.SocketHints;
+import edu.wpi.grip.core.util.Icons;
 
-import static org.bytedeco.javacpp.opencv_core.*;
-import static org.bytedeco.javacpp.opencv_imgproc.*;
+import static org.bytedeco.javacpp.opencv_core.CV_32SC1;
+import static org.bytedeco.javacpp.opencv_core.CV_8UC1;
+import static org.bytedeco.javacpp.opencv_core.CV_8UC3;
+import static org.bytedeco.javacpp.opencv_core.LINE_8;
+import static org.bytedeco.javacpp.opencv_core.Mat;
+import static org.bytedeco.javacpp.opencv_core.MatVector;
+import static org.bytedeco.javacpp.opencv_core.Point;
+import static org.bytedeco.javacpp.opencv_core.Scalar;
+import static org.bytedeco.javacpp.opencv_core.bitwise_not;
+import static org.bytedeco.javacpp.opencv_imgproc.CV_FILLED;
+import static org.bytedeco.javacpp.opencv_imgproc.circle;
+import static org.bytedeco.javacpp.opencv_imgproc.drawContours;
+import static org.bytedeco.javacpp.opencv_imgproc.watershed;
 
 /**
  * GRIP {@link Operation} for
  * {@link org.bytedeco.javacpp.opencv_imgproc#watershed}.
  */
-public class WatershedOperation implements Operation {
+public class WatershedOperation implements Operation<WatershedOperation> {
+
+    public static final OperationDescription<WatershedOperation> DESCRIPTION =
+            OperationDescription.builder(WatershedOperation.class)
+                    .constructor(WatershedOperation::new)
+                    .name("Watershed")
+                    .description("Isolates overlapping objects from the background and each other")
+                    .category(OperationDescription.Category.FEATURE_DETECTION)
+                    .icon(Icons.iconStream("opencv"))
+                    .build();
 
     private final SocketHint<Mat> srcHint = SocketHints.Inputs.createMatSocketHint("Input", false);
     private final SocketHint<ContoursReport> contoursHint = new SocketHint.Builder<>(ContoursReport.class)
@@ -26,42 +46,46 @@ public class WatershedOperation implements Operation {
 
     private final SocketHint<Mat> outputHint = SocketHints.Inputs.createMatSocketHint("Output", true);
 
-    @Override
-    public String getName() {
-        return "Watershed";
+    private final InputSocket<Mat> srcSocket;
+    private final InputSocket<ContoursReport> contoursSocket;
+    private final OutputSocket<Mat> outputSocket;
+
+    public WatershedOperation(InputSocket.Factory inputSocketFactory, OutputSocket.Factory outputSocketFactory) {
+        srcSocket = inputSocketFactory.create(srcHint);
+        contoursSocket = inputSocketFactory.create(contoursHint);
+        outputSocket = outputSocketFactory.create(outputHint);
     }
 
     @Override
-    public String getDescription() {
-        return "Isolates overlapping objects from the background and each other";
+    public OperationDescription<WatershedOperation> getDescription() {
+        return DESCRIPTION;
     }
 
     @Override
-    public InputSocket<?>[] createInputSockets(EventBus eventBus) {
+    public InputSocket<?>[] createInputSockets() {
         return new InputSocket<?>[]{
-                new InputSocket<>(eventBus, srcHint),
-                new InputSocket<>(eventBus, contoursHint)
+                srcSocket,
+                contoursSocket
         };
     }
 
     @Override
-    public OutputSocket<?>[] createOutputSockets(EventBus eventBus) {
+    public OutputSocket<?>[] createOutputSockets() {
         return new OutputSocket<?>[]{
-                new OutputSocket<>(eventBus, outputHint)
+                outputSocket
         };
     }
 
     @Override
-    public void perform(InputSocket<?>[] inputs, OutputSocket<?>[] outputs) {
-        final Mat input = (Mat) inputs[0].getValue().get();
+    public void perform() {
+        final Mat input = srcSocket.getValue().get();
         if (input.type() != CV_8UC3) {
             throw new IllegalArgumentException("Watershed only works on 8-bit, 3-channel images");
         }
 
-        final ContoursReport contourReport = (ContoursReport) inputs[1].getValue().get();
+        final ContoursReport contourReport = contoursSocket.getValue().get();
         final MatVector contours = contourReport.getContours();
 
-        final OutputSocket<Mat> outputSocket = (OutputSocket<Mat>) outputs[0];
         final Mat markers = new Mat(input.size(), CV_32SC1, new Scalar(0.0));
         final Mat output = new Mat(markers.size(), CV_8UC1, new Scalar(0.0));
 

@@ -9,7 +9,7 @@ import edu.wpi.grip.core.events.ExceptionEvent;
 import edu.wpi.grip.core.operations.Operations;
 import edu.wpi.grip.core.operations.network.GRIPNetworkModule;
 import edu.wpi.grip.core.serialization.Project;
-import edu.wpi.grip.generated.CVOperations;
+//import edu.wpi.grip.generated.CVOperations;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -44,7 +44,7 @@ public class Main {
         }
 
         operations.addOperations();
-        CVOperations.addOperations(eventBus);
+//        CVOperations.addOperations(eventBus);
 
         final String projectPath = args[0];
 

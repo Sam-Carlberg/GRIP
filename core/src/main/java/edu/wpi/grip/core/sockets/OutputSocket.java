@@ -3,6 +3,7 @@ package edu.wpi.grip.core.sockets;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.eventbus.EventBus;
+import com.google.inject.Inject;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.events.SocketPreviewChangedEvent;
@@ -17,6 +18,21 @@ import java.util.Optional;
  */
 @XStreamAlias(value = "grip:Output")
 public class OutputSocket<T> extends Socket<T> {
+
+    public interface Factory {
+        <T> OutputSocket<T> create(SocketHint<T> hint);
+    }
+
+    public static class FactoryImpl implements Factory {
+
+        @Inject
+        private EventBus eventBus;
+
+        @Override
+        public <T> OutputSocket<T> create(SocketHint<T> hint) {
+            return new OutputSocket<>(eventBus, hint);
+        }
+    }
 
     /**
      * Indicates if the socket is being previewed

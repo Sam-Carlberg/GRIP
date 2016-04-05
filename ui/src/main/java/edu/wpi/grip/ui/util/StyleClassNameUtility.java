@@ -2,6 +2,7 @@ package edu.wpi.grip.ui.util;
 
 import edu.wpi.grip.core.Connection;
 import edu.wpi.grip.core.Operation;
+import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.Step;
 
 /**
@@ -22,6 +23,16 @@ public final class StyleClassNameUtility {
      */
     public static String idNameFor(Operation operation) {
         return shortNameFor(operation).append("-operation").toString();
+    }
+
+    /**
+     * Returns the CSS id name for an operation
+     *
+     * @param operationDescription the description of the operation
+     * @return The CSS id for the operation. To use as a css selector then prepend the string with a '#'
+     */
+    public static String idNameFor(OperationDescription<?> operationDescription) {
+        return shortNameFor(operationDescription).append("-operation").toString();
     }
 
     /**
@@ -47,7 +58,11 @@ public final class StyleClassNameUtility {
                 connection.getInputSocket().getSocketHint().getIdentifier();
     }
 
+    private static StringBuilder shortNameFor(OperationDescription<?> operationDescription) {
+        return new StringBuilder(operationDescription.getName().toLowerCase().replace(" ", "-"));
+    }
+
     private static StringBuilder shortNameFor(Operation operation) {
-        return new StringBuilder(operation.getName().toLowerCase().replace(" ", "-"));
+        return new StringBuilder(operation.getDescription().getName().toLowerCase().replace(" ", "-"));
     }
 }

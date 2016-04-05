@@ -1,63 +1,80 @@
 package edu.wpi.grip.core.operations.composite;
 
 
-import com.google.common.eventbus.EventBus;
-import edu.wpi.grip.core.*;
-import edu.wpi.grip.core.sockets.*;
+import edu.wpi.grip.core.Operation;
+import edu.wpi.grip.core.OperationDescription;
+import edu.wpi.grip.core.sockets.InputSocket;
+import edu.wpi.grip.core.sockets.LinkedSocketHint;
+import edu.wpi.grip.core.sockets.OutputSocket;
+import edu.wpi.grip.core.sockets.SocketHint;
+import edu.wpi.grip.core.sockets.SocketHints;
+import edu.wpi.grip.core.sockets.SocketsProvider;
 
 import java.util.Optional;
 
-public class ValveOperation implements Operation {
-    @Override
-    public String getName() {
-        return "Valve";
+public class ValveOperation implements Operation<ValveOperation> {
+
+    public static OperationDescription DESCRIPTION =
+            OperationDescription.builder(ValveOperation.class)
+                    .constructor(ValveOperation::new)
+                    .name("Valve")
+                    .description("Toggle an output socket on or off using a boolean")
+                    .category(OperationDescription.Category.LOGICAL)
+                    .build();
+
+    // This hint toggles the switch between using the true and false sockets
+    private final SocketHint<Boolean> switcherHint = SocketHints.createBooleanSocketHint("valve", true);
+    private final LinkedSocketHint linkedSocketHint;
+
+    private final InputSocket<Boolean> switcherSocket;
+    private final InputSocket inputSocket; // Intentionally using raw types
+
+    private final OutputSocket outputSocket;
+
+    public ValveOperation(InputSocket.Factory inputSocketFactory, OutputSocket.Factory outputSocketFactory) {
+        this.linkedSocketHint = new LinkedSocketHint(inputSocketFactory, outputSocketFactory);
+
+        this.switcherSocket = inputSocketFactory.create(switcherHint);
+        this.inputSocket = linkedSocketHint.linkedInputSocket("Input");
+
+        this.outputSocket = linkedSocketHint.linkedOutputSocket("Output");
     }
 
     @Override
-    public String getDescription() {
-        return "Toggle an output socket on or off using a boolean";
+    public OperationDescription<ValveOperation> getDescription() {
+        return DESCRIPTION;
     }
 
     @Override
-    public Category getCategory() {
-        return Category.LOGICAL;
-    }
-
-    @Override
-    public SocketsProvider createSockets(EventBus eventBus) {
-        // This hint toggles the switch between using the true and false sockets
-        final SocketHint<Boolean> switcherHint = SocketHints.createBooleanSocketHint("valve", true);
-
-        final LinkedSocketHint linkedSocketHint = new LinkedSocketHint(eventBus);
+    public SocketsProvider getSockets() {
         final InputSocket<?>[] inputs = new InputSocket[]{
-                new InputSocket<>(eventBus, switcherHint),
-                linkedSocketHint.linkedInputSocket("Input"),
+                switcherSocket,
+                inputSocket
         };
         final OutputSocket<?>[] outputs = new OutputSocket[]{
-                linkedSocketHint.linkedOutputSocket("Output")
+                outputSocket
         };
         return new SocketsProvider(inputs, outputs);
     }
 
     @Override
-    public InputSocket<?>[] createInputSockets(EventBus eventBus) {
+    public InputSocket<?>[] createInputSockets() {
         throw new UnsupportedOperationException("This method should not be used");
     }
 
     @Override
-    public OutputSocket<?>[] createOutputSockets(EventBus eventBus) {
+    public OutputSocket<?>[] createOutputSockets() {
         throw new UnsupportedOperationException("This method should not be used");
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public void perform(InputSocket<?>[] inputs, OutputSocket<?>[] outputs) {
-        final InputSocket<Boolean> switchHint = (InputSocket<Boolean>) inputs[0];
+    public void perform() {
         // If the input is true pass the value through
-        if (switchHint.getValue().get()) {
-            outputs[0].setValueOptional(((InputSocket) inputs[1]).getValue());
+        if (switcherSocket.getValue().get()) {
+            outputSocket.setValueOptional(inputSocket.getValue());
         } else {
-            outputs[0].setValueOptional((Optional) Optional.empty());
+            outputSocket.setValueOptional(Optional.empty());
         }
     }
 }

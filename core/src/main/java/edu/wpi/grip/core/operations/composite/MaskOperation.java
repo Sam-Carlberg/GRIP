@@ -1,14 +1,12 @@
 package edu.wpi.grip.core.operations.composite;
 
-import com.google.common.eventbus.EventBus;
-import edu.wpi.grip.core.*;
+import edu.wpi.grip.core.Operation;
+import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.sockets.SocketHints;
-
-import java.io.InputStream;
-import java.util.Optional;
+import edu.wpi.grip.core.util.Icons;
 
 import static org.bytedeco.javacpp.opencv_core.Mat;
 import static org.bytedeco.javacpp.opencv_core.bitwise_xor;
@@ -16,55 +14,60 @@ import static org.bytedeco.javacpp.opencv_core.bitwise_xor;
 /**
  * An {@link Operation} that masks out an area of interest from an image
  */
-public class MaskOperation implements Operation {
+public class MaskOperation implements Operation<MaskOperation> {
+
+    public static final OperationDescription<MaskOperation> DESCRIPTION =
+            OperationDescription.builder(MaskOperation.class)
+                    .constructor(MaskOperation::new)
+                    .name("Mask")
+                    .description("Filter out an area of interest in an image using a binary mask.")
+                    .category(OperationDescription.Category.IMAGE_PROCESSING)
+                    .icon(Icons.iconStream("mask"))
+                    .build();
 
     private final SocketHint<Mat> inputHint = SocketHints.Inputs.createMatSocketHint("Input", false);
     private final SocketHint<Mat> maskHint = SocketHints.Inputs.createMatSocketHint("Mask", false);
 
     private final SocketHint<Mat> outputHint = SocketHints.Outputs.createMatSocketHint("Output");
 
-    @Override
-    public String getName() {
-        return "Mask";
+
+    private final InputSocket<Mat> inputSocket;
+    private final InputSocket<Mat> maskSocket;
+
+    private final OutputSocket<Mat> outputSocket;
+
+    public MaskOperation(InputSocket.Factory inputSocketFactory, OutputSocket.Factory outputSocketFactory) {
+        this.inputSocket = inputSocketFactory.create(inputHint);
+        this.maskSocket = inputSocketFactory.create(maskHint);
+
+        this.outputSocket = outputSocketFactory.create(outputHint);
     }
 
     @Override
-    public String getDescription() {
-        return "Filter out an area of interest in an image using a binary mask.";
+    public OperationDescription<MaskOperation> getDescription() {
+        return DESCRIPTION;
     }
 
     @Override
-    public Category getCategory() {
-        return Category.IMAGE_PROCESSING;
-    }
-
-    @Override
-    public Optional<InputStream> getIcon() {
-        return Optional.of(getClass().getResourceAsStream("/edu/wpi/grip/ui/icons/mask.png"));
-    }
-
-    @Override
-    public InputSocket<?>[] createInputSockets(EventBus eventBus) {
+    public InputSocket<?>[] createInputSockets() {
         return new InputSocket<?>[]{
-                new InputSocket<>(eventBus, inputHint),
-                new InputSocket<>(eventBus, maskHint),
+                inputSocket,
+                maskSocket
         };
     }
 
     @Override
-    public OutputSocket<?>[] createOutputSockets(EventBus eventBus) {
+    public OutputSocket<?>[] createOutputSockets() {
         return new OutputSocket<?>[]{
-                new OutputSocket<>(eventBus, outputHint)
+                outputSocket
         };
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public void perform(InputSocket<?>[] inputs, OutputSocket<?>[] outputs) {
-        final Mat input = ((InputSocket<Mat>) inputs[0]).getValue().get();
-        final Mat mask = ((InputSocket<Mat>) inputs[1]).getValue().get();
+    public void perform() {
+        final Mat input = inputSocket.getValue().get();
+        final Mat mask = maskSocket.getValue().get();
 
-        final OutputSocket<Mat> outputSocket = (OutputSocket<Mat>) outputs[0];
         final Mat output = outputSocket.getValue().get();
 
         // Clear the output to black, then copy the input to it with the mask

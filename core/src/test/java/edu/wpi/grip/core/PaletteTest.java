@@ -23,7 +23,7 @@ public class PaletteTest {
         eventBus = new EventBus();
         palette = new Palette(eventBus);
         eventBus.register(palette);
-        operation = new Operation() {
+        operation = new Operation(eventBus, name, description, category) {
             @Override
             public String getName() {
                 return "Find Target";
@@ -35,12 +35,12 @@ public class PaletteTest {
             }
 
             @Override
-            public InputSocket<?>[] createInputSockets(EventBus eventBus) {
+            public InputSocket<?>[] getInputSockets(EventBus eventBus) {
                 return new InputSocket<?>[0];
             }
 
             @Override
-            public OutputSocket<?>[] createOutputSockets(EventBus eventBus) {
+            public OutputSocket<?>[] getOutputSockets(EventBus eventBus) {
                 return new OutputSocket<?>[0];
             }
 

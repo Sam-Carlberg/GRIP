@@ -1,7 +1,11 @@
 package edu.wpi.grip.core.operations.network.networktables;
 
 import com.google.common.collect.ImmutableSet;
-import edu.wpi.grip.core.operations.network.*;
+import edu.wpi.grip.core.operations.network.MapNetworkPublisherFactory;
+import edu.wpi.grip.core.operations.network.PublishAnnotatedOperation;
+import edu.wpi.grip.core.operations.network.PublishValue;
+import edu.wpi.grip.core.operations.network.Publishable;
+import edu.wpi.grip.core.sockets.InputSocket;
 
 import java.io.InputStream;
 import java.util.Optional;
@@ -19,8 +23,8 @@ public abstract class NTPublishAnnotatedOperation<S, T extends Publishable, P> e
      * Create a new publish operation for a socket type that implements {@link Publishable} directly
      */
     @SuppressWarnings("unchecked")
-    protected NTPublishAnnotatedOperation(MapNetworkPublisherFactory factory) {
-        super(factory);
+    protected NTPublishAnnotatedOperation(InputSocket.Factory inputSocketFactory, MapNetworkPublisherFactory factory) {
+        super(inputSocketFactory, factory);
     }
 
     /**
@@ -30,11 +34,11 @@ public abstract class NTPublishAnnotatedOperation<S, T extends Publishable, P> e
      *
      * @param converter  A function to convert socket values into publishable values
      */
-    protected NTPublishAnnotatedOperation(MapNetworkPublisherFactory factory, Function<S, T> converter) {
-        super(factory, converter);
+    protected NTPublishAnnotatedOperation(InputSocket.Factory inputSocketFactory, MapNetworkPublisherFactory factory, Function<S, T> converter) {
+        super(inputSocketFactory, factory, converter);
     }
 
-    @Override
+//    @Override
     public ImmutableSet<String> getAliases() {
         return ImmutableSet.of("Publish " + getSocketType().getRawType().getSimpleName());
     }
@@ -54,7 +58,7 @@ public abstract class NTPublishAnnotatedOperation<S, T extends Publishable, P> e
         return "Subtable Name";
     }
 
-    @Override
+//    @Override
     public Optional<InputStream> getIcon() {
         return Optional.of(getClass().getResourceAsStream("/edu/wpi/grip/ui/icons/first.png"));
     }

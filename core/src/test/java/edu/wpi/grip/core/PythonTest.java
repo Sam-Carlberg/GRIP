@@ -1,7 +1,6 @@
 package edu.wpi.grip.core;
 
 import com.google.common.eventbus.EventBus;
-import edu.wpi.grip.core.operations.PythonScriptOperation;
 import edu.wpi.grip.core.sockets.Socket;
 import edu.wpi.grip.core.util.MockExceptionWitness;
 import org.junit.Before;

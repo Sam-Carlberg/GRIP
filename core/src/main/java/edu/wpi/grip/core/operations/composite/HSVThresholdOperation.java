@@ -1,10 +1,11 @@
 package edu.wpi.grip.core.operations.composite;
 
-import com.google.common.eventbus.EventBus;
+import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.sockets.SocketHints;
+import edu.wpi.grip.core.util.Icons;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Scalar;
 
@@ -20,58 +21,77 @@ import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
 /**
  * An {@link edu.wpi.grip.core.Operation} that converts a color image into a binary image based on the HSV threshold ranges for each channel
  */
-public class HSVThresholdOperation extends ThresholdOperation {
+public class HSVThresholdOperation extends ThresholdOperation<HSVThresholdOperation> {
+
+    public static final OperationDescription<HSVThresholdOperation> DESCRIPTION =
+            OperationDescription.builder(HSVThresholdOperation.class)
+                    .constructor(HSVThresholdOperation::new)
+                    .name("HSV Threshold")
+                    .description("Segment an image based on hue, saturation, and value ranges.")
+                    .category(OperationDescription.Category.IMAGE_PROCESSING)
+                    .icon(Icons.iconStream("threshold"))
+                    .build();
 
     private static final Logger logger = Logger.getLogger(HSVThresholdOperation.class.getName());
     private final SocketHint<Mat> inputHint = SocketHints.Inputs.createMatSocketHint("Input", false);
-    private final SocketHint<List> hueHint = SocketHints.Inputs.createNumberListRangeSocketHint("Hue", 0.0, 180.0);
-    private final SocketHint<List> saturationHint = SocketHints.Inputs.createNumberListRangeSocketHint("Saturation", 0.0, 255.0);
-    private final SocketHint<List> valueHint = SocketHints.Inputs.createNumberListRangeSocketHint("Value", 0.0, 255.0);
+    private final SocketHint<List<Number>> hueHint = SocketHints.Inputs.createNumberListRangeSocketHint("Hue", 0.0, 180.0);
+    private final SocketHint<List<Number>> saturationHint = SocketHints.Inputs.createNumberListRangeSocketHint("Saturation", 0.0, 255.0);
+    private final SocketHint<List<Number>> valueHint = SocketHints.Inputs.createNumberListRangeSocketHint("Value", 0.0, 255.0);
 
     private final SocketHint<Mat> outputHint = SocketHints.Outputs.createMatSocketHint("Output");
 
-    @Override
-    public String getName() {
-        return "HSV Threshold";
+    private final InputSocket<Mat> inputSocket;
+    private final InputSocket<List<Number>> hueSocket;
+    private final InputSocket<List<Number>> saturationSocket;
+    private final InputSocket<List<Number>> valueSocket;
+
+    private final OutputSocket<Mat> outputSocket;
+
+    public HSVThresholdOperation(InputSocket.Factory inputSocketFactory, OutputSocket.Factory outputSocketFactory) {
+        this.inputSocket = inputSocketFactory.create(inputHint);
+        this.hueSocket = inputSocketFactory.create(hueHint);
+        this.saturationSocket = inputSocketFactory.create(saturationHint);
+        this.valueSocket = inputSocketFactory.create(valueHint);
+
+        this.outputSocket = outputSocketFactory.create(outputHint);
     }
 
     @Override
-    public String getDescription() {
-        return "Segment an image based on hue, saturation and value ranges.";
+    public OperationDescription<HSVThresholdOperation> getDescription() {
+        return DESCRIPTION;
     }
 
     @Override
-    public InputSocket<?>[] createInputSockets(EventBus eventBus) {
+    public InputSocket<?>[] createInputSockets() {
         return new InputSocket<?>[]{
-                new InputSocket<>(eventBus, inputHint),
-                new InputSocket<>(eventBus, hueHint),
-                new InputSocket<>(eventBus, saturationHint),
-                new InputSocket<>(eventBus, valueHint),
+                inputSocket,
+                hueSocket,
+                saturationSocket,
+                valueSocket
         };
     }
 
     @Override
-    public OutputSocket<?>[] createOutputSockets(EventBus eventBus) {
+    public OutputSocket<?>[] createOutputSockets() {
         return new OutputSocket<?>[]{
-                new OutputSocket<>(eventBus, outputHint)
+                outputSocket
         };
     }
 
 
     @Override
-    public void perform(InputSocket<?>[] inputs, OutputSocket<?>[] outputs, Optional<?> data) {
+    public void perform(Optional<?> data) {
         final Mat[] dataArray = (Mat[]) data.orElseThrow(() -> new IllegalStateException("Data was not provided"));
 
-        final Mat input = ((InputSocket<Mat>) inputs[0]).getValue().get();
-        final List<Number> channel1 = ((InputSocket<List<Number>>) inputs[1]).getValue().get();
-        final List<Number> channel2 = ((InputSocket<List<Number>>) inputs[2]).getValue().get();
-        final List<Number> channel3 = ((InputSocket<List<Number>>) inputs[3]).getValue().get();
+        final Mat input = inputSocket.getValue().get();
+        final List<Number> channel1 = hueSocket.getValue().get();
+        final List<Number> channel2 = saturationSocket.getValue().get();
+        final List<Number> channel3 = valueSocket.getValue().get();
 
         if (input.channels() != 3) {
             throw new IllegalArgumentException("HSV Threshold needs a 3-channel input");
         }
 
-        final OutputSocket<Mat> outputSocket = (OutputSocket<Mat>) outputs[0];
         final Mat output = outputSocket.getValue().get();
 
         final Scalar lowScalar = new Scalar(

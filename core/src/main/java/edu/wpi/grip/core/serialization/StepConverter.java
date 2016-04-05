@@ -33,12 +33,16 @@ public class StepConverter implements Converter {
     private Pipeline pipeline;
     @Inject
     private Step.Factory stepFactory;
+    @Inject
+    private InputSocket.Factory inputSocketFactory;
+    @Inject
+    private OutputSocket.Factory outputSocketFactory;
 
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         final Step step = ((Step) source);
 
-        writer.addAttribute(NAME_ATTRIBUTE, step.getOperation().getName());
+        writer.addAttribute(NAME_ATTRIBUTE, step.getOperation().getDescription().getName());
 
         // Also save any sockets in the step
         for (InputSocket<?> socket : step.getInputSockets()) {
@@ -53,7 +57,7 @@ public class StepConverter implements Converter {
     @Override
     public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
         final String operationName = reader.getAttribute(NAME_ATTRIBUTE);
-        final Optional<Operation> operation = this.palette.getOperationByName(operationName);
+        final Optional<OperationDescription> operation = this.palette.getOperationByName(operationName);
 
         if (!operation.isPresent()) {
             throw new ConversionException("Unknown operation: " + operationName);
@@ -61,7 +65,7 @@ public class StepConverter implements Converter {
 
         // Instead of simply returning the step and having XStream insert it into the pipeline using reflection, send a
         // StepAddedEvent.  This allows other interested classes (such as PipelineView) to also know when steps are added.
-        pipeline.addStep(stepFactory.create(operation.get()));
+        pipeline.addStep(stepFactory.create(operation.get().getConstructor().create(inputSocketFactory, outputSocketFactory)));
 
         while (reader.hasMoreChildren()) {
             context.convertAnother(this, Socket.class);

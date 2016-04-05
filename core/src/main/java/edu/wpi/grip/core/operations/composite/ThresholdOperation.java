@@ -4,20 +4,9 @@ import edu.wpi.grip.core.Operation;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Scalar;
 
-import java.io.InputStream;
 import java.util.Optional;
 
-public abstract class ThresholdOperation implements Operation {
-
-    @Override
-    public Optional<InputStream> getIcon() {
-        return Optional.of(getClass().getResourceAsStream("/edu/wpi/grip/ui/icons/threshold.png"));
-    }
-
-    @Override
-    public Category getCategory() {
-        return Category.IMAGE_PROCESSING;
-    }
+public abstract class ThresholdOperation<O extends ThresholdOperation<O>> implements Operation<O> {
 
     @Override
     public Optional<Mat[]> createData() {

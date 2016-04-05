@@ -1,6 +1,5 @@
 package edu.wpi.grip.core;
 
-import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -27,7 +26,7 @@ public class Step {
 
     private final ExceptionWitness witness;
 
-    private final Operation operation;
+    private final Operation<?> operation;
     private final InputSocket<?>[] inputSockets;
     private final OutputSocket<?>[] outputSockets;
     private final Optional<?> data;
@@ -36,19 +35,17 @@ public class Step {
 
     @Singleton
     public static class Factory {
-        private final EventBus eventBus;
         private final ExceptionWitness.Factory exceptionWitnessFactory;
 
         @Inject
-        public Factory(EventBus eventBus, ExceptionWitness.Factory exceptionWitnessFactory) {
-            this.eventBus = eventBus;
+        public Factory(ExceptionWitness.Factory exceptionWitnessFactory) {
             this.exceptionWitnessFactory = exceptionWitnessFactory;
         }
 
         public Step create(Operation operation) {
             checkNotNull(operation, "The operation can not be null");
             // Create the list of input and output sockets, and mark this step as their owner.
-            final SocketsProvider socketsProvider = operation.createSockets(eventBus);
+            final SocketsProvider socketsProvider = operation.getSockets();
             final InputSocket<?>[] inputSockets = socketsProvider.inputSockets();
             final OutputSocket<?>[] outputSockets = socketsProvider.outputSockets();
 
@@ -141,13 +138,13 @@ public class Step {
             // while that is happening.
             synchronized (removedLock) {
                 if (!removed) {
-                    this.operation.perform(inputSockets, outputSockets, data);
+                    this.operation.perform(data);
                 }
             }
         } catch (RuntimeException e) {
             // We do not want to catch all exceptions, only runtime exceptions.
             // This is especially important when it comes to InterruptedExceptions
-            final String operationFailedMessage = "The " + operation.getName() + " operation did not perform correctly.";
+            final String operationFailedMessage = String.format("The %s operation did not perform correctly.", operation.getDescription().getName());
             logger.log(Level.WARNING, operationFailedMessage, e);
             witness.flagException(e, operationFailedMessage);
             resetOutputSockets();
@@ -161,7 +158,7 @@ public class Step {
         // if we don't wait then the perform method could end up being run concurrently with the perform methods execution
         synchronized (removedLock) {
             removed = true;
-            operation.cleanUp(inputSockets, outputSockets, data);
+            operation.cleanUp(data);
         }
     }
 

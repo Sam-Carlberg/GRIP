@@ -1,17 +1,17 @@
 package edu.wpi.grip.core.operations.composite;
 
-import com.google.common.eventbus.EventBus;
-import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.Operation;
+import edu.wpi.grip.core.OperationDescription;
+import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHints;
+import edu.wpi.grip.core.util.Icons;
 import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.IntPointer;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Optional;
@@ -29,7 +29,16 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imencode;
  * <p>
  * Based on WPILib's CameraServer class: https://github.com/robotpy/allwpilib/blob/master/wpilibj/src/athena/java/edu/wpi/first/wpilibj/CameraServer.java
  */
-public class PublishVideoOperation implements Operation {
+public class PublishVideoOperation implements Operation<PublishVideoOperation> {
+
+    public static final OperationDescription<PublishVideoOperation> DESCRIPTION =
+            OperationDescription.builder(PublishVideoOperation.class)
+                    .constructor(PublishVideoOperation::new)
+                    .name("Publish Video")
+                    .description("Publish an M_JPEG stream to the dashboard.")
+                    .category(OperationDescription.Category.NETWORK)
+                    .icon(Icons.iconStream("publish-video"))
+                    .build();
 
     private final Logger logger = Logger.getLogger(PublishVideoOperation.class.getName());
 
@@ -41,6 +50,14 @@ public class PublishVideoOperation implements Operation {
     private Optional<Thread> serverThread = Optional.empty();
     private volatile boolean connected = false;
     private int numSteps = 0;
+
+    private final InputSocket<Mat> inputSocket;
+    private final InputSocket<Number> qualitySocket;
+
+    public PublishVideoOperation(InputSocket.Factory inputSocketFactory, OutputSocket.Factory outputSocketFactory) {
+        this.inputSocket = inputSocketFactory.create(SocketHints.Inputs.createMatSocketHint("Image", false));
+        this.qualitySocket = inputSocketFactory.create(SocketHints.Inputs.createNumberSliderSocketHint("Quality", 80, 0, 100));
+    }
 
     /**
      * Listens for incoming connections on port 1180 and writes JPEG data whenever there's a new frame.
@@ -114,35 +131,20 @@ public class PublishVideoOperation implements Operation {
     };
 
     @Override
-    public String getName() {
-        return "Publish Video";
+    public OperationDescription<PublishVideoOperation> getDescription() {
+        return DESCRIPTION;
     }
 
     @Override
-    public String getDescription() {
-        return "Publish an M-JPEG stream to the dashboard";
-    }
-
-    @Override
-    public Category getCategory() {
-        return Category.NETWORK;
-    }
-
-    @Override
-    public Optional<InputStream> getIcon() {
-        return Optional.of(getClass().getResourceAsStream("/edu/wpi/grip/ui/icons/publish-video.png"));
-    }
-
-    @Override
-    public InputSocket<?>[] createInputSockets(EventBus eventBus) {
+    public InputSocket<?>[] createInputSockets() {
         return new InputSocket<?>[]{
-                new InputSocket<>(eventBus, SocketHints.Inputs.createMatSocketHint("Image", false)),
-                new InputSocket<>(eventBus, SocketHints.Inputs.createNumberSliderSocketHint("Quality", 80, 0, 100)),
+                inputSocket,
+                qualitySocket
         };
     }
 
     @Override
-    public OutputSocket<?>[] createOutputSockets(EventBus eventBus) {
+    public OutputSocket<?>[] createOutputSockets() {
         return new OutputSocket<?>[0];
     }
 
@@ -158,9 +160,9 @@ public class PublishVideoOperation implements Operation {
     }
 
     @Override
-    public void perform(InputSocket<?>[] inputs, OutputSocket<?>[] outputs) {
-        Mat input = (Mat) inputs[0].getValue().get();
-        Number quality = (Number) inputs[1].getValue().get();
+    public void perform() {
+        Mat input = inputSocket.getValue().get();
+        Number quality = qualitySocket.getValue().get();
 
         if (!connected) {
             return; // Don't waste any time converting images if there's no dashboard connected
@@ -177,7 +179,7 @@ public class PublishVideoOperation implements Operation {
     }
 
     @Override
-    public synchronized void cleanUp(InputSocket<?>[] inputs, OutputSocket<?>[] outputs, Optional<?> data) {
+    public synchronized void cleanUp(Optional<?> data) {
         // Stop the video server if there are no Publish Video steps left
         if (--numSteps == 0) {
             serverThread.ifPresent(Thread::interrupt);

@@ -14,7 +14,7 @@ import edu.wpi.grip.core.operations.Operations;
 import edu.wpi.grip.core.operations.network.GRIPNetworkModule;
 import edu.wpi.grip.core.serialization.Project;
 import edu.wpi.grip.core.util.SafeShutdown;
-import edu.wpi.grip.generated.CVOperations;
+//import edu.wpi.grip.generated.CVOperations;
 import edu.wpi.grip.ui.util.DPIUtility;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -82,7 +82,7 @@ public class Main extends Application {
         }
 
         operations.addOperations();
-        CVOperations.addOperations(eventBus);
+//        CVOperations.addOperations(eventBus);
 
         // If there was a file specified on the command line, open it immediately
         if (!parameters.isEmpty()) {

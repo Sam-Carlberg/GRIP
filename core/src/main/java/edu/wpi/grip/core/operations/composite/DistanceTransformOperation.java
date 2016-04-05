@@ -1,26 +1,35 @@
 
 package edu.wpi.grip.core.operations.composite;
 
-import com.google.common.eventbus.EventBus;
-
-import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.Operation;
+import edu.wpi.grip.core.OperationDescription;
+import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.sockets.SocketHints;
-
-import java.io.InputStream;
-import java.util.Optional;
-
+import edu.wpi.grip.core.util.Icons;
 import org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_core.*;
-import static org.bytedeco.javacpp.opencv_imgproc.*;
+
+import static org.bytedeco.javacpp.opencv_core.CV_8U;
+import static org.bytedeco.javacpp.opencv_imgproc.CV_DIST_C;
+import static org.bytedeco.javacpp.opencv_imgproc.CV_DIST_L1;
+import static org.bytedeco.javacpp.opencv_imgproc.CV_DIST_L2;
+import static org.bytedeco.javacpp.opencv_imgproc.distanceTransform;
 
 /**
  * GRIP {@link Operation} for
  * {@link org.bytedeco.javacpp.opencv_imgproc#distanceTransform}.
  */
-public class DistanceTransformOperation implements Operation {
+public class DistanceTransformOperation implements Operation<DistanceTransformOperation> {
+
+    public static final OperationDescription<DistanceTransformOperation> DESCRIPTION =
+            OperationDescription.builder(DistanceTransformOperation.class)
+                    .constructor(DistanceTransformOperation::new)
+                    .name("Distance Transform")
+                    .description("Sets the values of pixels in a binary image to their distance to the nearest black pixel.")
+                    .category(OperationDescription.Category.IMAGE_PROCESSING)
+                    .icon(Icons.iconStream("opencv"))
+                    .build();
 
     private enum Type {
 
@@ -42,7 +51,9 @@ public class DistanceTransformOperation implements Operation {
         }
     }
 
-    /** Masks are either 0x0, 3x3, or 5x5 */
+    /**
+     * Masks are either 0x0, 3x3, or 5x5
+     */
     private enum MaskSize {
 
         ZERO("0x0", 0),
@@ -69,54 +80,53 @@ public class DistanceTransformOperation implements Operation {
 
     private final SocketHint<Mat> outputHint = SocketHints.Inputs.createMatSocketHint("Output", true);
 
-    @Override
-    public String getName() {
-        return "Distance Transform";
+
+    private final InputSocket<Mat> srcSocket;
+    private final InputSocket<Type> typeSocket;
+    private final InputSocket<MaskSize> maskSizeSocket;
+
+    private final OutputSocket<Mat> outputSocket;
+
+    public DistanceTransformOperation(InputSocket.Factory inputSocketFactory, OutputSocket.Factory outputSocketFactory) {
+        this.srcSocket = inputSocketFactory.create(srcHint);
+        this.typeSocket = inputSocketFactory.create(typeHint);
+        this.maskSizeSocket = inputSocketFactory.create(maskSizeHint);
+
+        this.outputSocket = outputSocketFactory.create(outputHint);
     }
 
     @Override
-    public String getDescription() {
-        return "Sets the values of pixels in a binary image to their distance to the nearest black pixel.";
+    public OperationDescription<DistanceTransformOperation> getDescription() {
+        return DESCRIPTION;
     }
 
     @Override
-    public Category getCategory() {
-        return Category.IMAGE_PROCESSING;
-    }
-
-    @Override
-    public Optional<InputStream> getIcon() {
-        return Optional.of(getClass().getResourceAsStream("/edu/wpi/grip/ui/icons/opencv.png"));
-    }
-
-    @Override
-    public InputSocket<?>[] createInputSockets(EventBus eventBus) {
+    public InputSocket<?>[] createInputSockets() {
         return new InputSocket<?>[]{
-            new InputSocket<>(eventBus, srcHint),
-            new InputSocket<>(eventBus, typeHint),
-            new InputSocket<>(eventBus, maskSizeHint)
+                srcSocket,
+                typeSocket,
+                maskSizeSocket
         };
     }
 
     @Override
-    public OutputSocket<?>[] createOutputSockets(EventBus eventBus) {
+    public OutputSocket<?>[] createOutputSockets() {
         return new OutputSocket<?>[]{
-            new OutputSocket<>(eventBus, outputHint)
+                outputSocket
         };
     }
 
     @Override
-    public void perform(InputSocket<?>[] inputs, OutputSocket<?>[] outputs) {
-        final Mat input = (Mat) inputs[0].getValue().get();
+    public void perform() {
+        final Mat input = srcSocket.getValue().get();
 
         if (input.type() != CV_8U) {
             throw new IllegalArgumentException("Distance transform only works on 8-bit binary images");
         }
 
-        final Type type = (Type) inputs[1].getValue().get();
-        final MaskSize maskSize = (MaskSize) inputs[2].getValue().get();
+        final Type type = typeSocket.getValue().get();
+        final MaskSize maskSize = maskSizeSocket.getValue().get();
 
-        final OutputSocket<Mat> outputSocket = (OutputSocket<Mat>) outputs[0];
         final Mat output = outputSocket.getValue().get();
 
         distanceTransform(input, output, type.value, maskSize.value);

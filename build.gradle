@@ -249,7 +249,8 @@ project(":core") {
         dest sourceSets.generated.java.srcDirs
         removeExisting true
     }
-    generateCodeFromSource.onlyIf { !project.hasProperty('skipGenerate') }
+//    generateCodeFromSource.onlyIf { !project.hasProperty('skipGenerate') }
+    generateCodeFromSource.onlyIf { false }
     compileJava.source sourceSets.generated.java, sourceSets.main.java
     compileJava.dependsOn generateCodeFromSource
 

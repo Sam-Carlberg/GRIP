@@ -1,15 +1,13 @@
 package edu.wpi.grip.core.operations.network;
 
 
-import com.google.common.eventbus.EventBus;
 import com.google.common.reflect.TypeToken;
-import edu.wpi.grip.core.*;
+import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.sockets.SocketHints;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -19,37 +17,43 @@ import java.util.Optional;
  * @param <S> The type of the socket that will be published
  * @param <P> The type of the publisher that will be used to publish values
  */
-public abstract class PublishOperation<S, P extends NetworkPublisher> implements Operation {
-    private final TypeToken<S> socketType;
+public abstract class PublishOperation<S, P extends NetworkPublisher> implements Operation<PublishOperation<S, P>> {
+    private final TypeToken<? super S> socketType;
+    private final SocketHint<? super S> publishHint;
+    private final SocketHint<String> nameHint;
 
-    protected PublishOperation() {
-        this.socketType = new TypeToken<S>(getClass()) {
-        };
+    private final InputSocket<? super S> publishSocket;
+    private final InputSocket<String> nameSocket;
+
+    protected PublishOperation(InputSocket.Factory inputSocketFactory) {
+        this.socketType = new TypeToken<S>(getClass()) {};
+        this.publishHint = new SocketHint.Builder<>(socketType.getRawType()).identifier("Value").build();
+        this.nameHint = SocketHints.Inputs.createTextSocketHint(getSocketHintStringPrompt(), "my" + socketType.getRawType().getSimpleName());
+
+        this.publishSocket = inputSocketFactory.create(publishHint);
+        this.nameSocket = inputSocketFactory.create(nameHint);
     }
 
-    @Override
     public final String getName() {
         return getNetworkProtocolNameAcronym() + "Publish " + socketType.getRawType().getSimpleName();
     }
 
-    @Override
-    public final String getDescription() {
-        return "Publish a " + socketType.getRawType().getSimpleName() + " to " + getNetworkProtocolName();
-    }
+//    @Override
+//    public final String getDescription() {
+//        return "Publish a " + socketType.getRawType().getSimpleName() + " to " + getNetworkProtocolName();
+//    }
 
 
     @Override
-    public final InputSocket<?>[] createInputSockets(EventBus eventBus) {
-        final List<InputSocket<?>> customSockets = provideRemainingInputSockets(eventBus);
+    public final InputSocket<?>[] createInputSockets() {
+        final List<InputSocket<?>> customSockets = provideRemainingInputSockets();
         final InputSocket<?>[] sockets = new InputSocket[2 + customSockets.size()];
         int i = 0;
         // Create an input for the actual object being published
-        sockets[i++] = new InputSocket<>(eventBus,
-                new SocketHint.Builder<>(socketType.getRawType()).identifier("Value").build());
+        sockets[i++] = publishSocket;
 
         // Create a string input for the key used by the network protocol
-        sockets[i++] = new InputSocket<>(eventBus,
-                SocketHints.Inputs.createTextSocketHint(getSocketHintStringPrompt(), "my" + socketType.getRawType().getSimpleName()));
+        sockets[i++] = nameSocket;
         for (InputSocket<?> socket : customSockets) {
             sockets[i++] = socket;
         }
@@ -57,7 +61,7 @@ public abstract class PublishOperation<S, P extends NetworkPublisher> implements
     }
 
     @Override
-    public final OutputSocket<?>[] createOutputSockets(EventBus eventBus) {
+    public final OutputSocket<?>[] createOutputSockets() {
         return new OutputSocket<?>[0];
     }
 
@@ -74,11 +78,11 @@ public abstract class PublishOperation<S, P extends NetworkPublisher> implements
 
     @Override
     @SuppressWarnings("unchecked")
-    public final void perform(InputSocket<?>[] inputs, OutputSocket<?>[] outputs, Optional<?> data) {
+    public final void perform(Optional<?> data) {
         // Get the socket value that should be published
-        final S socketValue = (S) socketType.getRawType().cast(inputs[0].getValue().get());
+        final S socketValue = (S) socketType.getRawType().cast(publishSocket.getValue().get());
         // Get the subfield
-        final String subField = (String) inputs[1].getValue().get();
+        final String subField = nameSocket.getValue().get();
 
         if (subField.isEmpty()) {
             throw new IllegalArgumentException("Need key to publish to " + getNetworkProtocolName());
@@ -86,7 +90,7 @@ public abstract class PublishOperation<S, P extends NetworkPublisher> implements
 
         // The publisher that the data will be published with
         final P publisher = (P) data.get();
-        final List<InputSocket<?>> remainingSockets = inputs.length > 2 ? Arrays.asList(inputs).subList(2, inputs.length) : Collections.emptyList();
+        final List<InputSocket<?>> remainingSockets = provideRemainingInputSockets();
         publisher.setName(subField);
         performPublish(socketValue, publisher, remainingSockets);
     }
@@ -100,14 +104,9 @@ public abstract class PublishOperation<S, P extends NetworkPublisher> implements
     protected abstract void performPublish(S socketValue, P publisher, List<InputSocket<?>> restOfInputSockets);
 
     @Override
-    public final void cleanUp(InputSocket<?>[] inputs, OutputSocket<?>[] outputs, Optional<?> data) {
+    public final void cleanUp(Optional<?> data) {
         final NetworkPublisher networkPublisher = (NetworkPublisher) data.get();
         networkPublisher.close();
-    }
-
-    @Override
-    public final Category getCategory() {
-        return Category.NETWORK;
     }
 
     /**
@@ -120,7 +119,7 @@ public abstract class PublishOperation<S, P extends NetworkPublisher> implements
     /**
      * Provide any additional input sockets to be used in addition to the default ones
      */
-    protected List<InputSocket<?>> provideRemainingInputSockets(EventBus eventBus) {
+    protected List<InputSocket<?>> provideRemainingInputSockets() {
         return Collections.emptyList();
     }
 
