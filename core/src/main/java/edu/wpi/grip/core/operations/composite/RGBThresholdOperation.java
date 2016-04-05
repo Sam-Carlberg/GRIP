@@ -18,9 +18,9 @@ import static org.bytedeco.javacpp.opencv_core.*;
 /**
  * An {@link Operation} that converts a color image into a binary image based on threshold ranges for each channel
  */
-public class RGBThresholdOperation extends ThresholdOperation<RGBThresholdOperation> {
+public class RGBThresholdOperation extends ThresholdOperation {
 
-    public static final OperationDescription<RGBThresholdOperation> DESCRIPTION =
+    public static final OperationDescription DESCRIPTION =
             OperationDescription.builder(RGBThresholdOperation.class)
                     .constructor(RGBThresholdOperation::new)
                     .name("RGB Threshold")
@@ -55,7 +55,7 @@ public class RGBThresholdOperation extends ThresholdOperation<RGBThresholdOperat
     }
 
     @Override
-    public OperationDescription<RGBThresholdOperation> getDescription() {
+    public OperationDescription getDescription() {
         return DESCRIPTION;
     }
 

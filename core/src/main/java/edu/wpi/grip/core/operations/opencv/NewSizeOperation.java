@@ -9,9 +9,9 @@ import edu.wpi.grip.core.sockets.SocketHints;
 import edu.wpi.grip.core.util.Icons;
 import org.bytedeco.javacpp.opencv_core.Size;
 
-public class NewSizeOperation implements CVOperation<NewSizeOperation> {
+public class NewSizeOperation implements CVOperation {
 
-    public static final OperationDescription<NewSizeOperation> DESCRIPTION =
+    public static final OperationDescription DESCRIPTION =
             CVOperation.defaultBuilder(NewSizeOperation.class)
                     .constructor(NewSizeOperation::new)
                     .name("New Size")
@@ -37,7 +37,7 @@ public class NewSizeOperation implements CVOperation<NewSizeOperation> {
     }
 
     @Override
-    public OperationDescription<NewSizeOperation> getDescription() {
+    public OperationDescription getDescription() {
         return DESCRIPTION;
     }
 

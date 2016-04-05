@@ -39,15 +39,15 @@ public class OperationController implements Controller {
 
     private final Pipeline pipeline;
     private final Step.Factory stepFactory;
-    private final OperationDescription<?> operationDescription;
+    private final OperationDescription operationDescription;
     private final Supplier<Operation> operationSupplier;
 
     public interface Factory {
-        OperationController create(OperationDescription<?> operationDescription, Supplier<Operation> operationSupplier);
+        OperationController create(OperationDescription operationDescription, Supplier<Operation> operationSupplier);
     }
 
     @Inject
-    OperationController(Pipeline pipeline, Step.Factory stepFactory, @Assisted OperationDescription<?> operationDescription, @Assisted Supplier<Operation> operationSupplier) {
+    OperationController(Pipeline pipeline, Step.Factory stepFactory, @Assisted OperationDescription operationDescription, @Assisted Supplier<Operation> operationSupplier) {
         this.pipeline = pipeline;
         this.stepFactory = stepFactory;
         this.operationDescription = operationDescription;
@@ -82,7 +82,7 @@ public class OperationController implements Controller {
         return root;
     }
 
-    public OperationDescription<?> getOperationDescription() {
+    public OperationDescription getOperationDescription() {
         return operationDescription;
     }
 }

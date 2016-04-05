@@ -15,9 +15,9 @@ import edu.wpi.grip.core.sockets.SocketsProvider;
  * Allows for switching between two arbitrary typed {@link Socket} using a
  * boolean {@link InputSocket}
  */
-public class SwitchOperation implements Operation<SwitchOperation> {
+public class SwitchOperation implements Operation {
 
-    public static final OperationDescription<SwitchOperation> DESCRIPTION =
+    public static final OperationDescription DESCRIPTION =
             OperationDescription.builder(SwitchOperation.class)
                     .constructor(SwitchOperation::new)
                     .name("Switch")
@@ -45,7 +45,7 @@ public class SwitchOperation implements Operation<SwitchOperation> {
     }
 
     @Override
-    public OperationDescription<SwitchOperation> getDescription() {
+    public OperationDescription getDescription() {
         return DESCRIPTION;
     }
 

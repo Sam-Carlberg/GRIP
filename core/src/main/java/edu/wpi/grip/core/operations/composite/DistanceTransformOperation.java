@@ -20,9 +20,9 @@ import static org.bytedeco.javacpp.opencv_imgproc.distanceTransform;
  * GRIP {@link Operation} for
  * {@link org.bytedeco.javacpp.opencv_imgproc#distanceTransform}.
  */
-public class DistanceTransformOperation implements Operation<DistanceTransformOperation> {
+public class DistanceTransformOperation implements Operation {
 
-    public static final OperationDescription<DistanceTransformOperation> DESCRIPTION =
+    public static final OperationDescription DESCRIPTION =
             OperationDescription.builder(DistanceTransformOperation.class)
                     .constructor(DistanceTransformOperation::new)
                     .name("Distance Transform")
@@ -96,7 +96,7 @@ public class DistanceTransformOperation implements Operation<DistanceTransformOp
     }
 
     @Override
-    public OperationDescription<DistanceTransformOperation> getDescription() {
+    public OperationDescription getDescription() {
         return DESCRIPTION;
     }
 

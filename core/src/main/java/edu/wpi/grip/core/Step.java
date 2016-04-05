@@ -26,7 +26,7 @@ public class Step {
 
     private final ExceptionWitness witness;
 
-    private final Operation<?> operation;
+    private final Operation operation;
     private final InputSocket<?>[] inputSockets;
     private final OutputSocket<?>[] outputSockets;
     private final Optional<?> data;

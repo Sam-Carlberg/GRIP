@@ -27,9 +27,9 @@ import static org.bytedeco.javacpp.opencv_imgproc.watershed;
  * GRIP {@link Operation} for
  * {@link org.bytedeco.javacpp.opencv_imgproc#watershed}.
  */
-public class WatershedOperation implements Operation<WatershedOperation> {
+public class WatershedOperation implements Operation {
 
-    public static final OperationDescription<WatershedOperation> DESCRIPTION =
+    public static final OperationDescription DESCRIPTION =
             OperationDescription.builder(WatershedOperation.class)
                     .constructor(WatershedOperation::new)
                     .name("Watershed")
@@ -57,7 +57,7 @@ public class WatershedOperation implements Operation<WatershedOperation> {
     }
 
     @Override
-    public OperationDescription<WatershedOperation> getDescription() {
+    public OperationDescription getDescription() {
         return DESCRIPTION;
     }
 

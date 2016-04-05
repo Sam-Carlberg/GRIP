@@ -20,9 +20,9 @@ import static org.bytedeco.javacpp.opencv_core.normalize;
  * GRIP {@link Operation} for
  * {@link org.bytedeco.javacpp.opencv_core#normalize}.
  */
-public class NormalizeOperation implements Operation<NormalizeOperation> {
+public class NormalizeOperation implements Operation {
 
-    public static final OperationDescription<NormalizeOperation> DESCRIPTION =
+    public static final OperationDescription DESCRIPTION =
             OperationDescription.builder(NormalizeOperation.class)
                     .constructor(NormalizeOperation::new)
                     .name("Normalize")
@@ -78,7 +78,7 @@ public class NormalizeOperation implements Operation<NormalizeOperation> {
     }
 
     @Override
-    public OperationDescription<NormalizeOperation> getDescription() {
+    public OperationDescription getDescription() {
         return DESCRIPTION;
     }
 

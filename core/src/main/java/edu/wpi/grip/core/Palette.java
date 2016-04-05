@@ -31,7 +31,7 @@ public class Palette {
 
     @Subscribe
     public void onOperationAdded(OperationAddedEvent event) {
-        final OperationDescription<?> operation = event.getOperation();
+        final OperationDescription operation = event.getOperation();
         map(operation.getName(), operation);
         for(String alias : operation.getAliases()) {
             map(alias, operation);

@@ -14,9 +14,9 @@ import static org.bytedeco.javacpp.opencv_core.bitwise_xor;
 /**
  * An {@link Operation} that masks out an area of interest from an image
  */
-public class MaskOperation implements Operation<MaskOperation> {
+public class MaskOperation implements Operation {
 
-    public static final OperationDescription<MaskOperation> DESCRIPTION =
+    public static final OperationDescription DESCRIPTION =
             OperationDescription.builder(MaskOperation.class)
                     .constructor(MaskOperation::new)
                     .name("Mask")
@@ -44,7 +44,7 @@ public class MaskOperation implements Operation<MaskOperation> {
     }
 
     @Override
-    public OperationDescription<MaskOperation> getDescription() {
+    public OperationDescription getDescription() {
         return DESCRIPTION;
     }
 

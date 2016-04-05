@@ -9,9 +9,9 @@ import edu.wpi.grip.core.sockets.SocketHints;
 import edu.wpi.grip.core.util.Icons;
 import org.bytedeco.javacpp.opencv_core.Point;
 
-public class NewPointOperation implements CVOperation<NewPointOperation> {
+public class NewPointOperation implements CVOperation {
 
-    public static final OperationDescription<NewPointOperation> DESCRIPTION =
+    public static final OperationDescription DESCRIPTION =
             CVOperation.defaultBuilder(NewPointOperation.class)
                     .constructor(NewPointOperation::new)
                     .name("New Point")
@@ -39,7 +39,7 @@ public class NewPointOperation implements CVOperation<NewPointOperation> {
     }
 
     @Override
-    public OperationDescription<NewPointOperation> getDescription() {
+    public OperationDescription getDescription() {
         return DESCRIPTION;
     }
 

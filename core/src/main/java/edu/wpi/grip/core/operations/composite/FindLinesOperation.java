@@ -21,7 +21,7 @@ import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
 /**
  * Find line segments in a color or grayscale image
  */
-public class FindLinesOperation implements Operation<FindLinesOperation> {
+public class FindLinesOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder(FindLinesOperation.class)
@@ -47,7 +47,7 @@ public class FindLinesOperation implements Operation<FindLinesOperation> {
     }
 
     @Override
-    public OperationDescription<FindLinesOperation> getDescription() {
+    public OperationDescription getDescription() {
         return DESCRIPTION;
     }
 

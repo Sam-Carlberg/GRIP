@@ -31,7 +31,7 @@ public final class StyleClassNameUtility {
      * @param operationDescription the description of the operation
      * @return The CSS id for the operation. To use as a css selector then prepend the string with a '#'
      */
-    public static String idNameFor(OperationDescription<?> operationDescription) {
+    public static String idNameFor(OperationDescription operationDescription) {
         return shortNameFor(operationDescription).append("-operation").toString();
     }
 
@@ -58,7 +58,7 @@ public final class StyleClassNameUtility {
                 connection.getInputSocket().getSocketHint().getIdentifier();
     }
 
-    private static StringBuilder shortNameFor(OperationDescription<?> operationDescription) {
+    private static StringBuilder shortNameFor(OperationDescription operationDescription) {
         return new StringBuilder(operationDescription.getName().toLowerCase().replace(" ", "-"));
     }
 

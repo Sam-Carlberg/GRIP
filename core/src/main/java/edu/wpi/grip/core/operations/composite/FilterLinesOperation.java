@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
  * Given a ListReport, filter only the lines that meet certain criteria.  This operation can be used to narrow down detected lines
  * to only relevant ones.
  */
-public class FilterLinesOperation implements Operation<FilterLinesOperation> {
+public class FilterLinesOperation implements Operation {
 
-    public static final OperationDescription<FilterLinesOperation> DESCRIPTION =
+    public static final OperationDescription DESCRIPTION =
             OperationDescription.builder(FilterLinesOperation.class)
                     .constructor(FilterLinesOperation::new)
                     .name("Filter Lines")
@@ -53,7 +53,7 @@ public class FilterLinesOperation implements Operation<FilterLinesOperation> {
     }
 
     @Override
-    public OperationDescription<FilterLinesOperation> getDescription() {
+    public OperationDescription getDescription() {
         return DESCRIPTION;
     }
 

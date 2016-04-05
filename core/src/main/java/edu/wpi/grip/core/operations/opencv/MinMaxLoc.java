@@ -12,9 +12,9 @@ import org.bytedeco.javacpp.opencv_core.Point;
 /**
  * Operation to call {@link opencv_core#minMaxLoc}
  */
-public class MinMaxLoc implements CVOperation<MinMaxLoc> {
+public class MinMaxLoc implements CVOperation {
 
-    public static final OperationDescription<MinMaxLoc> DESCRIPTION =
+    public static final OperationDescription DESCRIPTION =
             CVOperation.defaultBuilder(MinMaxLoc.class)
                     .constructor(MinMaxLoc::new)
                     .name("Find Min and Max")
@@ -52,7 +52,7 @@ public class MinMaxLoc implements CVOperation<MinMaxLoc> {
     }
 
     @Override
-    public OperationDescription<MinMaxLoc> getDescription() {
+    public OperationDescription getDescription() {
         return DESCRIPTION;
     }
 

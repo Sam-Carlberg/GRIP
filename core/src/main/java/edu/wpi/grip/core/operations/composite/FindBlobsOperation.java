@@ -19,7 +19,7 @@ import static org.bytedeco.javacpp.opencv_features2d.SimpleBlobDetector;
 /**
  * Find groups of similar pixels in a color or grayscale image
  */
-public class FindBlobsOperation implements Operation<FindBlobsOperation> {
+public class FindBlobsOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder(FindBlobsOperation.class)
@@ -57,7 +57,7 @@ public class FindBlobsOperation implements Operation<FindBlobsOperation> {
     }
 
     @Override
-    public OperationDescription<FindBlobsOperation> getDescription() {
+    public OperationDescription getDescription() {
         return DESCRIPTION;
     }
 

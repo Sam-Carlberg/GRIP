@@ -87,7 +87,7 @@ public class OperationListController {
 
     @Subscribe
     public void onOperationAdded(OperationAddedEvent event) {
-        OperationDescription<?> operationDescription = event.getOperation();
+        OperationDescription operationDescription = event.getOperation();
 
         if (root.getUserData() == null || operationDescription.getCategory() == root.getUserData()) {
             PlatformImpl.runAndWait(() ->

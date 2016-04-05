@@ -8,9 +8,9 @@ import edu.wpi.grip.core.sockets.SocketHints;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Size;
 
-public class MatFieldAccessor implements CVOperation<MatFieldAccessor> {
+public class MatFieldAccessor implements CVOperation {
 
-    public static final OperationDescription<MatFieldAccessor> DESCRIPTION =
+    public static final OperationDescription DESCRIPTION =
              CVOperation.defaultBuilder(MatFieldAccessor.class)
                     .constructor(MatFieldAccessor::new)
                     .name("Get Mat Info")
@@ -48,7 +48,7 @@ public class MatFieldAccessor implements CVOperation<MatFieldAccessor> {
     }
 
     @Override
-    public OperationDescription<MatFieldAccessor> getDescription() {
+    public OperationDescription getDescription() {
         return DESCRIPTION;
     }
 

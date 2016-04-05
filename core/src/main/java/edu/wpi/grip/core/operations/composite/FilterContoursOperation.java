@@ -27,9 +27,9 @@ import static org.bytedeco.javacpp.opencv_imgproc.convexHull;
  * contours from noise and small objects, as well as contours that do not meet the expected characteristics of the
  * feature we're actually looking for.  So, this operation can help narrow them down.
  */
-public class FilterContoursOperation implements Operation<FilterContoursOperation> {
+public class FilterContoursOperation implements Operation {
 
-    public static final OperationDescription<FilterContoursOperation> DESCRIPTION =
+    public static final OperationDescription DESCRIPTION =
             OperationDescription.builder(FilterContoursOperation.class)
                     .constructor(FilterContoursOperation::new)
                     .name("Filter Contours")
@@ -104,7 +104,7 @@ public class FilterContoursOperation implements Operation<FilterContoursOperatio
     }
 
     @Override
-    public OperationDescription<FilterContoursOperation> getDescription() {
+    public OperationDescription getDescription() {
         return DESCRIPTION;
     }
 

@@ -13,23 +13,21 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * An interface describing how an operation should be displayed in the {@link Palette} to the user.
- *
- * @param <O> the type of operation that this entry describes
  */
-public final class OperationDescription<O extends Operation> {
+public final class OperationDescription {
 
     private static final Map<Class<? extends Operation>, OperationDescription> registry = new HashMap<>();
 
-    private static <O extends Operation> void register(Class<O> operationClass, OperationDescription<O> descriptor) {
+    private static void register(Class<? extends Operation> operationClass, OperationDescription descriptor) {
         registry.putIfAbsent(operationClass, descriptor);
     }
 
     @SuppressWarnings("unchecked")
-    public static <O extends Operation> OperationDescription<O> descriptorForOperation(Class<O> operationClass) {
+    public static OperationDescription descriptorForOperation(Class<? extends Operation> operationClass) {
         return registry.get(operationClass);
     }
 
-    private final Operation.Constructor<O> operationConstructor;
+    private final Operation.Constructor operationConstructor;
     private final String name;
     private final String description;
     private final Category category;
@@ -39,7 +37,7 @@ public final class OperationDescription<O extends Operation> {
     /**
      * Private constructor - use {@link #builder} to instantiate this class.
      */
-    private OperationDescription(Operation.Constructor<O> operationConstructor,
+    private OperationDescription(Operation.Constructor operationConstructor,
                                  String name,
                                  String description,
                                  Category category,
@@ -65,7 +63,7 @@ public final class OperationDescription<O extends Operation> {
         MISCELLANEOUS,
     }
 
-    public Operation.Constructor<O> getConstructor() {
+    public Operation.Constructor getConstructor() {
         return operationConstructor;
     }
 
@@ -124,11 +122,11 @@ public final class OperationDescription<O extends Operation> {
      *
      * @param operationClass the type of the operation to create a descriptor for. Note that only one descriptor object
      *                       can exist for each {@code Operation} type.
-     * @param <O>            the type of the operation
+     * @param             the type of the operation
      * @return
      */
-    public static <O extends Operation> Builder<O> builder(Class<O> operationClass) {
-        return new Builder<>(operationClass)
+    public static  Builder builder(Class operationClass) {
+        return new Builder(operationClass)
                 .category(Category.MISCELLANEOUS)
                 .icon(null);
     }
@@ -136,19 +134,19 @@ public final class OperationDescription<O extends Operation> {
     /**
      * Builder class for {@code OperationDescription}
      *
-     * @param <O> the type of operation that the built descriptor will be describing. Only one descriptor may exist
+     * @param  the type of operation that the built descriptor will be describing. Only one descriptor may exist
      *            for any {@code Operation} subclass.
      */
-    public static final class Builder<O extends Operation> {
-        private final Class<O> operationClass;
-        private Operation.Constructor<O> operationConstructor;
+    public static final class Builder {
+        private final Class operationClass;
+        private Operation.Constructor operationConstructor;
         private String name;
         private String description;
         private Category category;
         private InputStream icon;
         private ImmutableSet<String> aliases = ImmutableSet.of(); // default to empty Set to avoid NPE if not assigned
 
-        private Builder(Class<O> operationClass) {
+        private Builder(Class operationClass) {
             if (registry.containsKey(operationClass)) {
                 throw new IllegalStateException(operationClass.getName() + " has already been registered to " + registry.get(operationClass));
             }
@@ -158,7 +156,7 @@ public final class OperationDescription<O extends Operation> {
         /**
          * Sets the Operation constructor.
          */
-        public Builder<O> constructor(Operation.Constructor<O> constructor) {
+        public Builder constructor(Operation.Constructor constructor) {
             this.operationConstructor = checkNotNull(constructor);
             return this;
         }
@@ -166,7 +164,7 @@ public final class OperationDescription<O extends Operation> {
         /**
          * Sets the name
          */
-        public Builder<O> name(String name) {
+        public Builder name(String name) {
             this.name = checkNotNull(name);
             return this;
         }
@@ -174,7 +172,7 @@ public final class OperationDescription<O extends Operation> {
         /**
          * Sets the description
          */
-        public Builder<O> description(String description) {
+        public Builder description(String description) {
             this.description = checkNotNull(description);
             return this;
         }
@@ -182,7 +180,7 @@ public final class OperationDescription<O extends Operation> {
         /**
          * Sets the category
          */
-        public Builder<O> category(Category category) {
+        public Builder category(Category category) {
             this.category = checkNotNull(category);
             return this;
         }
@@ -190,7 +188,7 @@ public final class OperationDescription<O extends Operation> {
         /**
          * Sets the icon
          */
-        public Builder<O> icon(InputStream icon) {
+        public Builder icon(InputStream icon) {
             this.icon = icon;
             return this;
         }
@@ -198,7 +196,7 @@ public final class OperationDescription<O extends Operation> {
         /**
          * Sets the aliases
          */
-        public Builder<O> aliases(String... aliases) {
+        public Builder aliases(String... aliases) {
             this.aliases = ImmutableSet.copyOf(checkNotNull(aliases));
             return this;
         }
@@ -206,8 +204,8 @@ public final class OperationDescription<O extends Operation> {
         /**
          * Builds a new {@code OperationDescription}
          */
-        public OperationDescription<O> build() {
-            OperationDescription<O> descriptor = new OperationDescription<>(
+        public OperationDescription build() {
+            OperationDescription descriptor = new OperationDescription(
                     operationConstructor,
                     name,
                     description,

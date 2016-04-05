@@ -21,9 +21,9 @@ import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
 /**
  * An {@link edu.wpi.grip.core.Operation} that converts a color image into a binary image based on the HSV threshold ranges for each channel
  */
-public class HSVThresholdOperation extends ThresholdOperation<HSVThresholdOperation> {
+public class HSVThresholdOperation extends ThresholdOperation {
 
-    public static final OperationDescription<HSVThresholdOperation> DESCRIPTION =
+    public static final OperationDescription DESCRIPTION =
             OperationDescription.builder(HSVThresholdOperation.class)
                     .constructor(HSVThresholdOperation::new)
                     .name("HSV Threshold")
@@ -57,7 +57,7 @@ public class HSVThresholdOperation extends ThresholdOperation<HSVThresholdOperat
     }
 
     @Override
-    public OperationDescription<HSVThresholdOperation> getDescription() {
+    public OperationDescription getDescription() {
         return DESCRIPTION;
     }
 

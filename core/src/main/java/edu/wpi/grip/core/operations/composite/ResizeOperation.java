@@ -21,9 +21,9 @@ import static org.bytedeco.javacpp.opencv_imgproc.resize;
  * be a useful optimization, and scaling them up might be necessary for combining multiple images that are different
  * sizes.
  */
-public class ResizeOperation implements Operation<ResizeOperation> {
+public class ResizeOperation implements Operation {
 
-    public static final OperationDescription<ResizeOperation> DESCRIPTION =
+    public static final OperationDescription DESCRIPTION =
             OperationDescription.builder(ResizeOperation.class)
                     .constructor(ResizeOperation::new)
                     .name("Resize Image")
@@ -70,7 +70,7 @@ public class ResizeOperation implements Operation<ResizeOperation> {
     }
 
     @Override
-    public OperationDescription<ResizeOperation> getDescription() {
+    public OperationDescription getDescription() {
         return DESCRIPTION;
     }
 

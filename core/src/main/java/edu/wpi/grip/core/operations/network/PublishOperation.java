@@ -17,7 +17,7 @@ import java.util.Optional;
  * @param <S> The type of the socket that will be published
  * @param <P> The type of the publisher that will be used to publish values
  */
-public abstract class PublishOperation<S, P extends NetworkPublisher> implements Operation<PublishOperation<S, P>> {
+public abstract class PublishOperation<S, P extends NetworkPublisher> implements Operation {
     private final TypeToken<? super S> socketType;
     private final SocketHint<? super S> publishHint;
     private final SocketHint<String> nameHint;

@@ -10,7 +10,7 @@ import java.util.Optional;
  * The common interface used by <code>Step</code>s in a pipeline to call various operations.  There is usually only one
  * instance of any class that implements <code>Operation</code>, which is called whenever that operation is used.
  */
-public interface Operation<O extends Operation<O>> {
+public interface Operation {
 
     /**
      * Factory that creates an {@code Operation} instance from an input socket factory and an output socket factory.
@@ -30,7 +30,7 @@ public interface Operation<O extends Operation<O>> {
     /**
      * @return an object describing this {@code Operation}.
      */
-    OperationDescription<O> getDescription();
+    OperationDescription getDescription();
 
     default SocketsProvider getSockets() {
         return new SocketsProvider(createInputSockets(), createOutputSockets());

@@ -29,9 +29,9 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imencode;
  * <p>
  * Based on WPILib's CameraServer class: https://github.com/robotpy/allwpilib/blob/master/wpilibj/src/athena/java/edu/wpi/first/wpilibj/CameraServer.java
  */
-public class PublishVideoOperation implements Operation<PublishVideoOperation> {
+public class PublishVideoOperation implements Operation {
 
-    public static final OperationDescription<PublishVideoOperation> DESCRIPTION =
+    public static final OperationDescription DESCRIPTION =
             OperationDescription.builder(PublishVideoOperation.class)
                     .constructor(PublishVideoOperation::new)
                     .name("Publish Video")
@@ -131,7 +131,7 @@ public class PublishVideoOperation implements Operation<PublishVideoOperation> {
     };
 
     @Override
-    public OperationDescription<PublishVideoOperation> getDescription() {
+    public OperationDescription getDescription() {
         return DESCRIPTION;
     }
 

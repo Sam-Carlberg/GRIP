@@ -20,7 +20,7 @@ import static org.bytedeco.javacpp.opencv_imgproc.findContours;
 /**
  * An {@link Operation} that, given a binary image, produces a list of contours of all of the shapes in the image
  */
-public class FindContoursOperation implements Operation<FindContoursOperation> {
+public class FindContoursOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder(FindContoursOperation.class)
@@ -54,7 +54,7 @@ public class FindContoursOperation implements Operation<FindContoursOperation> {
     }
 
     @Override
-    public OperationDescription<FindContoursOperation> getDescription() {
+    public OperationDescription getDescription() {
         return DESCRIPTION;
     }
 

@@ -6,7 +6,7 @@ import org.bytedeco.javacpp.opencv_core.Scalar;
 
 import java.util.Optional;
 
-public abstract class ThresholdOperation<O extends ThresholdOperation<O>> implements Operation<O> {
+public abstract class ThresholdOperation<O extends ThresholdOperation<O>> implements Operation {
 
     @Override
     public Optional<Mat[]> createData() {

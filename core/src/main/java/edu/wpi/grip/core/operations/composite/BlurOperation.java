@@ -18,12 +18,12 @@ import static org.bytedeco.javacpp.opencv_imgproc.medianBlur;
 /**
  * An {@link Operation} that softens an image using one of several different filters
  */
-public class BlurOperation implements Operation<BlurOperation> {
+public class BlurOperation implements Operation {
 
     /**
      * Describes this operation. This is used by the 'Operations' class to add operations to GRIP.
      */
-    public static final OperationDescription<BlurOperation> DESCRIPTION =
+    public static final OperationDescription DESCRIPTION =
             OperationDescription.builder(BlurOperation.class)
                     .constructor(BlurOperation::new)
                     .name("Blur")
@@ -65,12 +65,10 @@ public class BlurOperation implements Operation<BlurOperation> {
         this.radiusSocket = inputSocketFactory.create(radiusHint);
 
         this.outputSocket = outputSocketFactory.create(outputHint);
-
-        System.out.println("New BlurOperation!");
     }
 
     @Override
-    public OperationDescription<BlurOperation> getDescription() {
+    public OperationDescription getDescription() {
         return DESCRIPTION;
     }
 

@@ -14,9 +14,9 @@ import static org.bytedeco.javacpp.opencv_imgproc.convexHull;
  * <p>
  * This can help remove holes in detected shapes, making them easier to analyze.
  */
-public class ConvexHullsOperation implements Operation<ConvexHullsOperation> {
+public class ConvexHullsOperation implements Operation {
 
-    public static final OperationDescription<ConvexHullsOperation> DESCRIPTION =
+    public static final OperationDescription DESCRIPTION =
             OperationDescription.builder(ConvexHullsOperation.class)
                     .constructor(ConvexHullsOperation::new)
                     .name("Convex Hulls")
@@ -37,7 +37,7 @@ public class ConvexHullsOperation implements Operation<ConvexHullsOperation> {
     }
 
     @Override
-    public OperationDescription<ConvexHullsOperation> getDescription() {
+    public OperationDescription getDescription() {
         return DESCRIPTION;
     }
 

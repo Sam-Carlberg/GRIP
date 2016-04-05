@@ -10,19 +10,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * script, or at startup for the built-in operations.  This is NOT the event for adding a new step to the pipeline.
  */
 public class OperationAddedEvent {
-    private final OperationDescription<?> operation;
+    private final OperationDescription operation;
 
     /**
      * @param operation The operation being added
      */
-    public OperationAddedEvent(OperationDescription<?> operation) {
+    public OperationAddedEvent(OperationDescription operation) {
         this.operation = checkNotNull(operation, "Operation cannot be null");
     }
 
     /**
      * @return The operation being added.
      */
-    public OperationDescription<?> getOperation() {
+    public OperationDescription getOperation() {
         return this.operation;
     }
 

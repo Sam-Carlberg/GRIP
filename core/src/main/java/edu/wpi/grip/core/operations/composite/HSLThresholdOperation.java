@@ -22,7 +22,7 @@ import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
 /**
  * An {@link edu.wpi.grip.core.Operation} that converts a color image into a binary image based on the HSL threshold ranges
  */
-public class HSLThresholdOperation extends ThresholdOperation<HSLThresholdOperation> {
+public class HSLThresholdOperation extends ThresholdOperation {
 
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder(HSLThresholdOperation.class)
@@ -58,7 +58,7 @@ public class HSLThresholdOperation extends ThresholdOperation<HSLThresholdOperat
     }
 
     @Override
-    public OperationDescription<HSLThresholdOperation> getDescription() {
+    public OperationDescription getDescription() {
         return DESCRIPTION;
     }
 

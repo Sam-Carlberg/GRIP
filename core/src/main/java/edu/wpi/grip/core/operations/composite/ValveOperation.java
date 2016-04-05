@@ -12,7 +12,7 @@ import edu.wpi.grip.core.sockets.SocketsProvider;
 
 import java.util.Optional;
 
-public class ValveOperation implements Operation<ValveOperation> {
+public class ValveOperation implements Operation {
 
     public static OperationDescription DESCRIPTION =
             OperationDescription.builder(ValveOperation.class)
@@ -41,7 +41,7 @@ public class ValveOperation implements Operation<ValveOperation> {
     }
 
     @Override
-    public OperationDescription<ValveOperation> getDescription() {
+    public OperationDescription getDescription() {
         return DESCRIPTION;
     }
 

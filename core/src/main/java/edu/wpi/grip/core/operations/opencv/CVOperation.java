@@ -4,9 +4,9 @@ import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.util.Icons;
 
-public interface CVOperation<O extends CVOperation<O>> extends Operation<O> {
+public interface CVOperation extends Operation {
 
-    static <O extends CVOperation<O>> OperationDescription.Builder<O> defaultBuilder(Class<O> operationClass) {
+    static OperationDescription.Builder defaultBuilder(Class<? extends CVOperation> operationClass) {
         return OperationDescription.builder(operationClass)
                 .category(OperationDescription.Category.OPENCV)
                 .icon(Icons.iconStream("opencv"));
