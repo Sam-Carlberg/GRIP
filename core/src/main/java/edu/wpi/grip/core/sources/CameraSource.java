@@ -8,6 +8,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.sockets.SocketHints;
@@ -137,10 +138,12 @@ public class CameraSource extends Source implements RestartableService {
     @AssistedInject
     CameraSource(
             final EventBus eventBus,
+            final InputSocket.Factory inputSocketFactory,
+            final OutputSocket.Factory outputSocketFactory,
             final FrameGrabberFactory grabberFactory,
             final ExceptionWitness.Factory exceptionWitnessFactory,
             @Assisted final int deviceNumber) throws IOException {
-        this(eventBus, grabberFactory, exceptionWitnessFactory, createProperties(deviceNumber));
+        this(eventBus, inputSocketFactory, outputSocketFactory, grabberFactory, exceptionWitnessFactory, createProperties(deviceNumber));
     }
 
     /**
@@ -152,10 +155,12 @@ public class CameraSource extends Source implements RestartableService {
     @AssistedInject
     CameraSource(
             final EventBus eventBus,
+            final InputSocket.Factory inputSocketFactory,
+            final OutputSocket.Factory outputSocketFactory,
             final FrameGrabberFactory grabberFactory,
             final ExceptionWitness.Factory exceptionWitnessFactory,
             @Assisted final String address) throws IOException {
-        this(eventBus, grabberFactory, exceptionWitnessFactory, createProperties(address));
+        this(eventBus, inputSocketFactory, outputSocketFactory, grabberFactory, exceptionWitnessFactory, createProperties(address));
     }
 
     /**
@@ -164,13 +169,15 @@ public class CameraSource extends Source implements RestartableService {
     @AssistedInject
     CameraSource(
             final EventBus eventBus,
+            final InputSocket.Factory inputSocketFactory,
+            final OutputSocket.Factory outputSocketFactory,
             final FrameGrabberFactory grabberFactory,
             final ExceptionWitness.Factory exceptionWitnessFactory,
             @Assisted final Properties properties) throws MalformedURLException {
         super(exceptionWitnessFactory);
         this.eventBus = eventBus;
-        this.frameOutputSocket = new OutputSocket<>(eventBus, imageOutputHint);
-        this.frameRateOutputSocket = new OutputSocket<>(eventBus, frameRateOutputHint);
+        this.frameOutputSocket = outputSocketFactory.create(imageOutputHint);
+        this.frameRateOutputSocket = outputSocketFactory.create(frameRateOutputHint);
         this.properties = properties;
 
         final String deviceNumberProperty = properties.getProperty(DEVICE_NUMBER_PROPERTY);
