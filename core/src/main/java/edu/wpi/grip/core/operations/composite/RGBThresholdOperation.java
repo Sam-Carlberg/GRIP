@@ -21,7 +21,7 @@ import static org.bytedeco.javacpp.opencv_core.*;
 public class RGBThresholdOperation extends ThresholdOperation {
 
     public static final OperationDescription DESCRIPTION =
-            OperationDescription.builder(RGBThresholdOperation.class)
+            OperationDescription.builder()
                     .constructor(RGBThresholdOperation::new)
                     .name("RGB Threshold")
                     .description("Segment an image based on color ranges")

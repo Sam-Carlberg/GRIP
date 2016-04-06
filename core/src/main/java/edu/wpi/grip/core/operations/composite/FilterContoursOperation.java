@@ -30,7 +30,7 @@ import static org.bytedeco.javacpp.opencv_imgproc.convexHull;
 public class FilterContoursOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
-            OperationDescription.builder(FilterContoursOperation.class)
+            OperationDescription.builder()
                     .constructor(FilterContoursOperation::new)
                     .name("Filter Contours")
                     .description("Find contours matching certain criteria")

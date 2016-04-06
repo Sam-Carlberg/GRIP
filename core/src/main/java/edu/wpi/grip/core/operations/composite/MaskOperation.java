@@ -17,7 +17,7 @@ import static org.bytedeco.javacpp.opencv_core.bitwise_xor;
 public class MaskOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
-            OperationDescription.builder(MaskOperation.class)
+            OperationDescription.builder()
                     .constructor(MaskOperation::new)
                     .name("Mask")
                     .description("Filter out an area of interest in an image using a binary mask.")

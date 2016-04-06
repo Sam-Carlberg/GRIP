@@ -15,7 +15,7 @@ import org.bytedeco.javacpp.opencv_core.Point;
 public class MinMaxLoc implements CVOperation {
 
     public static final OperationDescription DESCRIPTION =
-            CVOperation.defaultBuilder(MinMaxLoc.class)
+            CVOperation.defaultBuilder()
                     .constructor(MinMaxLoc::new)
                     .name("Find Min and Max")
                     .description("Find the global minimum and manimum in a single channel grayscale image.")

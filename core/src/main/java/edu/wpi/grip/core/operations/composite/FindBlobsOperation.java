@@ -22,7 +22,7 @@ import static org.bytedeco.javacpp.opencv_features2d.SimpleBlobDetector;
 public class FindBlobsOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
-            OperationDescription.builder(FindBlobsOperation.class)
+            OperationDescription.builder()
                     .constructor(FindBlobsOperation::new)
                     .name("Find Blobs")
                     .description("Detects groups of pixels in an image.")

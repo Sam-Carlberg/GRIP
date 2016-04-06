@@ -30,7 +30,7 @@ import static org.bytedeco.javacpp.opencv_imgproc.watershed;
 public class WatershedOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
-            OperationDescription.builder(WatershedOperation.class)
+            OperationDescription.builder()
                     .constructor(WatershedOperation::new)
                     .name("Watershed")
                     .description("Isolates overlapping objects from the background and each other")

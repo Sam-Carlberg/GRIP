@@ -24,7 +24,7 @@ import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
 public class HSVThresholdOperation extends ThresholdOperation {
 
     public static final OperationDescription DESCRIPTION =
-            OperationDescription.builder(HSVThresholdOperation.class)
+            OperationDescription.builder()
                     .constructor(HSVThresholdOperation::new)
                     .name("HSV Threshold")
                     .description("Segment an image based on hue, saturation, and value ranges.")

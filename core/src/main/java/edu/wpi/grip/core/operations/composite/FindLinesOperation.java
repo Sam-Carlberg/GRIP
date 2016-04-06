@@ -24,7 +24,7 @@ import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
 public class FindLinesOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
-            OperationDescription.builder(FindLinesOperation.class)
+            OperationDescription.builder()
                     .constructor(FindLinesOperation::new)
                     .name("Find Lines")
                     .description("Detects line segments in an image.")

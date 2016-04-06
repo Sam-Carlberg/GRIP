@@ -4,6 +4,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -15,17 +16,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * An interface describing how an operation should be displayed in the {@link Palette} to the user.
  */
 public final class OperationDescription {
-
-    private static final Map<Class<? extends Operation>, OperationDescription> registry = new HashMap<>();
-
-    private static void register(Class<? extends Operation> operationClass, OperationDescription descriptor) {
-        registry.putIfAbsent(operationClass, descriptor);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static OperationDescription descriptorForOperation(Class<? extends Operation> operationClass) {
-        return registry.get(operationClass);
-    }
 
     private final Operation.Constructor operationConstructor;
     private final String name;
@@ -119,14 +109,9 @@ public final class OperationDescription {
      * The created descriptor has a default category of {@link Category#MISCELLANEOUS MISCELLANEOUS} and no icon; use
      * the {@link Builder#category(Category) .category()} and {@link Builder#icon(InputStream) .icon()} methods to
      * override the default values.
-     *
-     * @param operationClass the type of the operation to create a descriptor for. Note that only one descriptor object
-     *                       can exist for each {@code Operation} type.
-     * @param             the type of the operation
-     * @return
      */
-    public static  Builder builder(Class operationClass) {
-        return new Builder(operationClass)
+    public static  Builder builder() {
+        return new Builder()
                 .category(Category.MISCELLANEOUS)
                 .icon(null);
     }
@@ -138,7 +123,6 @@ public final class OperationDescription {
      *            for any {@code Operation} subclass.
      */
     public static final class Builder {
-        private final Class operationClass;
         private Operation.Constructor operationConstructor;
         private String name;
         private String description;
@@ -146,12 +130,10 @@ public final class OperationDescription {
         private InputStream icon;
         private ImmutableSet<String> aliases = ImmutableSet.of(); // default to empty Set to avoid NPE if not assigned
 
-        private Builder(Class operationClass) {
-            if (registry.containsKey(operationClass)) {
-                throw new IllegalStateException(operationClass.getName() + " has already been registered to " + registry.get(operationClass));
-            }
-            this.operationClass = operationClass;
-        }
+        /**
+         * Private constructor; use {@link OperationDescription#builder()} to create a builder.
+         */
+        private Builder() { }
 
         /**
          * Sets the Operation constructor.
@@ -205,15 +187,13 @@ public final class OperationDescription {
          * Builds a new {@code OperationDescription}
          */
         public OperationDescription build() {
-            OperationDescription descriptor = new OperationDescription(
+            return new OperationDescription(
                     operationConstructor,
                     name,
                     description,
                     category,
                     icon,
                     aliases);
-            register(operationClass, descriptor);
-            return descriptor;
         }
     }
 

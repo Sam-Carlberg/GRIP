@@ -17,7 +17,7 @@ import static org.bytedeco.javacpp.opencv_imgproc.convexHull;
 public class ConvexHullsOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
-            OperationDescription.builder(ConvexHullsOperation.class)
+            OperationDescription.builder()
                     .constructor(ConvexHullsOperation::new)
                     .name("Convex Hulls")
                     .description("Compute the convex hulls of contours")

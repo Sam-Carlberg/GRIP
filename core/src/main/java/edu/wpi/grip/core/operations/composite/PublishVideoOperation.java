@@ -32,7 +32,7 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imencode;
 public class PublishVideoOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
-            OperationDescription.builder(PublishVideoOperation.class)
+            OperationDescription.builder()
                     .constructor(PublishVideoOperation::new)
                     .name("Publish Video")
                     .description("Publish an M_JPEG stream to the dashboard.")

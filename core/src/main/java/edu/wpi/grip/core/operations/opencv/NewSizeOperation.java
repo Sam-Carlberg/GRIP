@@ -12,7 +12,7 @@ import org.bytedeco.javacpp.opencv_core.Size;
 public class NewSizeOperation implements CVOperation {
 
     public static final OperationDescription DESCRIPTION =
-            CVOperation.defaultBuilder(NewSizeOperation.class)
+            CVOperation.defaultBuilder()
                     .constructor(NewSizeOperation::new)
                     .name("New Size")
                     .description("Create a size.")

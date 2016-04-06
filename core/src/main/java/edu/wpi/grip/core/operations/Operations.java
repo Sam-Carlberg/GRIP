@@ -5,7 +5,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-
 import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.events.OperationAddedEvent;
 import edu.wpi.grip.core.operations.composite.BlurOperation;
@@ -27,12 +26,14 @@ import edu.wpi.grip.core.operations.composite.ResizeOperation;
 import edu.wpi.grip.core.operations.composite.SwitchOperation;
 import edu.wpi.grip.core.operations.composite.ValveOperation;
 import edu.wpi.grip.core.operations.composite.WatershedOperation;
+import edu.wpi.grip.core.operations.network.MapNetworkPublisherFactory;
+import edu.wpi.grip.core.operations.network.ros.ROSNetworkPublisherFactory;
 import edu.wpi.grip.core.operations.opencv.MatFieldAccessor;
 import edu.wpi.grip.core.operations.opencv.MinMaxLoc;
 import edu.wpi.grip.core.operations.opencv.NewPointOperation;
 import edu.wpi.grip.core.operations.opencv.NewSizeOperation;
-import edu.wpi.grip.core.operations.network.MapNetworkPublisherFactory;
-import edu.wpi.grip.core.operations.network.ros.ROSNetworkPublisherFactory;
+import edu.wpi.grip.core.sockets.InputSocket;
+import edu.wpi.grip.core.sockets.OutputSocket;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -42,7 +43,11 @@ public class Operations {
     private final ImmutableList<OperationDescription> operations;
 
     @Inject
-    Operations(EventBus eventBus, @Named("ntManager") MapNetworkPublisherFactory ntPublisherFactory, @Named("rosManager") ROSNetworkPublisherFactory rosPublishFactory) {
+    Operations(EventBus eventBus,
+               @Named("ntManager") MapNetworkPublisherFactory ntPublisherFactory,
+               @Named("rosManager") ROSNetworkPublisherFactory rosPublishFactory,
+               InputSocket.Factory isf,
+               OutputSocket.Factory osf) {
         this.eventBus = checkNotNull(eventBus, "EventBus cannot be null");
         checkNotNull(ntPublisherFactory, "ntPublisherFactory cannot be null");
         checkNotNull(rosPublishFactory, "rosPublishFactory cannot be null");

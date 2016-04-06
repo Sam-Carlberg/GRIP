@@ -24,7 +24,7 @@ import static org.bytedeco.javacpp.opencv_imgproc.resize;
 public class ResizeOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
-            OperationDescription.builder(ResizeOperation.class)
+            OperationDescription.builder()
                     .constructor(ResizeOperation::new)
                     .name("Resize Image")
                     .description("Scale an image to an exact size")

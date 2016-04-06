@@ -12,7 +12,7 @@ import org.bytedeco.javacpp.opencv_core.Point;
 public class NewPointOperation implements CVOperation {
 
     public static final OperationDescription DESCRIPTION =
-            CVOperation.defaultBuilder(NewPointOperation.class)
+            CVOperation.defaultBuilder()
                     .constructor(NewPointOperation::new)
                     .name("New Point")
                     .description("Create a point by (x,y) value.")

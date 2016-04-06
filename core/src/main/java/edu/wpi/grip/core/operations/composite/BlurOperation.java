@@ -24,7 +24,7 @@ public class BlurOperation implements Operation {
      * Describes this operation. This is used by the 'Operations' class to add operations to GRIP.
      */
     public static final OperationDescription DESCRIPTION =
-            OperationDescription.builder(BlurOperation.class)
+            OperationDescription.builder()
                     .constructor(BlurOperation::new)
                     .name("Blur")
                     .description("Blurs an image to remove noise")

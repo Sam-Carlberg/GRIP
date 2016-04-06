@@ -23,7 +23,7 @@ import static org.bytedeco.javacpp.opencv_imgproc.findContours;
 public class FindContoursOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
-            OperationDescription.builder(FindContoursOperation.class)
+            OperationDescription.builder()
                     .constructor(FindContoursOperation::new)
                     .name("Find Contours")
                     .description("Detects contours in a binary image.")

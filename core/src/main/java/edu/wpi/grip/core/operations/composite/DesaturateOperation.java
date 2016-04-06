@@ -19,7 +19,7 @@ import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
 public class DesaturateOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
-            OperationDescription.builder(DesaturateOperation.class)
+            OperationDescription.builder()
                     .constructor(DesaturateOperation::new)
                     .name("Desaturate")
                     .description("Convert a color image into shades of gray.")
