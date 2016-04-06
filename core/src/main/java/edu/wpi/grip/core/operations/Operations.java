@@ -27,6 +27,7 @@ import edu.wpi.grip.core.operations.composite.SwitchOperation;
 import edu.wpi.grip.core.operations.composite.ValveOperation;
 import edu.wpi.grip.core.operations.composite.WatershedOperation;
 import edu.wpi.grip.core.operations.network.MapNetworkPublisherFactory;
+import edu.wpi.grip.core.operations.network.networktables.NTPublishAnnotatedOperation;
 import edu.wpi.grip.core.operations.network.ros.ROSNetworkPublisherFactory;
 import edu.wpi.grip.core.operations.opencv.MatFieldAccessor;
 import edu.wpi.grip.core.operations.opencv.MinMaxLoc;
@@ -34,6 +35,7 @@ import edu.wpi.grip.core.operations.opencv.NewPointOperation;
 import edu.wpi.grip.core.operations.opencv.NewSizeOperation;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
+import edu.wpi.grip.core.util.Icons;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -75,7 +77,15 @@ public class Operations {
                 MatFieldAccessor.DESCRIPTION,
                 MinMaxLoc.DESCRIPTION,
                 NewPointOperation.DESCRIPTION,
-                NewSizeOperation.DESCRIPTION
+                NewSizeOperation.DESCRIPTION,
+
+                OperationDescription.builder()
+                        .constructor((i, o) -> new NTPublishAnnotatedOperation(i))
+                        .name("NTPublish")
+                        .description("Publishes data to network tables")
+                        .icon(Icons.iconStream("first"))
+                        .category(OperationDescription.Category.NETWORK)
+                        .build()
         );
     }
 
