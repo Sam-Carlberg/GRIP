@@ -5,10 +5,10 @@ import com.google.common.io.Files;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import edu.wpi.grip.core.Source;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.sockets.SocketHints;
-import edu.wpi.grip.core.Source;
 import edu.wpi.grip.core.util.ExceptionWitness;
 import edu.wpi.grip.core.util.ImageLoadingUtility;
 import org.bytedeco.javacpp.opencv_core.Mat;
@@ -51,29 +51,32 @@ public final class ImageFileSource extends Source {
     @AssistedInject
     ImageFileSource(
             final EventBus eventBus,
+            final OutputSocket.Factory outputSocketFactory,
             final ExceptionWitness.Factory exceptionWitnessFactory,
             @Assisted final File file) {
-        this(eventBus, exceptionWitnessFactory, URLDecoder.decode(Paths.get(file.toURI()).toString()));
+        this(eventBus, outputSocketFactory, exceptionWitnessFactory, URLDecoder.decode(Paths.get(file.toURI()).toString()));
     }
 
 
     @AssistedInject
     ImageFileSource(
             final EventBus eventBus,
+            final OutputSocket.Factory outputSocketFactory,
             final ExceptionWitness.Factory exceptionWitnessFactory,
             @Assisted final Properties properties) {
-        this(eventBus, exceptionWitnessFactory, properties.getProperty(PATH_PROPERTY));
+        this(eventBus, outputSocketFactory, exceptionWitnessFactory, properties.getProperty(PATH_PROPERTY));
     }
 
     private ImageFileSource(
             final EventBus eventBus,
+            final OutputSocket.Factory outputSocketFactory,
             final ExceptionWitness.Factory exceptionWitnessFactory,
             final String path) {
         super(exceptionWitnessFactory);
         this.eventBus = checkNotNull(eventBus, "Event Bus was null.");
         this.path = checkNotNull(path, "Path can not be null");
         this.name = Files.getNameWithoutExtension(this.path);
-        this.outputSocket = new OutputSocket<>(eventBus, imageOutputHint);
+        this.outputSocket = outputSocketFactory.create(imageOutputHint);
     }
 
     /**

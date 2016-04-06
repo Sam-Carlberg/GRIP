@@ -1,14 +1,11 @@
 package edu.wpi.grip.core.sockets;
 
-import com.google.common.eventbus.EventBus;
-import com.google.inject.Inject;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import edu.wpi.grip.core.Connection;
 import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.Source;
 import edu.wpi.grip.core.Step;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,44 +15,17 @@ import java.util.Set;
  * @param <T> The type of the value that this socket stores
  */
 @XStreamAlias(value = "grip:Input")
-public class InputSocket<T> extends Socket<T> {
+public interface InputSocket<T> extends Socket<T> {
 
-    public interface Factory {
+    interface Factory {
         <T> InputSocket<T> create(SocketHint<T> hint);
     }
 
-    public static class FactoryImpl implements Factory {
-
-        @Inject
-        private EventBus eventBus;
-
-        @Override
-        public <T> InputSocket<T> create(SocketHint<T> hint) {
-            return new InputSocket<>(eventBus, hint);
-        }
-    }
-
-
     /**
-     * @param eventBus   The Guava {@link EventBus} used by the application.
-     * @param socketHint {@link #getSocketHint}
+     * A decorator for the {@link InputSocket}
+     * @param <T> The type of the value that this socket stores
      */
-    public InputSocket(EventBus eventBus, SocketHint<T> socketHint) {
-        super(eventBus, socketHint, Direction.INPUT);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void onDisconnected() {
-        super.onDisconnected();
-        if (this.getConnections().isEmpty()) {
-            this.setValue(this.getSocketHint().createInitialValue().orElse(null));
-        }
-    }
-
-    public static abstract class Decorator<T> extends InputSocket<T> {
+    abstract class Decorator<T> implements InputSocket<T> {
 
         private final InputSocket<T> decorated;
 
@@ -63,13 +33,7 @@ public class InputSocket<T> extends Socket<T> {
          * @param socket the decorated socket
          */
         public Decorator(InputSocket<T> socket) {
-            super(socket.eventBus, socket.getSocketHint());
             this.decorated = socket;
-        }
-
-        @Override
-        protected void onDisconnected() {
-            decorated.onDisconnected();
         }
 
         @Override
@@ -120,11 +84,6 @@ public class InputSocket<T> extends Socket<T> {
         @Override
         public void setStep(Optional<Step> step) {
             decorated.setStep(step);
-        }
-
-        @Override
-        public void setValue(@Nullable T value) {
-            decorated.setValue(value);
         }
 
         @Override

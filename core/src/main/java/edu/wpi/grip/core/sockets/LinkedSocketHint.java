@@ -1,7 +1,6 @@
 package edu.wpi.grip.core.sockets;
 
 import edu.wpi.grip.core.Connection;
-import edu.wpi.grip.core.events.ConnectionRemovedEvent;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -36,7 +35,7 @@ public final class LinkedSocketHint extends SocketHint.SocketHintDecorator {
         /**
          * @param socket the decorated socket
          */
-        public LinkedInputSocket(InputSocket<T> socket) {
+        LinkedInputSocket(InputSocket<T> socket) {
             super(socket);
         }
 
@@ -51,7 +50,7 @@ public final class LinkedSocketHint extends SocketHint.SocketHintDecorator {
 
         @Override
         @SuppressWarnings("unchecked")
-        public void onDisconnected() {
+        public void removeConnection(Connection connection) {
             synchronized (this) {
                 // Remove this socket because it is no longer controlling the type of socket
                 controllingSockets.remove(this);
@@ -60,13 +59,13 @@ public final class LinkedSocketHint extends SocketHint.SocketHintDecorator {
                     // XXX: TODO: This is breaking the law of Demeter fix this
                     controlledOutputSockets.forEach(outputSocket -> {
                         final Set<Connection<?>> connections = outputSocket.getConnections();
-                        connections.stream().map(ConnectionRemovedEvent::new).forEach(this.eventBus::post);
+                        connections.stream().forEach(Connection::remove);
                         outputSocket.setPreviewed(false);
                         outputSocket.setValueOptional(Optional.empty());
                     });
                 }
             }
-            super.onDisconnected();
+            super.removeConnection(connection);
         }
     }
 
