@@ -25,7 +25,6 @@ public class BlurOperation implements Operation {
      */
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
-                    .constructor(BlurOperation::new)
                     .name("Blur")
                     .description("Blurs an image to remove noise")
                     .category(OperationDescription.Category.IMAGE_PROCESSING)

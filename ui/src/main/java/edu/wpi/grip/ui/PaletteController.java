@@ -1,6 +1,5 @@
 package edu.wpi.grip.ui;
 
-import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.OperationDescription;
 import javafx.beans.property.ObjectProperty;
 import javafx.fxml.FXML;

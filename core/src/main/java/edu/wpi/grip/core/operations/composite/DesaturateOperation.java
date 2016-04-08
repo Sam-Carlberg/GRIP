@@ -20,7 +20,6 @@ public class DesaturateOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
-                    .constructor(DesaturateOperation::new)
                     .name("Desaturate")
                     .description("Convert a color image into shades of gray.")
                     .category(OperationDescription.Category.IMAGE_PROCESSING)

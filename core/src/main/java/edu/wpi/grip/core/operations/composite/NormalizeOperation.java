@@ -24,7 +24,6 @@ public class NormalizeOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
-                    .constructor(NormalizeOperation::new)
                     .name("Normalize")
                     .description("Normalizes or remaps the values of pixels in an image.")
                     .category(OperationDescription.Category.IMAGE_PROCESSING)

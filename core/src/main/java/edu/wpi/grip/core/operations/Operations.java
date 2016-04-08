@@ -5,9 +5,11 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import edu.wpi.grip.core.OperationDescription;
+import edu.wpi.grip.core.OperationMetaData;
 import edu.wpi.grip.core.events.OperationAddedEvent;
+import edu.wpi.grip.core.operations.composite.BlobsReport;
 import edu.wpi.grip.core.operations.composite.BlurOperation;
+import edu.wpi.grip.core.operations.composite.ContoursReport;
 import edu.wpi.grip.core.operations.composite.ConvexHullsOperation;
 import edu.wpi.grip.core.operations.composite.DesaturateOperation;
 import edu.wpi.grip.core.operations.composite.DistanceTransformOperation;
@@ -18,6 +20,7 @@ import edu.wpi.grip.core.operations.composite.FindContoursOperation;
 import edu.wpi.grip.core.operations.composite.FindLinesOperation;
 import edu.wpi.grip.core.operations.composite.HSLThresholdOperation;
 import edu.wpi.grip.core.operations.composite.HSVThresholdOperation;
+import edu.wpi.grip.core.operations.composite.LinesReport;
 import edu.wpi.grip.core.operations.composite.MaskOperation;
 import edu.wpi.grip.core.operations.composite.NormalizeOperation;
 import edu.wpi.grip.core.operations.composite.PublishVideoOperation;
@@ -26,7 +29,10 @@ import edu.wpi.grip.core.operations.composite.ResizeOperation;
 import edu.wpi.grip.core.operations.composite.SwitchOperation;
 import edu.wpi.grip.core.operations.composite.ValveOperation;
 import edu.wpi.grip.core.operations.composite.WatershedOperation;
+import edu.wpi.grip.core.operations.network.BooleanPublishable;
 import edu.wpi.grip.core.operations.network.MapNetworkPublisherFactory;
+import edu.wpi.grip.core.operations.network.NumberPublishable;
+import edu.wpi.grip.core.operations.network.Vector2D;
 import edu.wpi.grip.core.operations.network.networktables.NTPublishAnnotatedOperation;
 import edu.wpi.grip.core.operations.network.ros.ROSNetworkPublisherFactory;
 import edu.wpi.grip.core.operations.opencv.MatFieldAccessor;
@@ -35,14 +41,17 @@ import edu.wpi.grip.core.operations.opencv.NewPointOperation;
 import edu.wpi.grip.core.operations.opencv.NewSizeOperation;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
-import edu.wpi.grip.core.util.Icons;
+import org.bytedeco.javacpp.opencv_core.Point;
+import org.bytedeco.javacpp.opencv_core.Size;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
 public class Operations {
+
     private final EventBus eventBus;
-    private final ImmutableList<OperationDescription> operations;
+
+    private final ImmutableList<OperationMetaData> operations;
 
     @Inject
     Operations(EventBus eventBus,
@@ -54,38 +63,48 @@ public class Operations {
         checkNotNull(ntPublisherFactory, "ntPublisherFactory cannot be null");
         checkNotNull(rosPublishFactory, "rosPublishFactory cannot be null");
         this.operations = ImmutableList.of(
-                BlurOperation.DESCRIPTION,
-                ConvexHullsOperation.DESCRIPTION,
-                DesaturateOperation.DESCRIPTION,
-                DistanceTransformOperation.DESCRIPTION,
-                FilterContoursOperation.DESCRIPTION,
-                FilterLinesOperation.DESCRIPTION,
-                FindBlobsOperation.DESCRIPTION,
-                FindContoursOperation.DESCRIPTION,
-                FindLinesOperation.DESCRIPTION,
-                HSLThresholdOperation.DESCRIPTION,
-                HSVThresholdOperation.DESCRIPTION,
-                MaskOperation.DESCRIPTION,
-                NormalizeOperation.DESCRIPTION,
-                PublishVideoOperation.DESCRIPTION,
-                ResizeOperation.DESCRIPTION,
-                RGBThresholdOperation.DESCRIPTION,
-                SwitchOperation.DESCRIPTION,
-                ValveOperation.DESCRIPTION,
-                WatershedOperation.DESCRIPTION,
+                // Composite operations
+                new OperationMetaData(BlurOperation.DESCRIPTION, () -> new BlurOperation(isf, osf)),
+                new OperationMetaData(ConvexHullsOperation.DESCRIPTION, () -> new ConvexHullsOperation(isf, osf)),
+                new OperationMetaData(DesaturateOperation.DESCRIPTION, () -> new DesaturateOperation(isf, osf)),
+                new OperationMetaData(DistanceTransformOperation.DESCRIPTION, () -> new DistanceTransformOperation(isf, osf)),
+                new OperationMetaData(FilterContoursOperation.DESCRIPTION, () -> new FilterContoursOperation(isf, osf)),
+                new OperationMetaData(FilterLinesOperation.DESCRIPTION, () -> new FilterLinesOperation(isf, osf)),
+                new OperationMetaData(FindBlobsOperation.DESCRIPTION, () -> new FindBlobsOperation(isf, osf)),
+                new OperationMetaData(FindContoursOperation.DESCRIPTION, () -> new FindContoursOperation(isf, osf)),
+                new OperationMetaData(FindLinesOperation.DESCRIPTION, () -> new FindLinesOperation(isf, osf)),
+                new OperationMetaData(HSLThresholdOperation.DESCRIPTION, () -> new HSLThresholdOperation(isf, osf)),
+                new OperationMetaData(HSVThresholdOperation.DESCRIPTION, () -> new HSVThresholdOperation(isf, osf)),
+                new OperationMetaData(MaskOperation.DESCRIPTION, () -> new MaskOperation(isf, osf)),
+                new OperationMetaData(NormalizeOperation.DESCRIPTION, () -> new NormalizeOperation(isf, osf)),
+                new OperationMetaData(PublishVideoOperation.DESCRIPTION, () -> new PublishVideoOperation(isf, osf)),
+                new OperationMetaData(ResizeOperation.DESCRIPTION, () -> new ResizeOperation(isf, osf)),
+                new OperationMetaData(RGBThresholdOperation.DESCRIPTION, () -> new RGBThresholdOperation(isf, osf)),
+                new OperationMetaData(SwitchOperation.DESCRIPTION, () -> new SwitchOperation(isf, osf)),
+                new OperationMetaData(ValveOperation.DESCRIPTION, () -> new ValveOperation(isf, osf)),
+                new OperationMetaData(WatershedOperation.DESCRIPTION, () -> new WatershedOperation(isf, osf)),
 
-                MatFieldAccessor.DESCRIPTION,
-                MinMaxLoc.DESCRIPTION,
-                NewPointOperation.DESCRIPTION,
-                NewSizeOperation.DESCRIPTION,
+                // OpenCV operations
+                new OperationMetaData(MatFieldAccessor.DESCRIPTION, () -> new MatFieldAccessor(isf, osf)),
+                new OperationMetaData(MinMaxLoc.DESCRIPTION, () -> new MinMaxLoc(isf, osf)),
+                new OperationMetaData(NewPointOperation.DESCRIPTION, () -> new NewPointOperation(isf, osf)),
+                new OperationMetaData(NewSizeOperation.DESCRIPTION, () -> new NewSizeOperation(isf, osf)),
 
-                OperationDescription.builder()
-                        .constructor((i, o) -> new NTPublishAnnotatedOperation(i))
-                        .name("NTPublish")
-                        .description("Publishes data to network tables")
-                        .icon(Icons.iconStream("first"))
-                        .category(OperationDescription.Category.NETWORK)
-                        .build()
+                // NetworkTables publishing operations
+                new OperationMetaData(NTPublishAnnotatedOperation.descriptionFor(ContoursReport.class),
+                        () -> new NTPublishAnnotatedOperation<>(isf, ContoursReport.class, ntPublisherFactory)),
+                new OperationMetaData(NTPublishAnnotatedOperation.descriptionFor(LinesReport.class),
+                        () -> new NTPublishAnnotatedOperation<>(isf, LinesReport.class, ntPublisherFactory)),
+                new OperationMetaData(NTPublishAnnotatedOperation.descriptionFor(BlobsReport.class),
+                        () -> new NTPublishAnnotatedOperation<>(isf, BlobsReport.class, ntPublisherFactory)),
+                new OperationMetaData(NTPublishAnnotatedOperation.descriptionFor(Size.class),
+                        () -> new NTPublishAnnotatedOperation<>(isf, Size.class, Vector2D.class, Vector2D::new, ntPublisherFactory)),
+                new OperationMetaData(NTPublishAnnotatedOperation.descriptionFor(Point.class),
+                        () -> new NTPublishAnnotatedOperation<>(isf, Point.class, Vector2D.class, Vector2D::new, ntPublisherFactory)),
+                new OperationMetaData(NTPublishAnnotatedOperation.descriptionFor(Number.class),
+                        () -> new NTPublishAnnotatedOperation<>(isf, Number.class, NumberPublishable.class, NumberPublishable::new, ntPublisherFactory)),
+                new OperationMetaData(NTPublishAnnotatedOperation.descriptionFor(Boolean.class),
+                        () -> new NTPublishAnnotatedOperation<>(isf, Boolean.class, BooleanPublishable.class, BooleanPublishable::new, ntPublisherFactory))
         );
     }
 

@@ -31,7 +31,6 @@ public class WatershedOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
-                    .constructor(WatershedOperation::new)
                     .name("Watershed")
                     .description("Isolates overlapping objects from the background and each other")
                     .category(OperationDescription.Category.FEATURE_DETECTION)

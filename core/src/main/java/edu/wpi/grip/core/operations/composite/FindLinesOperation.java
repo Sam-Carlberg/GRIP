@@ -25,7 +25,6 @@ public class FindLinesOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
-                    .constructor(FindLinesOperation::new)
                     .name("Find Lines")
                     .description("Detects line segments in an image.")
                     .category(OperationDescription.Category.FEATURE_DETECTION)

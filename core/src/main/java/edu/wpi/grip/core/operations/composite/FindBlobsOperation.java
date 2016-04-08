@@ -23,7 +23,6 @@ public class FindBlobsOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
-                    .constructor(FindBlobsOperation::new)
                     .name("Find Blobs")
                     .description("Detects groups of pixels in an image.")
                     .category(OperationDescription.Category.FEATURE_DETECTION)

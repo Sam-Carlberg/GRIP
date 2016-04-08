@@ -19,7 +19,6 @@ public class FilterLinesOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
-                    .constructor(FilterLinesOperation::new)
                     .name("Filter Lines")
                     .description("Filter only lines from a Find Lines operation that fit certain criteria")
                     .category(OperationDescription.Category.FEATURE_DETECTION)

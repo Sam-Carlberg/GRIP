@@ -7,7 +7,10 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import edu.wpi.grip.core.*;
+import edu.wpi.grip.core.Palette;
+import edu.wpi.grip.core.Pipeline;
+import edu.wpi.grip.core.Step;
+import edu.wpi.grip.core.OperationMetaData;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.Socket;
@@ -33,10 +36,6 @@ public class StepConverter implements Converter {
     private Pipeline pipeline;
     @Inject
     private Step.Factory stepFactory;
-    @Inject
-    private InputSocket.Factory inputSocketFactory;
-    @Inject
-    private OutputSocket.Factory outputSocketFactory;
 
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
@@ -57,7 +56,7 @@ public class StepConverter implements Converter {
     @Override
     public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
         final String operationName = reader.getAttribute(NAME_ATTRIBUTE);
-        final Optional<OperationDescription> operation = this.palette.getOperationByName(operationName);
+        final Optional<OperationMetaData> operation = this.palette.getOperationByName(operationName);
 
         if (!operation.isPresent()) {
             throw new ConversionException("Unknown operation: " + operationName);
@@ -65,7 +64,7 @@ public class StepConverter implements Converter {
 
         // Instead of simply returning the step and having XStream insert it into the pipeline using reflection, send a
         // StepAddedEvent.  This allows other interested classes (such as PipelineView) to also know when steps are added.
-        pipeline.addStep(stepFactory.create(operation.get().getConstructor().create(inputSocketFactory, outputSocketFactory)));
+        pipeline.addStep(stepFactory.create(operation.get().getOperationSupplier().get()));
 
         while (reader.hasMoreChildren()) {
             context.convertAnother(this, Socket.class);

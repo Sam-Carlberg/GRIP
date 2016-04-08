@@ -18,7 +18,6 @@ public class MaskOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
-                    .constructor(MaskOperation::new)
                     .name("Mask")
                     .description("Filter out an area of interest in an image using a binary mask.")
                     .category(OperationDescription.Category.IMAGE_PROCESSING)

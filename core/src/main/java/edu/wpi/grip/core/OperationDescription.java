@@ -4,9 +4,6 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -15,31 +12,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * An interface describing how an operation should be displayed in the {@link Palette} to the user.
  */
-public final class OperationDescription {
-
-    private final Operation.Constructor operationConstructor;
-    private final String name;
-    private final String description;
-    private final Category category;
-    private final InputStream icon;
-    private final ImmutableSet<String> aliases;
-
-    /**
-     * Private constructor - use {@link #builder} to instantiate this class.
-     */
-    private OperationDescription(Operation.Constructor operationConstructor,
-                                 String name,
-                                 String description,
-                                 Category category,
-                                 InputStream iconStream,
-                                 Set<String> aliases) {
-        this.operationConstructor = checkNotNull(operationConstructor);
-        this.name = checkNotNull(name);
-        this.description = checkNotNull(description);
-        this.category = checkNotNull(category);
-        this.icon = iconStream; // This is allowed to be null
-        this.aliases = ImmutableSet.copyOf(checkNotNull(aliases));
-    }
+public class OperationDescription {
 
     /**
      * The categories that entries can be in.
@@ -53,8 +26,25 @@ public final class OperationDescription {
         MISCELLANEOUS,
     }
 
-    public Operation.Constructor getConstructor() {
-        return operationConstructor;
+    private final String name;
+    private final String description;
+    private final Category category;
+    private final InputStream icon;
+    private final ImmutableSet<String> aliases;
+
+    /**
+     * Private constructor - use {@link #builder} to instantiate this class.
+     */
+    protected OperationDescription(String name,
+                                 String description,
+                                 Category category,
+                                 InputStream iconStream,
+                                 Set<String> aliases) {
+        this.name = checkNotNull(name);
+        this.description = checkNotNull(description);
+        this.category = checkNotNull(category);
+        this.icon = iconStream; // This is allowed to be null
+        this.aliases = ImmutableSet.copyOf(checkNotNull(aliases));
     }
 
     /**
@@ -81,7 +71,7 @@ public final class OperationDescription {
     /**
      * @return An {@link InputStream} of a 128x128 image to show the user as a representation of the operation.
      */
-    public Optional<? extends InputStream> getIcon() {
+    public Optional<InputStream> getIcon() {
         return Optional.ofNullable(icon);
     }
 
@@ -110,7 +100,7 @@ public final class OperationDescription {
      * the {@link Builder#category(Category) .category()} and {@link Builder#icon(InputStream) .icon()} methods to
      * override the default values.
      */
-    public static  Builder builder() {
+    public static Builder builder() {
         return new Builder()
                 .category(Category.MISCELLANEOUS)
                 .icon(null);
@@ -118,12 +108,8 @@ public final class OperationDescription {
 
     /**
      * Builder class for {@code OperationDescription}
-     *
-     * @param  the type of operation that the built descriptor will be describing. Only one descriptor may exist
-     *            for any {@code Operation} subclass.
      */
     public static final class Builder {
-        private Operation.Constructor operationConstructor;
         private String name;
         private String description;
         private Category category;
@@ -133,14 +119,7 @@ public final class OperationDescription {
         /**
          * Private constructor; use {@link OperationDescription#builder()} to create a builder.
          */
-        private Builder() { }
-
-        /**
-         * Sets the Operation constructor.
-         */
-        public Builder constructor(Operation.Constructor constructor) {
-            this.operationConstructor = checkNotNull(constructor);
-            return this;
+        private Builder() {
         }
 
         /**
@@ -188,7 +167,6 @@ public final class OperationDescription {
          */
         public OperationDescription build() {
             return new OperationDescription(
-                    operationConstructor,
                     name,
                     description,
                     category,

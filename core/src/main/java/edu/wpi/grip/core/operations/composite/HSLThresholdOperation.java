@@ -2,6 +2,7 @@ package edu.wpi.grip.core.operations.composite;
 
 
 import edu.wpi.grip.core.OperationDescription;
+import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
@@ -20,13 +21,12 @@ import static org.bytedeco.javacpp.opencv_imgproc.COLOR_BGR2HLS;
 import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
 
 /**
- * An {@link edu.wpi.grip.core.Operation} that converts a color image into a binary image based on the HSL threshold ranges
+ * An {@link Operation} that converts a color image into a binary image based on the HSL threshold ranges
  */
 public class HSLThresholdOperation extends ThresholdOperation {
 
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
-                    .constructor(HSLThresholdOperation::new)
                     .name("HSL Threshold")
                     .description("Segment an image based on hue, saturation, and luminance ranges.")
                     .category(OperationDescription.Category.IMAGE_PROCESSING)

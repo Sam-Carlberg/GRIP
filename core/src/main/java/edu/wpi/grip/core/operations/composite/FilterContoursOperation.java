@@ -31,7 +31,6 @@ public class FilterContoursOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
-                    .constructor(FilterContoursOperation::new)
                     .name("Filter Contours")
                     .description("Find contours matching certain criteria")
                     .category(OperationDescription.Category.FEATURE_DETECTION)

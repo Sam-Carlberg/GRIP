@@ -25,7 +25,6 @@ public class ResizeOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
-                    .constructor(ResizeOperation::new)
                     .name("Resize Image")
                     .description("Scale an image to an exact size")
                     .category(OperationDescription.Category.IMAGE_PROCESSING)

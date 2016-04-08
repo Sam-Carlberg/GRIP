@@ -2,9 +2,10 @@ package edu.wpi.grip.ui;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
 import com.sun.javafx.application.PlatformImpl;
-import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.events.OperationAddedEvent;
+import edu.wpi.grip.core.OperationMetaData;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.ui.annotations.ParametrizedController;
@@ -18,8 +19,6 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.VBox;
-
-import javax.inject.Inject;
 
 /**
  * Controller for a VBox of {@link OperationController}s.  The user data for this should be what category it shows,
@@ -87,11 +86,11 @@ public class OperationListController {
 
     @Subscribe
     public void onOperationAdded(OperationAddedEvent event) {
-        OperationDescription operationDescription = event.getOperation();
+        OperationMetaData operationDescription = event.getOperation();
 
-        if (root.getUserData() == null || operationDescription.getCategory() == root.getUserData()) {
+        if (root.getUserData() == null || operationDescription.getDescription().getCategory() == root.getUserData()) {
             PlatformImpl.runAndWait(() ->
-                    operationsMapManager.add(operationControllerFactory.create(operationDescription, () -> operationDescription.getConstructor().create(isf, osf))));
+                    operationsMapManager.add(operationControllerFactory.create(operationDescription.getDescription(), operationDescription.getOperationSupplier())));
         }
     }
 

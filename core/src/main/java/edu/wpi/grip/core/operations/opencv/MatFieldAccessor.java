@@ -12,7 +12,6 @@ public class MatFieldAccessor implements CVOperation {
 
     public static final OperationDescription DESCRIPTION =
              CVOperation.defaultBuilder()
-                    .constructor(MatFieldAccessor::new)
                     .name("Get Mat Info")
                     .description("Provide access to the various elements and properties of an image.")
                     .build();

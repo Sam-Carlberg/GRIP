@@ -16,7 +16,6 @@ public class MinMaxLoc implements CVOperation {
 
     public static final OperationDescription DESCRIPTION =
             CVOperation.defaultBuilder()
-                    .constructor(MinMaxLoc::new)
                     .name("Find Min and Max")
                     .description("Find the global minimum and manimum in a single channel grayscale image.")
                     .build();

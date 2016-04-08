@@ -19,7 +19,6 @@ public class SwitchOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
-                    .constructor(SwitchOperation::new)
                     .name("Switch")
                     .description("Switch between two possible input sockets using a boolean")
                     .category(OperationDescription.Category.LOGICAL)

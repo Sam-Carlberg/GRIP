@@ -24,7 +24,6 @@ public class FindContoursOperation implements Operation {
 
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
-                    .constructor(FindContoursOperation::new)
                     .name("Find Contours")
                     .description("Detects contours in a binary image.")
                     .category(OperationDescription.Category.FEATURE_DETECTION)

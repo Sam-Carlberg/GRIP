@@ -13,21 +13,6 @@ import java.util.Optional;
 public interface Operation {
 
     /**
-     * Factory that creates an {@code Operation} instance from an input socket factory and an output socket factory.
-     *
-     * @param <O> the type of the operation to create
-     */
-    interface Constructor<O extends Operation> {
-        /**
-         * Creates an {@code Operation} instance from an input socket factory and an output socket factory.
-         *
-         * @param isf the input socket factory
-         * @param osf the output socket factory
-         */
-        O create(InputSocket.Factory isf, OutputSocket.Factory osf);
-    }
-
-    /**
      * @return an object describing this {@code Operation}.
      */
     OperationDescription getDescription();
