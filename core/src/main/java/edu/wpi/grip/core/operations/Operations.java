@@ -34,7 +34,9 @@ import edu.wpi.grip.core.operations.network.MapNetworkPublisherFactory;
 import edu.wpi.grip.core.operations.network.NumberPublishable;
 import edu.wpi.grip.core.operations.network.Vector2D;
 import edu.wpi.grip.core.operations.network.networktables.NTPublishAnnotatedOperation;
+import edu.wpi.grip.core.operations.network.ros.JavaToMessageConverter;
 import edu.wpi.grip.core.operations.network.ros.ROSNetworkPublisherFactory;
+import edu.wpi.grip.core.operations.network.ros.ROSPublishOperation;
 import edu.wpi.grip.core.operations.opencv.MatFieldAccessor;
 import edu.wpi.grip.core.operations.opencv.MinMaxLoc;
 import edu.wpi.grip.core.operations.opencv.NewPointOperation;
@@ -104,7 +106,13 @@ public class Operations {
                 new OperationMetaData(NTPublishAnnotatedOperation.descriptionFor(Number.class),
                         () -> new NTPublishAnnotatedOperation<>(isf, Number.class, NumberPublishable.class, NumberPublishable::new, ntPublisherFactory)),
                 new OperationMetaData(NTPublishAnnotatedOperation.descriptionFor(Boolean.class),
-                        () -> new NTPublishAnnotatedOperation<>(isf, Boolean.class, BooleanPublishable.class, BooleanPublishable::new, ntPublisherFactory))
+                        () -> new NTPublishAnnotatedOperation<>(isf, Boolean.class, BooleanPublishable.class, BooleanPublishable::new, ntPublisherFactory)),
+
+                // ROS publishing operations
+                new OperationMetaData(ROSPublishOperation.descriptionFor(Number.class),
+                        () -> new ROSPublishOperation<>(isf, Number.class, rosPublishFactory, JavaToMessageConverter.FLOAT)),
+                new OperationMetaData(ROSPublishOperation.descriptionFor(Boolean.class),
+                        () -> new ROSPublishOperation<>(isf, Boolean.class, rosPublishFactory, JavaToMessageConverter.BOOL))
         );
     }
 
