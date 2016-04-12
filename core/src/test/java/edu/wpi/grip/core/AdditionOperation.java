@@ -1,6 +1,5 @@
 package edu.wpi.grip.core;
 
-import com.google.common.eventbus.EventBus;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
@@ -12,31 +11,40 @@ public class AdditionOperation implements Operation {
             bHint = SocketHints.createNumberSocketHint("b", 0.0),
             cHint = SocketHints.Outputs.createNumberSocketHint("c", 0.0);
 
-    @Override
-    public String getName() {
-        return "Add";
+    private InputSocket<Number> a, b;
+    private OutputSocket<Number> c;
+
+    public AdditionOperation(InputSocket.Factory isf, OutputSocket.Factory osf) {
+        a = isf.create(aHint);
+        b = isf.create(bHint);
+        c = osf.create(cHint);
     }
 
     @Override
-    public String getDescription() {
-        return "Compute the sum of two doubles";
+    public OperationDescription getDescription() {
+        return OperationDescription.builder()
+                .name("Add")
+                .description("Compute the sum of two doubles")
+                .build();
     }
 
     @Override
-    public InputSocket[] createInputSockets(EventBus eventBus) {
-        return new InputSocket[]{new InputSocket<>(eventBus, aHint), new InputSocket<>(eventBus, bHint)};
+    public InputSocket[] createInputSockets() {
+        return new InputSocket[]{a, b};
     }
 
     @Override
-    public OutputSocket[] createOutputSockets(EventBus eventBus) {
-        return new OutputSocket[]{new OutputSocket<>(eventBus, cHint)};
+    public OutputSocket[] createOutputSockets() {
+        return new OutputSocket[]{c};
     }
 
     @Override
-    public void perform(InputSocket[] inputs, OutputSocket[] outputs) {
-        InputSocket<Number> a = inputs[0], b = inputs[1];
-        OutputSocket<Number> c = outputs[0];
-
-        c.setValue(a.getValue().get().doubleValue() + b.getValue().get().doubleValue());
+    public void perform() {
+        System.out.println("Performing addition");
+        double val_a = a.getValue().get().doubleValue();
+        double val_b = b.getValue().get().doubleValue();
+        double val_c = val_a + val_b;
+        System.out.printf("%s + %s = %s%n", val_a, val_b, val_c);
+        c.setValue(val_c);
     }
 }

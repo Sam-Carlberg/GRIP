@@ -2,6 +2,8 @@ package edu.wpi.grip.core;
 
 import java.util.function.Supplier;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Holds metadata for an operation.
  */
@@ -17,8 +19,8 @@ public class OperationMetaData {
      * @param operationSupplier a supplier for the {@code Operation}. This should return a new instance each time it's called.
      */
     public OperationMetaData(OperationDescription description, Supplier<Operation> operationSupplier) {
-        this.description = description;
-        this.operationSupplier = operationSupplier;
+        this.description = checkNotNull(description);
+        this.operationSupplier = checkNotNull(operationSupplier);
     }
 
     /**

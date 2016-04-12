@@ -2,11 +2,16 @@ package edu.wpi.grip.core.operations;
 
 
 import com.google.common.eventbus.EventBus;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import edu.wpi.grip.core.GRIPCoreModule;
 import edu.wpi.grip.core.operations.network.MapNetworkPublisherFactory;
 import edu.wpi.grip.core.operations.network.MockMapNetworkPublisher;
 import edu.wpi.grip.core.operations.network.ros.JavaToMessageConverter;
 import edu.wpi.grip.core.operations.network.ros.ROSMessagePublisher;
 import edu.wpi.grip.core.operations.network.ros.ROSNetworkPublisherFactory;
+import edu.wpi.grip.core.sockets.InputSocket;
+import edu.wpi.grip.core.sockets.OutputSocket;
 
 import java.util.Optional;
 
@@ -34,10 +39,17 @@ public class OperationsFactory {
     }
 
     public static Operations create(EventBus eventBus) {
-        return create(eventBus, MockMapNetworkPublisher::new, MockROSMessagePublisher::new);
+        Injector injector = Guice.createInjector(new GRIPCoreModule());
+        InputSocket.Factory isf = injector.getInstance(InputSocket.Factory.class);
+        OutputSocket.Factory osf = injector.getInstance(OutputSocket.Factory.class);
+        return create(eventBus, MockMapNetworkPublisher::new, MockROSMessagePublisher::new, isf, osf);
     }
 
-    public static Operations create(EventBus eventBus, MapNetworkPublisherFactory mapFactory, ROSNetworkPublisherFactory rosFactory) {
-        return new Operations(eventBus, mapFactory, rosFactory);
+    public static Operations create(EventBus eventBus,
+                                    MapNetworkPublisherFactory mapFactory,
+                                    ROSNetworkPublisherFactory rosFactory,
+                                    InputSocket.Factory isf,
+                                    OutputSocket.Factory osf) {
+        return new Operations(eventBus, mapFactory, rosFactory, isf, osf);
     }
 }

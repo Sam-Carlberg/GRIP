@@ -1,35 +1,31 @@
 package edu.wpi.grip.core;
 
 
-import com.google.common.eventbus.EventBus;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 
-import java.util.Optional;
-
 public class MockOperation implements Operation {
+
     @Override
-    public String getName() {
-        return "Mock Operation";
+    public OperationDescription getDescription() {
+        return OperationDescription.builder()
+                .name("Mock Operation")
+                .description("A mock operation description")
+                .build();
     }
 
     @Override
-    public String getDescription() {
-        return "A mock operation description";
-    }
-
-    @Override
-    public InputSocket<?>[] createInputSockets(EventBus eventBus) {
+    public InputSocket<?>[] createInputSockets() {
         return new InputSocket<?>[0];
     }
 
     @Override
-    public OutputSocket<?>[] createOutputSockets(EventBus eventBus) {
+    public OutputSocket<?>[] createOutputSockets() {
         return new OutputSocket<?>[0];
     }
 
     @Override
-    public void perform(InputSocket<?>[] inputs, OutputSocket<?>[] outputs, Optional<?> data) {
+    public void perform() {
 
     }
 }

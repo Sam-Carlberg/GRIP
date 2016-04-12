@@ -1,6 +1,9 @@
 package edu.wpi.grip.core.sources;
 
 import com.google.common.eventbus.EventBus;
+import com.google.inject.Guice;
+import edu.wpi.grip.core.GRIPCoreModule;
+import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.util.MockExceptionWitness;
 import org.bytedeco.javacv.FrameGrabber;
 
@@ -25,11 +28,11 @@ public class MockCameraSource extends CameraSource {
     }
 
     public MockCameraSource(EventBus eventBus, String address) throws IOException {
-        super(eventBus, new FrameGrabberFactory(), MockExceptionWitness.MOCK_FACTORY, address);
+        super(eventBus, Guice.createInjector(new GRIPCoreModule()).getInstance(OutputSocket.Factory.class), new FrameGrabberFactory(), MockExceptionWitness.MOCK_FACTORY, address);
     }
 
     public MockCameraSource(EventBus eventBus, int deviceNumber) throws IOException {
-        super(eventBus, new FrameGrabberFactory(), MockExceptionWitness.MOCK_FACTORY, deviceNumber);
+        super(eventBus, Guice.createInjector(new GRIPCoreModule()).getInstance(OutputSocket.Factory.class), new FrameGrabberFactory(), MockExceptionWitness.MOCK_FACTORY, deviceNumber);
     }
 
     @Override

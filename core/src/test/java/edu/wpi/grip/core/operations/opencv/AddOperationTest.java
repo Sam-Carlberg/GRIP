@@ -50,8 +50,8 @@ public class AddOperationTest {
     @Test
     public void testAddMatrixOfOnesToMatrixOfTwosEqualsMatrixOfThrees() {
         // Given
-        InputSocket[] inputs = addition.createInputSockets(eventBus);
-        OutputSocket[] outputs = addition.createOutputSockets(eventBus);
+        InputSocket[] inputs = addition.createInputSockets();
+        OutputSocket[] outputs = addition.createOutputSockets();
         InputSocket<Mat> a = inputs[0], b = inputs[1];
         OutputSocket<Mat> c = outputs[0];
 
@@ -63,7 +63,7 @@ public class AddOperationTest {
         //When
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < 1000; i++) {
-            addition.perform(inputs, outputs);
+            addition.perform();
         }
         long endTime = System.currentTimeMillis();
         System.out.println("Run time: " + (endTime - startTime));

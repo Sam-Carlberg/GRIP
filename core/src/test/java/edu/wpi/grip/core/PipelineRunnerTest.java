@@ -91,7 +91,7 @@ public class PipelineRunnerTest {
             final String illegalAugmentExceptionMessage = "Kersplat!";
             class OperationThatThrowsExceptionOnPerform implements SimpleOperation {
                 @Override
-                public void perform(InputSocket<?>[] inputs, OutputSocket<?>[] outputs) {
+                public void perform() {
                     throw new IllegalArgumentException(illegalAugmentExceptionMessage);
                 }
             }
@@ -108,7 +108,7 @@ public class PipelineRunnerTest {
             eventBus.register(exceptionEventReceiver);
             eventBus.register(new RenderWaiterResumer(renderWaiter));
 
-            final Step throwingStep = new Step.Factory(eventBus, MockExceptionWitness.simpleFactory(eventBus)).create(new OperationThatThrowsExceptionOnPerform());
+            final Step throwingStep = new Step.Factory(MockExceptionWitness.simpleFactory(eventBus)).create(new OperationThatThrowsExceptionOnPerform());
             final PipelineRunner runner = new PipelineRunner(eventBus, () -> ImmutableList.of(), () -> ImmutableList.of(throwingStep));
             runner.addListener(failureListener, MoreExecutors.directExecutor());
 
@@ -146,7 +146,7 @@ public class PipelineRunnerTest {
             renderWaiter = new Waiter();
             sourceCounter = new RunSourceCounter();
             operationCounter = new RunCounterOperation();
-            runCounterStep = new Step.Factory(null, MockExceptionWitness.MOCK_FACTORY).create(operationCounter);
+            runCounterStep = new Step.Factory(MockExceptionWitness.MOCK_FACTORY).create(operationCounter);
             failureListener = new FailureListener();
 
         }
@@ -311,34 +311,33 @@ public class PipelineRunnerTest {
         private int cleanUpCount = 0;
 
         @Override
-        public void perform(InputSocket<?>[] inputSockets, OutputSocket<?>[] outputSockets) {
+        public void perform() {
             performCount++;
         }
 
         @Override
-        public void cleanUp(InputSocket<?>[] inputs, OutputSocket<?>[] outputs, Optional<?> data) {
+        public void cleanUp(Optional<?> data) {
             cleanUpCount++;
         }
     }
 
     interface SimpleOperation extends Operation {
+
         @Override
-        default String getName() {
-            return null;
+        default OperationDescription getDescription() {
+            return OperationDescription.builder()
+                    .name("Simple Operation")
+                    .description("A simple operation for testing")
+                    .build();
         }
 
         @Override
-        default String getDescription() {
-            return null;
-        }
-
-        @Override
-        default InputSocket<?>[] createInputSockets(EventBus eventBus) {
+        default InputSocket<?>[] createInputSockets() {
             return new InputSocket<?>[0];
         }
 
         @Override
-        default OutputSocket<?>[] createOutputSockets(EventBus eventBus) {
+        default OutputSocket<?>[] createOutputSockets() {
             return new OutputSocket<?>[0];
         }
     }

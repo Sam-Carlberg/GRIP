@@ -8,13 +8,12 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import edu.wpi.grip.core.sockets.InputSocket;
-import edu.wpi.grip.core.sockets.OutputSocket;
-import edu.wpi.grip.core.sockets.SocketHint;
-import edu.wpi.grip.core.sockets.SocketHints;
 import edu.wpi.grip.core.Source;
 import edu.wpi.grip.core.events.SourceHasPendingUpdateEvent;
 import edu.wpi.grip.core.events.SourceRemovedEvent;
+import edu.wpi.grip.core.sockets.OutputSocket;
+import edu.wpi.grip.core.sockets.SocketHint;
+import edu.wpi.grip.core.sockets.SocketHints;
 import edu.wpi.grip.core.util.ExceptionWitness;
 import edu.wpi.grip.core.util.service.AutoRestartingService;
 import edu.wpi.grip.core.util.service.LoggingListener;
@@ -138,12 +137,11 @@ public class CameraSource extends Source implements RestartableService {
     @AssistedInject
     CameraSource(
             final EventBus eventBus,
-            final InputSocket.Factory inputSocketFactory,
             final OutputSocket.Factory outputSocketFactory,
             final FrameGrabberFactory grabberFactory,
             final ExceptionWitness.Factory exceptionWitnessFactory,
             @Assisted final int deviceNumber) throws IOException {
-        this(eventBus, inputSocketFactory, outputSocketFactory, grabberFactory, exceptionWitnessFactory, createProperties(deviceNumber));
+        this(eventBus, outputSocketFactory, grabberFactory, exceptionWitnessFactory, createProperties(deviceNumber));
     }
 
     /**
@@ -155,12 +153,11 @@ public class CameraSource extends Source implements RestartableService {
     @AssistedInject
     CameraSource(
             final EventBus eventBus,
-            final InputSocket.Factory inputSocketFactory,
             final OutputSocket.Factory outputSocketFactory,
             final FrameGrabberFactory grabberFactory,
             final ExceptionWitness.Factory exceptionWitnessFactory,
             @Assisted final String address) throws IOException {
-        this(eventBus, inputSocketFactory, outputSocketFactory, grabberFactory, exceptionWitnessFactory, createProperties(address));
+        this(eventBus, outputSocketFactory, grabberFactory, exceptionWitnessFactory, createProperties(address));
     }
 
     /**
@@ -169,7 +166,6 @@ public class CameraSource extends Source implements RestartableService {
     @AssistedInject
     CameraSource(
             final EventBus eventBus,
-            final InputSocket.Factory inputSocketFactory,
             final OutputSocket.Factory outputSocketFactory,
             final FrameGrabberFactory grabberFactory,
             final ExceptionWitness.Factory exceptionWitnessFactory,

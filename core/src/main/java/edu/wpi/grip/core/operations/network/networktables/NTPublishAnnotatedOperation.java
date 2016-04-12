@@ -1,7 +1,6 @@
 package edu.wpi.grip.core.operations.network.networktables;
 
 import edu.wpi.grip.core.OperationDescription;
-import edu.wpi.grip.core.operations.network.MapNetworkPublisher;
 import edu.wpi.grip.core.operations.network.MapNetworkPublisherFactory;
 import edu.wpi.grip.core.operations.network.PublishAnnotatedOperation;
 import edu.wpi.grip.core.operations.network.PublishValue;
@@ -9,11 +8,9 @@ import edu.wpi.grip.core.operations.network.Publishable;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.util.Icons;
 
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * An operation that publishes any type that implements {@link Publishable} to NetworkTables.
@@ -32,6 +29,7 @@ public class NTPublishAnnotatedOperation<D, P extends Publishable> extends Publi
      * @param dataType the type of the data to publish
      */
     public static OperationDescription descriptionFor(Class<?> dataType) {
+        checkNotNull(dataType);
         final String name = dataType.getSimpleName();
         return OperationDescription.builder()
                 .name(String.format("NTPublish %s", name))
@@ -42,7 +40,6 @@ public class NTPublishAnnotatedOperation<D, P extends Publishable> extends Publi
                 .build();
     }
 
-    private final MapNetworkPublisher publisher;
     private final OperationDescription description;
 
     /**
@@ -73,11 +70,7 @@ public class NTPublishAnnotatedOperation<D, P extends Publishable> extends Publi
                                        Class<P> publishType,
                                        Function<D, P> converter,
                                        MapNetworkPublisherFactory publisherFactory) {
-        super(inputSocketFactory, dataType, publishType, converter);
-        this.publisher = publisherFactory.create(valueMethodStream()
-                .map(m -> m.getAnnotation(PublishValue.class).key())
-                .filter(k -> !k.isEmpty())
-                .collect(Collectors.toSet()));
+        super(inputSocketFactory, dataType, publishType, converter, publisherFactory);
         super.nameSocket.setValue("my" + dataType.getSimpleName());
         this.description = descriptionFor(dataType);
     }
@@ -87,14 +80,4 @@ public class NTPublishAnnotatedOperation<D, P extends Publishable> extends Publi
         return description;
     }
 
-    @Override
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
-    protected void doPublish() {
-        publisher.setName(nameSocket.getValue().get());
-        D data = dataSocket.getValue().get();
-        Map<String, Object> dataMap = valueMethodStream()
-                .map(m -> Pair.of(m.getAnnotation(PublishValue.class).key(), get(m, converter.apply(data))))
-                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
-        publisher.publish(dataMap);
-    }
 }

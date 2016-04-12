@@ -1,6 +1,7 @@
 package edu.wpi.grip.core;
 
-import com.google.common.eventbus.EventBus;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import edu.wpi.grip.core.sockets.*;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
@@ -15,34 +16,43 @@ public class AddOperation implements Operation {
             bHint = SocketHints.Inputs.createMatSocketHint("b", false),
             sumHint = SocketHints.Inputs.createMatSocketHint("sum", true);
 
-    @Override
-    public String getName() {
-        return "OpenCV Add";
+    private InputSocket<Mat> a, b;
+    private OutputSocket<Mat> sum;
+
+    public AddOperation() {
+        Injector injector = Guice.createInjector(new GRIPCoreModule());
+
+        InputSocket.Factory isf = injector.getInstance(InputSocket.Factory.class);
+        OutputSocket.Factory osf = injector.getInstance(OutputSocket.Factory.class);
+
+        a = isf.create(aHint);
+        b = isf.create(bHint);
+        sum = osf.create(sumHint);
+    }
+
+    public OperationDescription getDescription() {
+        return OperationDescription.builder()
+                .name("OpenCV Add")
+                .description("Compute the per-pixel sum of two images.")
+                .build();
     }
 
     @Override
-    public String getDescription() {
-        return "Compute the per-pixel sum of two images.";
-    }
-
-    @Override
-    public InputSocket[] createInputSockets(EventBus eventBus) {
+    public InputSocket[] createInputSockets() {
         return new InputSocket[]{
-                new InputSocket<Mat>(eventBus, aHint),
-                new InputSocket<Mat>(eventBus, bHint)
+                a, b
         };
     }
 
     @Override
-    public OutputSocket[] createOutputSockets(EventBus eventBus) {
+    public OutputSocket[] createOutputSockets() {
         return new OutputSocket[]{
-                new OutputSocket<Mat>(eventBus, sumHint)
+                sum
         };
     }
 
     @Override
-    public void perform(InputSocket[] inputs, OutputSocket[] outputs) {
-        Socket<Mat> a = inputs[0], b = inputs[1], sum = outputs[0];
+    public void perform() {
         opencv_core.add(a.getValue().get(), b.getValue().get(), sum.getValue().get());
     }
 }

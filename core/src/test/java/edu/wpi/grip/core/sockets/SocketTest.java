@@ -19,7 +19,7 @@ public class SocketTest {
     @Before
     public void initialize() {
         sh = SocketHints.Inputs.createNumberSliderSocketHint("foo", 0.0, 0.0, 1.0);
-        socket = new OutputSocket<Number>(eventBus, sh);
+        socket = new OutputSocketImpl<>(eventBus, sh);
         eventBus.register(socket);
     }
 
@@ -39,7 +39,7 @@ public class SocketTest {
     @Test
     public void testDefaultValue() throws Exception {
         sh = SocketHints.Inputs.createNumberSliderSocketHint("foo", testValue, 0.0, 1.0);
-        socket = new OutputSocket<Number>(eventBus, sh);
+        socket = new OutputSocketImpl<>(eventBus, sh);
         assertEquals(testValue, socket.getValue().get());
 
     }
@@ -67,7 +67,7 @@ public class SocketTest {
     @Test
     public void testSocketPreview() {
         SocketHint<Number> sh = SocketHints.createNumberSocketHint("foo", 0);
-        OutputSocket<Number> socket = new OutputSocket<Number>(eventBus, sh);
+        OutputSocket<Number> socket = new OutputSocketImpl<>(eventBus, sh);
 
         final boolean[] handled = new boolean[]{false};
         Object eventHandler = new Object() {
@@ -88,28 +88,28 @@ public class SocketTest {
 
     @Test(expected = NullPointerException.class)
     public void testSocketHintNotNullInput() throws Exception {
-        new InputSocket<Number>(eventBus, null);
+        new InputSocketImpl<>(eventBus, null);
     }
 
     @Test(expected = NullPointerException.class)
     public void testSocketHintNotNullOutput() throws Exception {
-        new OutputSocket<Number>(eventBus, null);
+        new OutputSocketImpl<>(eventBus, null);
     }
 
     @Test(expected = NullPointerException.class)
     public void testSocketEventBusNotNullInput() throws Exception {
-        new InputSocket<Number>(null, sh);
+        new InputSocketImpl<>(null, sh);
     }
 
     @Test(expected = NullPointerException.class)
     public void testSocketEventBusNotNullOutput() throws Exception {
-        new OutputSocket<Number>(null, sh);
+        new OutputSocketImpl<>(null, sh);
     }
 
     @Test(expected = ClassCastException.class)
     @SuppressWarnings("unchecked")
     public void testSocketValueWrongType() throws Exception {
-        InputSocket socket = new InputSocket(eventBus, sh);
+        InputSocket socket = new InputSocketImpl(eventBus, sh);
 
         socket.setValue("I am not a Double");
     }

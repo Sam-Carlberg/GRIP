@@ -12,6 +12,8 @@ import edu.wpi.grip.core.util.Icons;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Abstract superclass for operations that publish data.
  */
@@ -38,6 +40,8 @@ public abstract class NetworkPublishOperation<D> implements Operation {
     protected final InputSocket<String> nameSocket;
 
     protected NetworkPublishOperation(InputSocket.Factory isf, Class<D> dataType) {
+        checkNotNull(isf);
+        checkNotNull(dataType);
         this.dataType = dataType;
         this.dataSocket = isf.create(dataHint);
         this.nameSocket = isf.create(nameHint);

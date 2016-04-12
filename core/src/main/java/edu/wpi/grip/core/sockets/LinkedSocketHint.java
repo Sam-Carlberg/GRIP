@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * A {@link SocketHint} that's type is linked between many other sockets and who's type is defined by
  * whatever {@link InputSocket} was connected to it first.
@@ -23,8 +25,8 @@ public final class LinkedSocketHint extends SocketHint.SocketHintDecorator {
     @SuppressWarnings("unchecked")
     public LinkedSocketHint(InputSocket.Factory inputSocketFactory, OutputSocket.Factory outputSocketFactory) {
         super(new Builder(Object.class).identifier("").build());
-        this.inputSocketFactory = inputSocketFactory;
-        this.outputSocketFactory = outputSocketFactory;
+        this.inputSocketFactory = checkNotNull(inputSocketFactory);
+        this.outputSocketFactory = checkNotNull(outputSocketFactory);
     }
 
     /**

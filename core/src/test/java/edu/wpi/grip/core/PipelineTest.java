@@ -27,6 +27,8 @@ public class PipelineTest {
     private EventBus eventBus;
     private Pipeline pipeline;
     private Operation addition;
+    private InputSocket.Factory isf;
+    private OutputSocket.Factory osf;
 
     private class MockConnection extends Connection {
 
@@ -47,7 +49,9 @@ public class PipelineTest {
         stepFactory = injector.getInstance(Step.Factory.class);
         eventBus = injector.getInstance(EventBus.class);
         pipeline = injector.getInstance(Pipeline.class);
-        addition = new AdditionOperation();
+        isf = injector.getInstance(InputSocket.Factory.class);
+        osf = injector.getInstance(OutputSocket.Factory.class);
+        addition = new AdditionOperation(isf, osf);
     }
 
     @After
@@ -189,8 +193,8 @@ public class PipelineTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testPipeline() {
-        Step step1 = stepFactory.create(addition);
-        Step step2 = stepFactory.create(addition);
+        Step step1 = stepFactory.create(new AdditionOperation(isf, osf));
+        Step step2 = stepFactory.create(new AdditionOperation(isf, osf));
         InputSocket<Double> a1 = (InputSocket<Double>) step1.getInputSockets()[0];
         InputSocket<Double> b1 = (InputSocket<Double>) step1.getInputSockets()[1];
         OutputSocket<Double> sum1 = (OutputSocket<Double>) step1.getOutputSockets()[0];
@@ -224,8 +228,8 @@ public class PipelineTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testPipelineRemoved() {
-        Step step1 = stepFactory.create(addition);
-        Step step2 = stepFactory.create(addition);
+        Step step1 = stepFactory.create(new AdditionOperation(isf, osf));
+        Step step2 = stepFactory.create(new AdditionOperation(isf, osf));
         InputSocket<Double> a1 = (InputSocket<Double>) step1.getInputSockets()[0];
         InputSocket<Double> b1 = (InputSocket<Double>) step1.getInputSockets()[1];
         OutputSocket<Double> sum1 = (OutputSocket<Double>) step1.getOutputSockets()[0];
@@ -270,8 +274,11 @@ public class PipelineTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testCannotConnectIncompatibleTypes() {
-        InputSocket<Number> a = new InputSocket<>(eventBus, SocketHints.createNumberSocketHint("a", 0.0));
-        OutputSocket<String> b = new OutputSocket<>(eventBus, new SocketHint.Builder<>(String.class).identifier("b").initialValue("").build());
+        Injector injector = Guice.createInjector(new GRIPCoreModule());
+        InputSocket.Factory isf = injector.getInstance(InputSocket.Factory.class);
+        OutputSocket.Factory osf = injector.getInstance(OutputSocket.Factory.class);
+        InputSocket<Number> a = isf.create(SocketHints.createNumberSocketHint("a", 0.0));
+        OutputSocket<String> b = osf.create(new SocketHint.Builder<>(String.class).identifier("b").initialValue("").build());
 
         assertFalse("Should not be able to connect incompatible types", pipeline.canConnect((OutputSocket) b, (InputSocket) a));
     }

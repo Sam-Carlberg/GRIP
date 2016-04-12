@@ -3,6 +3,8 @@ package edu.wpi.grip.core.util;
 import java.io.InputStream;
 import java.util.logging.Logger;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Utility class for fetching icon streams.
  */
@@ -19,10 +21,9 @@ public final class Icons {
      * @return a stream for the given icon, or {@code null} if no image by that name exists
      */
     public static InputStream iconStream(String path, String name, String type) {
-        if (name == null || name.isEmpty()) {
-            logger.info("Icon name was null or empty");
-            return null;
-        }
+        checkNotNull(path);
+        checkNotNull(name);
+        checkNotNull(type);
         return Icons.class.getResourceAsStream(path + name + type);
     }
 

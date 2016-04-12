@@ -1,6 +1,7 @@
 package edu.wpi.grip.core;
 
-import com.google.common.eventbus.EventBus;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
@@ -12,31 +13,43 @@ public class SubtractionOperation implements Operation {
             bHint = SocketHints.createNumberSocketHint("b", 0.0),
             cHint = SocketHints.Outputs.createNumberSocketHint("c", 0.0);
 
-    @Override
-    public String getName() {
-        return "Subtract";
+    private InputSocket<Number> a, b;
+    private OutputSocket<Number> c;
+
+    public SubtractionOperation() {
+        Injector injector = Guice.createInjector(new GRIPCoreModule());
+        InputSocket.Factory isf = injector.getInstance(InputSocket.Factory.class);
+        OutputSocket.Factory osf = injector.getInstance(OutputSocket.Factory.class);
+
+        a = isf.create(aHint);
+        b = isf.create(bHint);
+        c = osf.create(cHint);
     }
 
     @Override
-    public String getDescription() {
-        return "Compute the difference between two doubles";
+    public OperationDescription getDescription() {
+        return OperationDescription.builder()
+                .name("Subtract")
+                .description("Computer the difference between two doubles")
+                .build();
     }
 
     @Override
-    public InputSocket[] createInputSockets(EventBus eventBus) {
-        return new InputSocket[]{new InputSocket<>(eventBus, aHint), new InputSocket<>(eventBus, bHint)};
+    public InputSocket[] createInputSockets() {
+        return new InputSocket[]{
+                a, b
+        };
     }
 
     @Override
-    public OutputSocket[] createOutputSockets(EventBus eventBus) {
-        return new OutputSocket[]{new OutputSocket<>(eventBus, cHint)};
+    public OutputSocket[] createOutputSockets() {
+        return new OutputSocket[]{
+                c
+        };
     }
 
     @Override
-    public void perform(InputSocket[] inputs, OutputSocket[] outputs) {
-        InputSocket<Number> a = inputs[0], b = inputs[1];
-        OutputSocket<Number> c = outputs[0];
-
+    public void perform() {
         c.setValue(a.getValue().get().doubleValue() - b.getValue().get().doubleValue());
     }
 }

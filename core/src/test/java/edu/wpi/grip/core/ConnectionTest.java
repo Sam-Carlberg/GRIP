@@ -1,6 +1,8 @@
 package edu.wpi.grip.core;
 
 import com.google.common.eventbus.EventBus;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import edu.wpi.grip.core.events.ConnectionRemovedEvent;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
@@ -26,15 +28,18 @@ public class ConnectionTest {
 
     @Before
     public void setUp() {
-        eventBus = new EventBus();
+        Injector injector = Guice.createInjector(new GRIPCoreModule());
+        InputSocket.Factory isf = injector.getInstance(InputSocket.Factory.class);
+        OutputSocket.Factory osf = injector.getInstance(OutputSocket.Factory.class);
+        eventBus = injector.getInstance(EventBus.class);
 
         fooHint = SocketHints.createNumberSocketHint("foo", 0.0);
         barHint = SocketHints.createNumberSocketHint("bar", 0.0);
 
 
-        foo = new OutputSocket<>(eventBus, fooHint);
+        foo = osf.create(fooHint);
         eventBus.register(foo);
-        bar = new InputSocket<>(eventBus, barHint);
+        bar = isf.create(barHint);
         eventBus.register(bar);
     }
 

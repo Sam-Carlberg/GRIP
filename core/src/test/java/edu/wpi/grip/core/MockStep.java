@@ -15,6 +15,6 @@ public class MockStep extends Step {
 
     public static Step createMockStepWithOperation() {
         final EventBus eventBus = new EventBus();
-        return new Step.Factory(eventBus, origin -> new MockExceptionWitness(eventBus, origin)).create(new MockOperation());
+        return new Step.Factory(origin -> new MockExceptionWitness(eventBus, origin)).create(new MockOperation());
     }
 }
