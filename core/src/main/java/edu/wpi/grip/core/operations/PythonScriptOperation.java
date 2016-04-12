@@ -171,7 +171,7 @@ public class PythonScriptOperation implements Operation {
      * @return An array of Sockets, based on the global "inputs" list in the Python script
      */
     @Override
-    public InputSocket<?>[] createInputSockets() {
+    public InputSocket<?>[] getInputSockets() {
         return inputSockets.toArray(new InputSocket[0]);
     }
 
@@ -179,7 +179,7 @@ public class PythonScriptOperation implements Operation {
      * @return An array of Sockets, based on the global "outputs" list in the Python script
      */
     @Override
-    public OutputSocket<?>[] createOutputSockets() {
+    public OutputSocket<?>[] getOutputSockets() {
         return outputSockets.toArray(new OutputSocket[0]);
     }
 
@@ -195,8 +195,8 @@ public class PythonScriptOperation implements Operation {
      */
     @Override
     public void perform() {
-        InputSocket[] inputs = createInputSockets();
-        OutputSocket[] outputs = createOutputSockets();
+        InputSocket[] inputs = getInputSockets();
+        OutputSocket[] outputs = getOutputSockets();
         PyObject[] pyInputs = new PyObject[inputs.length];
         for (int i = 0; i < inputs.length; i++) {
             pyInputs[i] = Py.java2py(inputs[i].getValue().get());

@@ -48,7 +48,7 @@ public class MaskOperation implements Operation {
     }
 
     @Override
-    public InputSocket<?>[] createInputSockets() {
+    public InputSocket<?>[] getInputSockets() {
         return new InputSocket<?>[]{
                 inputSocket,
                 maskSocket
@@ -56,7 +56,7 @@ public class MaskOperation implements Operation {
     }
 
     @Override
-    public OutputSocket<?>[] createOutputSockets() {
+    public OutputSocket<?>[] getOutputSockets() {
         return new OutputSocket<?>[]{
                 outputSocket
         };

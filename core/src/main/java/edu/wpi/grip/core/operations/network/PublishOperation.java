@@ -10,7 +10,6 @@ import edu.wpi.grip.core.sockets.SocketHints;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  *
@@ -25,6 +24,8 @@ public abstract class PublishOperation<S, P extends NetworkPublisher> implements
     private final InputSocket<? super S> publishSocket;
     private final InputSocket<String> nameSocket;
 
+    private final P publisher;
+
     protected PublishOperation(InputSocket.Factory inputSocketFactory) {
         this.socketType = new TypeToken<S>(getClass()) {};
         this.publishHint = new SocketHint.Builder<>(socketType.getRawType()).identifier("Value").build();
@@ -32,6 +33,7 @@ public abstract class PublishOperation<S, P extends NetworkPublisher> implements
 
         this.publishSocket = inputSocketFactory.create(publishHint);
         this.nameSocket = inputSocketFactory.create(nameHint);
+        this.publisher = createPublisher();
     }
 
     public final String getName() {
@@ -45,7 +47,7 @@ public abstract class PublishOperation<S, P extends NetworkPublisher> implements
 
 
     @Override
-    public final InputSocket<?>[] createInputSockets() {
+    public final InputSocket<?>[] getInputSockets() {
         final List<InputSocket<?>> customSockets = provideRemainingInputSockets();
         final InputSocket<?>[] sockets = new InputSocket[2 + customSockets.size()];
         int i = 0;
@@ -61,24 +63,13 @@ public abstract class PublishOperation<S, P extends NetworkPublisher> implements
     }
 
     @Override
-    public final OutputSocket<?>[] createOutputSockets() {
+    public final OutputSocket<?>[] getOutputSockets() {
         return new OutputSocket<?>[0];
-    }
-
-    /**
-     * There should be a different instance of {@link NetworkPublisher} for each step.
-     * The NetworkPublisher will be closed by the close function when this step is removed.
-     *
-     * @return The publisher that will be used for this step.
-     */
-    @Override
-    public final Optional<?> createData() {
-        return Optional.of(createPublisher());
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public final void perform(Optional<?> data) {
+    public final void perform() {
         // Get the socket value that should be published
         final S socketValue = (S) socketType.getRawType().cast(publishSocket.getValue().get());
         // Get the subfield
@@ -88,8 +79,6 @@ public abstract class PublishOperation<S, P extends NetworkPublisher> implements
             throw new IllegalArgumentException("Need key to publish to " + getNetworkProtocolName());
         }
 
-        // The publisher that the data will be published with
-        final P publisher = (P) data.get();
         final List<InputSocket<?>> remainingSockets = provideRemainingInputSockets();
         publisher.setName(subField);
         performPublish(socketValue, publisher, remainingSockets);
@@ -104,9 +93,8 @@ public abstract class PublishOperation<S, P extends NetworkPublisher> implements
     protected abstract void performPublish(S socketValue, P publisher, List<InputSocket<?>> restOfInputSockets);
 
     @Override
-    public final void cleanUp(Optional<?> data) {
-        final NetworkPublisher networkPublisher = (NetworkPublisher) data.get();
-        networkPublisher.close();
+    public final void cleanUp() {
+        publisher.close();
     }
 
     /**

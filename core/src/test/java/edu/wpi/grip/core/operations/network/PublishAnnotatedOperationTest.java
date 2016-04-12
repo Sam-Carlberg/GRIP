@@ -150,7 +150,7 @@ public class PublishAnnotatedOperationTest {
     @Test
     public void testNTValueOrder() {
         Operation ntPublishOperation = new TestPublishAnnotatedOperation<>(SimpleReport.class);
-        InputSocket<?>[] sockets = ntPublishOperation.createInputSockets();
+        InputSocket<?>[] sockets = ntPublishOperation.getInputSockets();
 
         assertEquals("Unexpected number of sockets", 4, sockets.length);
         assertEquals("Wrong publish name", "Publish bar", sockets[2].getSocketHint().getIdentifier());
@@ -251,12 +251,11 @@ public class PublishAnnotatedOperationTest {
         };
         final TestPublishAnnotatedOperation<SimpleReport> testPublishAnnotatedOperation = new TestPublishAnnotatedOperation<>(SimpleReport.class, factory);
 
-        final InputSocket[] inputSockets = testPublishAnnotatedOperation.createInputSockets();
+        final InputSocket[] inputSockets = testPublishAnnotatedOperation.getInputSockets();
         inputSockets[0].setValue(new SimpleReport());
         inputSockets[1].setValue(PUBLISHER_NAME);
-        final Optional<?> data = testPublishAnnotatedOperation.createData();
 
-        testPublishAnnotatedOperation.perform(data);
+        testPublishAnnotatedOperation.perform();
 
         assertTrue("publishNameChanged never ran", publishNameChangedRan[0]);
         assertTrue("doPublish never ran", doPublishRan[0]);

@@ -82,7 +82,7 @@ public class NormalizeOperation implements Operation {
     }
 
     @Override
-    public InputSocket<?>[] createInputSockets() {
+    public InputSocket<?>[] getInputSockets() {
         return new InputSocket<?>[]{
                 srcSocket,
                 typeSocket,
@@ -92,7 +92,7 @@ public class NormalizeOperation implements Operation {
     }
 
     @Override
-    public OutputSocket<?>[] createOutputSockets() {
+    public OutputSocket<?>[] getOutputSockets() {
         return new OutputSocket<?>[]{
                 outputSocket
         };

@@ -14,7 +14,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,16 +45,25 @@ public class PublishVideoOperation implements Operation {
 
     private final Object imageLock = new Object();
     private final BytePointer imagePointer = new BytePointer();
-    private Optional<Thread> serverThread = Optional.empty();
     private volatile boolean connected = false;
-    private int numSteps = 0;
+    private Thread serverThread = null;
+    private static int numSteps = 0;
 
     private final InputSocket<Mat> inputSocket;
     private final InputSocket<Number> qualitySocket;
 
     public PublishVideoOperation(InputSocket.Factory inputSocketFactory, OutputSocket.Factory outputSocketFactory) {
+        if (numSteps != 0) {
+            throw new IllegalStateException("Only one instance of PublishVideoOperation may exist");
+        }
         this.inputSocket = inputSocketFactory.create(SocketHints.Inputs.createMatSocketHint("Image", false));
         this.qualitySocket = inputSocketFactory.create(SocketHints.Inputs.createNumberSliderSocketHint("Quality", 80, 0, 100));
+        numSteps = numSteps + 1;
+        if (serverThread == null) {
+            serverThread = new Thread(runServer, "Camera Server");
+            serverThread.setDaemon(true);
+            serverThread.start();
+        }
     }
 
     /**
@@ -121,7 +129,7 @@ public class PublishVideoOperation implements Operation {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt(); // This is really unnecessary since the thread is about to exit
                 logger.info("Shutting down camera server");
-                serverThread = Optional.empty();
+                serverThread = null;
                 return;
             } finally {
                 connected = false;
@@ -135,7 +143,7 @@ public class PublishVideoOperation implements Operation {
     }
 
     @Override
-    public InputSocket<?>[] createInputSockets() {
+    public InputSocket<?>[] getInputSockets() {
         return new InputSocket<?>[]{
                 inputSocket,
                 qualitySocket
@@ -143,19 +151,8 @@ public class PublishVideoOperation implements Operation {
     }
 
     @Override
-    public OutputSocket<?>[] createOutputSockets() {
+    public OutputSocket<?>[] getOutputSockets() {
         return new OutputSocket<?>[0];
-    }
-
-    @Override
-    public synchronized Optional<?> createData() {
-        numSteps++;
-        if (!serverThread.isPresent()) {
-            serverThread = Optional.of(new Thread(runServer, "Camera Server"));
-            serverThread.get().setDaemon(true);
-            serverThread.get().start();
-        }
-        return Optional.empty();
     }
 
     @Override
@@ -178,10 +175,12 @@ public class PublishVideoOperation implements Operation {
     }
 
     @Override
-    public synchronized void cleanUp(Optional<?> data) {
+    public synchronized void cleanUp() {
         // Stop the video server if there are no Publish Video steps left
         if (--numSteps == 0) {
-            serverThread.ifPresent(Thread::interrupt);
+            if (serverThread != null) {
+                serverThread.interrupt();
+            }
         }
     }
 }

@@ -8,8 +8,6 @@ import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.sockets.SocketHints;
 import edu.wpi.grip.core.util.Icons;
 
-import java.util.Optional;
-
 import static org.bytedeco.javacpp.opencv_core.Mat;
 import static org.bytedeco.javacpp.opencv_core.MatVector;
 import static org.bytedeco.javacpp.opencv_imgproc.CV_CHAIN_APPROX_TC89_KCOS;
@@ -58,7 +56,7 @@ public class FindContoursOperation implements Operation {
     }
 
     @Override
-    public InputSocket<?>[] createInputSockets() {
+    public InputSocket<?>[] getInputSockets() {
         return new InputSocket<?>[]{
                 inputSocket,
                 externalSocket
@@ -66,21 +64,16 @@ public class FindContoursOperation implements Operation {
     }
 
     @Override
-    public OutputSocket<?>[] createOutputSockets() {
+    public OutputSocket<?>[] getOutputSockets() {
         return new OutputSocket<?>[]{
                 contoursSocket
         };
     }
 
     @Override
-    public Optional<?> createData() {
-        return Optional.of(new Mat());
-    }
-
-    @Override
-    public void perform(Optional<?> data) {
+    public void perform() {
         final Mat input = inputSocket.getValue().get();
-        final Mat tmp = (Mat) data.get();
+        final Mat tmp = new Mat();
         final boolean externalOnly = externalSocket.getValue().get();
 
         if (input.empty()) {

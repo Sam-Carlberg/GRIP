@@ -5,12 +5,10 @@ import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.util.MockExceptionWitness;
 
-import java.util.Optional;
-
 public class MockStep extends Step {
 
     public MockStep() {
-        super(null, new InputSocket[0], new OutputSocket[0], Optional.empty(), origin -> null);
+        super(null, new InputSocket[0], new OutputSocket[0], origin -> null);
     }
 
     public static Step createMockStepWithOperation() {

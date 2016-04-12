@@ -4,14 +4,9 @@ import edu.wpi.grip.core.Operation;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Scalar;
 
-import java.util.Optional;
-
 public abstract class ThresholdOperation<O extends ThresholdOperation<O>> implements Operation {
 
-    @Override
-    public Optional<Mat[]> createData() {
-        return Optional.of(new Mat[]{new Mat(), new Mat(), new Mat()});
-    }
+    protected Mat[] dataArray = {new Mat(), new Mat(), new Mat()};
 
     /**
      * @param dataArray The array with the element that should be re-allocated

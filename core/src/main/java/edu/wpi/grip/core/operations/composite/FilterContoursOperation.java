@@ -108,7 +108,7 @@ public class FilterContoursOperation implements Operation {
     }
 
     @Override
-    public InputSocket<?>[] createInputSockets() {
+    public InputSocket<?>[] getInputSockets() {
         return new InputSocket<?>[]{
                 contoursSocket,
                 minAreaSocket,
@@ -126,7 +126,7 @@ public class FilterContoursOperation implements Operation {
     }
 
     @Override
-    public OutputSocket<?>[] createOutputSockets() {
+    public OutputSocket<?>[] getOutputSockets() {
         return new OutputSocket<?>[]{
                 outputSocket
         };

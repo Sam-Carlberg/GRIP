@@ -29,7 +29,6 @@ public class Step {
     private final Operation operation;
     private final InputSocket<?>[] inputSockets;
     private final OutputSocket<?>[] outputSockets;
-    private final Optional<?> data;
     private final Object removedLock = new Object();
     private boolean removed = false;
 
@@ -53,7 +52,6 @@ public class Step {
                     operation,
                     inputSockets,
                     outputSockets,
-                    operation.createData(),
                     exceptionWitnessFactory
             );
 
@@ -72,18 +70,15 @@ public class Step {
      * @param operation               The operation that is performed at this step.
      * @param inputSockets            The input sockets from the operation.
      * @param outputSockets           The output sockets provided by the operation.
-     * @param data                    The data provided by the operation.
      * @param exceptionWitnessFactory A factory used to create an {@link ExceptionWitness}
      */
     Step(Operation operation,
          InputSocket<?>[] inputSockets,
          OutputSocket<?>[] outputSockets,
-         Optional<?> data,
          ExceptionWitness.Factory exceptionWitnessFactory) {
         this.operation = operation;
         this.inputSockets = inputSockets;
         this.outputSockets = outputSockets;
-        this.data = data;
         this.witness = exceptionWitnessFactory.create(this);
     }
 
@@ -138,7 +133,7 @@ public class Step {
             // while that is happening.
             synchronized (removedLock) {
                 if (!removed) {
-                    this.operation.perform(data);
+                    this.operation.perform();
                 }
             }
         } catch (RuntimeException e) {
@@ -158,7 +153,7 @@ public class Step {
         // if we don't wait then the perform method could end up being run concurrently with the perform methods execution
         synchronized (removedLock) {
             removed = true;
-            operation.cleanUp(data);
+            operation.cleanUp();
         }
     }
 

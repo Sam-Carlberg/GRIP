@@ -41,7 +41,7 @@ public class NewSizeOperation implements CVOperation {
     }
 
     @Override
-    public InputSocket<?>[] createInputSockets() {
+    public InputSocket<?>[] getInputSockets() {
         return new InputSocket[]{
                 widthSocket,
                 heightSocket
@@ -49,7 +49,7 @@ public class NewSizeOperation implements CVOperation {
     }
 
     @Override
-    public OutputSocket<?>[] createOutputSockets() {
+    public OutputSocket<?>[] getOutputSockets() {
         return new OutputSocket[]{
                 outputSocket
         };

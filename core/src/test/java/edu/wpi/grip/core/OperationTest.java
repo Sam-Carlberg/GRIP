@@ -33,8 +33,8 @@ public class OperationTest {
 
     @Test
     public void testOperation() throws Exception {
-        InputSocket[] inputs = addition.createInputSockets();
-        OutputSocket[] outputs = addition.createOutputSockets();
+        InputSocket[] inputs = addition.getInputSockets();
+        OutputSocket[] outputs = addition.getOutputSockets();
         InputSocket<Double> a = inputs[0], b = inputs[1];
         OutputSocket c = outputs[0];
 

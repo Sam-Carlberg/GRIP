@@ -1,7 +1,7 @@
 package edu.wpi.grip.core.operations.composite;
 
-import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.Operation;
+import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
@@ -11,7 +11,6 @@ import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Scalar;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -62,7 +61,7 @@ public class HSVThresholdOperation extends ThresholdOperation {
     }
 
     @Override
-    public InputSocket<?>[] createInputSockets() {
+    public InputSocket<?>[] getInputSockets() {
         return new InputSocket<?>[]{
                 inputSocket,
                 hueSocket,
@@ -72,7 +71,7 @@ public class HSVThresholdOperation extends ThresholdOperation {
     }
 
     @Override
-    public OutputSocket<?>[] createOutputSockets() {
+    public OutputSocket<?>[] getOutputSockets() {
         return new OutputSocket<?>[]{
                 outputSocket
         };
@@ -80,9 +79,7 @@ public class HSVThresholdOperation extends ThresholdOperation {
 
 
     @Override
-    public void perform(Optional<?> data) {
-        final Mat[] dataArray = (Mat[]) data.orElseThrow(() -> new IllegalStateException("Data was not provided"));
-
+    public void perform() {
         final Mat input = inputSocket.getValue().get();
         final List<Number> channel1 = hueSocket.getValue().get();
         final List<Number> channel2 = saturationSocket.getValue().get();

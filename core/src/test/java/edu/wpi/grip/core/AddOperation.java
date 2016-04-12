@@ -38,14 +38,14 @@ public class AddOperation implements Operation {
     }
 
     @Override
-    public InputSocket[] createInputSockets() {
+    public InputSocket[] getInputSockets() {
         return new InputSocket[]{
                 a, b
         };
     }
 
     @Override
-    public OutputSocket[] createOutputSockets() {
+    public OutputSocket[] getOutputSockets() {
         return new OutputSocket[]{
                 sum
         };

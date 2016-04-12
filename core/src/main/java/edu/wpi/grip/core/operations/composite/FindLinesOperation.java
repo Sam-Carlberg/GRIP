@@ -11,7 +11,6 @@ import org.bytedeco.javacpp.indexer.FloatIndexer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.bytedeco.javacpp.opencv_core.Mat;
 import static org.bytedeco.javacpp.opencv_imgproc.COLOR_BGR2GRAY;
@@ -51,27 +50,22 @@ public class FindLinesOperation implements Operation {
     }
 
     @Override
-    public InputSocket<?>[] createInputSockets() {
+    public InputSocket<?>[] getInputSockets() {
         return new InputSocket<?>[]{
                 inputSocket
         };
     }
 
     @Override
-    public OutputSocket<?>[] createOutputSockets() {
+    public OutputSocket<?>[] getOutputSockets() {
         return new OutputSocket<?>[]{
                 linesReportSocket
         };
     }
 
     @Override
-    public Optional<Mat> createData() {
-        return Optional.of(new Mat());
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
-    public void perform(Optional<?> data) {
+    public void perform() {
         final Mat input = inputSocket.getValue().get();
         final LineSegmentDetector lsd = linesReportSocket.getValue().get().getLineSegmentDetector();
 
@@ -81,7 +75,7 @@ public class FindLinesOperation implements Operation {
         } else {
             // The line detector works on a single channel.  If the input is a color image, we can just give the line
             // detector a grayscale version of it
-            final Mat tmp = (Mat) data.get();
+            final Mat tmp = new Mat();
             cvtColor(input, tmp, COLOR_BGR2GRAY);
             lsd.detect(tmp, lines);
         }

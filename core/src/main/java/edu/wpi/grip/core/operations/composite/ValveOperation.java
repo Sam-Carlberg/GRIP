@@ -57,12 +57,12 @@ public class ValveOperation implements Operation {
     }
 
     @Override
-    public InputSocket<?>[] createInputSockets() {
+    public InputSocket<?>[] getInputSockets() {
         throw new UnsupportedOperationException("This method should not be used");
     }
 
     @Override
-    public OutputSocket<?>[] createOutputSockets() {
+    public OutputSocket<?>[] getOutputSockets() {
         throw new UnsupportedOperationException("This method should not be used");
     }
 

@@ -43,7 +43,7 @@ public class NewPointOperation implements CVOperation {
     }
 
     @Override
-    public InputSocket<?>[] createInputSockets() {
+    public InputSocket<?>[] getInputSockets() {
         return new InputSocket[]{
                 xSocket,
                 ySocket
@@ -51,7 +51,7 @@ public class NewPointOperation implements CVOperation {
     }
 
     @Override
-    public OutputSocket<?>[] createOutputSockets() {
+    public OutputSocket<?>[] getOutputSockets() {
         return new OutputSocket[]{
                 outputSocket
         };

@@ -9,11 +9,12 @@ import edu.wpi.grip.core.sockets.SocketHints;
 import edu.wpi.grip.core.util.Icons;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.bytedeco.javacpp.opencv_core.*;
+import static org.bytedeco.javacpp.opencv_core.Mat;
+import static org.bytedeco.javacpp.opencv_core.Scalar;
+import static org.bytedeco.javacpp.opencv_core.inRange;
 
 /**
  * An {@link Operation} that converts a color image into a binary image based on threshold ranges for each channel
@@ -59,7 +60,7 @@ public class RGBThresholdOperation extends ThresholdOperation {
     }
 
     @Override
-    public InputSocket<?>[] createInputSockets() {
+    public InputSocket<?>[] getInputSockets() {
         return new InputSocket<?>[]{
                 inputSocket,
                 redSocket,
@@ -69,21 +70,14 @@ public class RGBThresholdOperation extends ThresholdOperation {
     }
 
     @Override
-    public OutputSocket<?>[] createOutputSockets() {
+    public OutputSocket<?>[] getOutputSockets() {
         return new OutputSocket<?>[]{
                 outputSocket
         };
     }
 
     @Override
-    public Optional<Mat[]> createData() {
-        return Optional.of(new Mat[]{new Mat(), new Mat()});
-    }
-
-    @Override
-    public void perform(Optional<?> data) {
-        final Mat[] dataArray = (Mat[]) data.orElseThrow(() -> new IllegalStateException("Data was not provided"));
-
+    public void perform() {
         final Mat input = inputSocket.getValue().get();
         final List<Number> channel1 = redSocket.getValue().get();
         final List<Number> channel2 = greenSocket.getValue().get();

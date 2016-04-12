@@ -48,7 +48,7 @@ public abstract class NetworkPublishOperation<D> implements Operation {
     }
 
     @Override
-    public InputSocket<?>[] createInputSockets() {
+    public InputSocket<?>[] getInputSockets() {
         List<InputSocket<?>> sockets = new ArrayList<>();
         sockets.add(dataSocket);
         sockets.add(nameSocket);
@@ -62,7 +62,7 @@ public abstract class NetworkPublishOperation<D> implements Operation {
     protected abstract List<InputSocket<Boolean>> createFlagSockets();
 
     @Override
-    public OutputSocket<?>[] createOutputSockets() {
+    public OutputSocket<?>[] getOutputSockets() {
         return new OutputSocket[0];
     }
 
