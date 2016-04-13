@@ -5,31 +5,9 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-
 import edu.wpi.grip.core.OperationMetaData;
 import edu.wpi.grip.core.events.OperationAddedEvent;
-import edu.wpi.grip.core.operations.composite.BlobsReport;
-import edu.wpi.grip.core.operations.composite.BlurOperation;
-import edu.wpi.grip.core.operations.composite.ContoursReport;
-import edu.wpi.grip.core.operations.composite.ConvexHullsOperation;
-import edu.wpi.grip.core.operations.composite.DesaturateOperation;
-import edu.wpi.grip.core.operations.composite.DistanceTransformOperation;
-import edu.wpi.grip.core.operations.composite.FilterContoursOperation;
-import edu.wpi.grip.core.operations.composite.FilterLinesOperation;
-import edu.wpi.grip.core.operations.composite.FindBlobsOperation;
-import edu.wpi.grip.core.operations.composite.FindContoursOperation;
-import edu.wpi.grip.core.operations.composite.FindLinesOperation;
-import edu.wpi.grip.core.operations.composite.HSLThresholdOperation;
-import edu.wpi.grip.core.operations.composite.HSVThresholdOperation;
-import edu.wpi.grip.core.operations.composite.LinesReport;
-import edu.wpi.grip.core.operations.composite.MaskOperation;
-import edu.wpi.grip.core.operations.composite.NormalizeOperation;
-import edu.wpi.grip.core.operations.composite.PublishVideoOperation;
-import edu.wpi.grip.core.operations.composite.RGBThresholdOperation;
-import edu.wpi.grip.core.operations.composite.ResizeOperation;
-import edu.wpi.grip.core.operations.composite.SwitchOperation;
-import edu.wpi.grip.core.operations.composite.ValveOperation;
-import edu.wpi.grip.core.operations.composite.WatershedOperation;
+import edu.wpi.grip.core.operations.composite.*;
 import edu.wpi.grip.core.operations.network.BooleanPublishable;
 import edu.wpi.grip.core.operations.network.MapNetworkPublisherFactory;
 import edu.wpi.grip.core.operations.network.NumberPublishable;
@@ -44,7 +22,6 @@ import edu.wpi.grip.core.operations.opencv.NewPointOperation;
 import edu.wpi.grip.core.operations.opencv.NewSizeOperation;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
-
 import org.bytedeco.javacpp.opencv_core.Point;
 import org.bytedeco.javacpp.opencv_core.Size;
 
@@ -93,6 +70,9 @@ public class Operations {
                 new OperationMetaData(MinMaxLoc.DESCRIPTION, () -> new MinMaxLoc(isf, osf)),
                 new OperationMetaData(NewPointOperation.DESCRIPTION, () -> new NewPointOperation(isf, osf)),
                 new OperationMetaData(NewSizeOperation.DESCRIPTION, () -> new NewSizeOperation(isf, osf)),
+
+                // Raw OpenCV operations
+
 
                 // NetworkTables publishing operations
                 new OperationMetaData(NTPublishAnnotatedOperation.descriptionFor(ContoursReport.class),

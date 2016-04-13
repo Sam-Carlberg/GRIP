@@ -9,7 +9,6 @@ import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.Palette;
 import edu.wpi.grip.core.Step;
 import edu.wpi.grip.core.operations.OperationsFactory;
-import edu.wpi.grip.generated.CVOperations;
 import edu.wpi.grip.ui.GRIPUIModule;
 import edu.wpi.grip.util.GRIPCoreTestModule;
 import javafx.scene.Scene;

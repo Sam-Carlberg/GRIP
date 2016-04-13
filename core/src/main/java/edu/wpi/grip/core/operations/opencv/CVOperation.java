@@ -11,4 +11,8 @@ public interface CVOperation extends Operation {
                 .category(OperationDescription.Category.OPENCV)
                 .icon(Icons.iconStream("opencv"));
     }
+
+    static OperationDescription defaults(String name, String description) {
+        return defaultBuilder().name(name).description(description).build();
+    }
 }
