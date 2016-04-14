@@ -1,6 +1,7 @@
 package edu.wpi.grip.core.operations.composite;
 
 
+import com.google.common.collect.ImmutableList;
 import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
@@ -8,8 +9,8 @@ import edu.wpi.grip.core.sockets.LinkedSocketHint;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.sockets.SocketHints;
-import edu.wpi.grip.core.sockets.SocketsProvider;
 
+import java.util.List;
 import java.util.Optional;
 
 public class ValveOperation implements Operation {
@@ -45,29 +46,16 @@ public class ValveOperation implements Operation {
     }
 
     @Override
-    public SocketsProvider getSockets() {
-        final InputSocket<?>[] inputs = new InputSocket[]{
-                switcherSocket,
-                inputSocket
-        };
-        final OutputSocket<?>[] outputs = new OutputSocket[]{
-                outputSocket
-        };
-        return new SocketsProvider(inputs, outputs);
+    public List<InputSocket> getInputSockets() {
+        return ImmutableList.of(switcherSocket, inputSocket);
     }
 
     @Override
-    public InputSocket<?>[] getInputSockets() {
-        throw new UnsupportedOperationException("This method should not be used");
+    public List<OutputSocket> getOutputSockets() {
+        return ImmutableList.of(outputSocket);
     }
 
     @Override
-    public OutputSocket<?>[] getOutputSockets() {
-        throw new UnsupportedOperationException("This method should not be used");
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
     public void perform() {
         // If the input is true pass the value through
         if (switcherSocket.getValue().get()) {

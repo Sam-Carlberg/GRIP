@@ -1,6 +1,7 @@
 package edu.wpi.grip.core.operations.composite;
 
 
+import com.google.common.collect.ImmutableList;
 import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
@@ -9,7 +10,8 @@ import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.Socket;
 import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.sockets.SocketHints;
-import edu.wpi.grip.core.sockets.SocketsProvider;
+
+import java.util.List;
 
 /**
  * Allows for switching between two arbitrary typed {@link Socket} using a
@@ -49,32 +51,19 @@ public class SwitchOperation implements Operation {
     }
 
     @Override
-    public SocketsProvider getSockets() {
-        final InputSocket<?>[] inputs = new InputSocket[]{
+    public List<InputSocket> getInputSockets() {
+        return ImmutableList.of(
                 switcherSocket,
                 inputSocket1,
                 inputSocket2
-        };
-        final OutputSocket<?>[] outputs = new OutputSocket[]{
-                outputSocket
-        };
-        return new SocketsProvider(inputs, outputs);
+        );
     }
 
     @Override
-    public InputSocket<?>[] getInputSockets() {
-        return new InputSocket[]{
-                switcherSocket,
-                inputSocket1,
-                inputSocket2
-        };
-    }
-
-    @Override
-    public OutputSocket<?>[] getOutputSockets() {
-        return new OutputSocket[]{
+    public List<OutputSocket> getOutputSockets() {
+        return ImmutableList.of(
                 outputSocket
-        };
+        );
     }
 
     @Override

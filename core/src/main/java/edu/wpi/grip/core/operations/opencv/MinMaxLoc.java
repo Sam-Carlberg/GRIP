@@ -1,5 +1,6 @@
 package edu.wpi.grip.core.operations.opencv;
 
+import com.google.common.collect.ImmutableList;
 import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
@@ -8,6 +9,8 @@ import edu.wpi.grip.core.sockets.SocketHints;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Point;
+
+import java.util.List;
 
 /**
  * Operation to call {@link opencv_core#minMaxLoc}
@@ -56,21 +59,21 @@ public class MinMaxLoc implements CVOperation {
     }
 
     @Override
-    public InputSocket<?>[] getInputSockets() {
-        return new InputSocket[]{
+    public List<InputSocket> getInputSockets() {
+        return ImmutableList.of(
                 srcSocket,
                 maskSocket
-        };
+        );
     }
 
     @Override
-    public OutputSocket<?>[] getOutputSockets() {
-        return new OutputSocket[]{
+    public List<OutputSocket> getOutputSockets() {
+        return ImmutableList.of(
                 minValSocket,
                 maxValSocket,
                 minLocSocket,
                 maxLocSocket
-        };
+        );
     }
 
     @Override

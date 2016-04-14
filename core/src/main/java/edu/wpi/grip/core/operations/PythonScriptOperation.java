@@ -1,11 +1,13 @@
 package edu.wpi.grip.core.operations;
 
+import com.google.common.collect.ImmutableList;
 import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.util.Icons;
+import jnr.ffi.annotations.Out;
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyFunction;
@@ -84,8 +86,8 @@ public class PythonScriptOperation implements Operation {
 
     private List<SocketHint<PyObject>> inputSocketHints;
     private List<SocketHint<PyObject>> outputSocketHints;
-    private List<InputSocket<?>> inputSockets;
-    private List<OutputSocket<?>> outputSockets;
+    private List<InputSocket> inputSockets; // intentionally using raw types
+    private List<OutputSocket> outputSockets; // intentionally using raw types
     private PyFunction performFunction;
     private PyString name;
     private PyString description;
@@ -171,16 +173,16 @@ public class PythonScriptOperation implements Operation {
      * @return An array of Sockets, based on the global "inputs" list in the Python script
      */
     @Override
-    public InputSocket<?>[] getInputSockets() {
-        return inputSockets.toArray(new InputSocket[0]);
+    public List<InputSocket> getInputSockets() {
+        return ImmutableList.copyOf(inputSockets);
     }
 
     /**
      * @return An array of Sockets, based on the global "outputs" list in the Python script
      */
     @Override
-    public OutputSocket<?>[] getOutputSockets() {
-        return outputSockets.toArray(new OutputSocket[0]);
+    public List<OutputSocket> getOutputSockets() {
+        return ImmutableList.copyOf(outputSockets);
     }
 
     /**
@@ -195,11 +197,9 @@ public class PythonScriptOperation implements Operation {
      */
     @Override
     public void perform() {
-        InputSocket[] inputs = getInputSockets();
-        OutputSocket[] outputs = getOutputSockets();
-        PyObject[] pyInputs = new PyObject[inputs.length];
-        for (int i = 0; i < inputs.length; i++) {
-            pyInputs[i] = Py.java2py(inputs[i].getValue().get());
+        PyObject[] pyInputs = new PyObject[inputSockets.size()];
+        for (int i = 0; i < inputSockets.size(); i++) {
+            pyInputs[i] = Py.java2py(inputSockets.get(i).getValue().get());
         }
 
         try {
@@ -211,21 +211,21 @@ public class PythonScriptOperation implements Operation {
                 PySequence pySequence = (PySequence) pyOutput;
                 Object[] javaOutputs = Py.tojava(pySequence, Object[].class);
 
-                if (outputs.length != javaOutputs.length) {
-                    throw new RuntimeException(wrongNumberOfArgumentsMsg(outputs.length, javaOutputs.length));
+                if (outputSockets.size() != javaOutputs.length) {
+                    throw new RuntimeException(wrongNumberOfArgumentsMsg(outputSockets.size(), javaOutputs.length));
                 }
 
                 for (int i = 0; i < javaOutputs.length; i++) {
-                    outputs[i].setValue(javaOutputs[i]);
+                    outputSockets.get(i).setValue(javaOutputs[i]);
                 }
             } else {
                 /* If the Python script did not return a sequence, there should only be one output socket. */
-                if (outputs.length != 1) {
-                    throw new RuntimeException(wrongNumberOfArgumentsMsg(outputs.length, 1));
+                if (outputSockets.size() != 1) {
+                    throw new RuntimeException(wrongNumberOfArgumentsMsg(outputSockets.size(), 1));
                 }
 
-                Object javaOutput = Py.tojava(pyOutput, outputs[0].getSocketHint().getType());
-                outputs[0].setValue(javaOutput);
+                Object javaOutput = Py.tojava(pyOutput, outputSockets.get(0).getSocketHint().getType());
+                outputSockets.get(0).setValue(javaOutput);
             }
         } catch (Exception e) {
             /* Exceptions can happen if there's a mistake in a Python script, so just print a stack trace and leave the

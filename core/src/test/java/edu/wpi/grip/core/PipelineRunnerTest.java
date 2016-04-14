@@ -20,6 +20,7 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -331,13 +332,13 @@ public class PipelineRunnerTest {
         }
 
         @Override
-        default InputSocket<?>[] getInputSockets() {
-            return new InputSocket<?>[0];
+        default List<InputSocket> getInputSockets() {
+            return ImmutableList.of();
         }
 
         @Override
-        default OutputSocket<?>[] getOutputSockets() {
-            return new OutputSocket<?>[0];
+        default List<OutputSocket> getOutputSockets() {
+            return ImmutableList.of();
         }
     }
 

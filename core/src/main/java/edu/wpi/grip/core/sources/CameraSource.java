@@ -2,6 +2,7 @@ package edu.wpi.grip.core.sources;
 
 
 import com.google.common.base.StandardSystemProperty;
+import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -26,6 +27,7 @@ import org.bytedeco.javacv.VideoInputFrameGrabber;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.Executor;
@@ -240,8 +242,8 @@ public class CameraSource extends Source implements RestartableService {
     }
 
     @Override
-    public OutputSocket[] createOutputSockets() {
-        return new OutputSocket[]{frameOutputSocket, frameRateOutputSocket};
+    public List<OutputSocket> createOutputSockets() {
+        return ImmutableList.of(frameOutputSocket, frameRateOutputSocket);
     }
 
     @Override

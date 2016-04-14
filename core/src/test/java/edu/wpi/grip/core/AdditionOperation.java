@@ -1,9 +1,12 @@
 package edu.wpi.grip.core;
 
+import com.google.common.collect.ImmutableList;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.sockets.SocketHints;
+
+import java.util.List;
 
 public class AdditionOperation implements Operation {
     private SocketHint<Number>
@@ -29,13 +32,13 @@ public class AdditionOperation implements Operation {
     }
 
     @Override
-    public InputSocket[] getInputSockets() {
-        return new InputSocket[]{a, b};
+    public List<InputSocket> getInputSockets() {
+        return ImmutableList.of(a, b);
     }
 
     @Override
-    public OutputSocket[] getOutputSockets() {
-        return new OutputSocket[]{c};
+    public List<OutputSocket> getOutputSockets() {
+        return ImmutableList.of(c);
     }
 
     @Override

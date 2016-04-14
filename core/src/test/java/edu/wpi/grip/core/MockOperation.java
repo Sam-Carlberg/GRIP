@@ -1,8 +1,11 @@
 package edu.wpi.grip.core;
 
 
+import com.google.common.collect.ImmutableList;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
+
+import java.util.List;
 
 public class MockOperation implements Operation {
 
@@ -15,13 +18,13 @@ public class MockOperation implements Operation {
     }
 
     @Override
-    public InputSocket<?>[] getInputSockets() {
-        return new InputSocket<?>[0];
+    public List<InputSocket> getInputSockets() {
+        return ImmutableList.of();
     }
 
     @Override
-    public OutputSocket<?>[] getOutputSockets() {
-        return new OutputSocket<?>[0];
+    public List<OutputSocket> getOutputSockets() {
+        return ImmutableList.of();
     }
 
     @Override

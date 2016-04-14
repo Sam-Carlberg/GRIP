@@ -37,9 +37,9 @@ public class PythonTest {
     public void testPython() throws Exception {
         Operation addition = new PythonScriptOperation(isf, osf, PythonTest.class.getResource("/edu/wpi/grip/scripts/addition.py"));
         Step step = new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(addition);
-        Socket aSocket = step.getInputSockets()[0];
-        Socket bSocket = step.getInputSockets()[1];
-        Socket sumSocket = step.getOutputSockets()[0];
+        Socket aSocket = step.getInputSockets().get(0);
+        Socket bSocket = step.getInputSockets().get(1);
+        Socket sumSocket = step.getOutputSockets().get(0);
 
         aSocket.setValue(a);
         bSocket.setValue(b);
@@ -56,9 +56,9 @@ public class PythonTest {
                 "\"b\", 0.0),\n]\n\noutputs = [\n    grip.SocketHints.Outputs.createNumberSocketHint(\"sum\", 0.0)," +
                 "\n]\n\ndef perform(a, b):\n    return a + b\n");
         Step step = new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(additionFromString);
-        Socket aSocket = step.getInputSockets()[0];
-        Socket bSocket = step.getInputSockets()[1];
-        Socket sumSocket = step.getOutputSockets()[0];
+        Socket aSocket = step.getInputSockets().get(0);
+        Socket bSocket = step.getInputSockets().get(1);
+        Socket sumSocket = step.getOutputSockets().get(0);
 
         aSocket.setValue(a);
         bSocket.setValue(b);
@@ -72,10 +72,10 @@ public class PythonTest {
     public void testPythonMultipleOutputs() throws Exception {
         Operation additionSubtraction = new PythonScriptOperation(isf, osf, PythonTest.class.getResource("/edu/wpi/grip/scripts/addition-subtraction.py"));
         Step step = new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(additionSubtraction);
-        Socket aSocket = step.getInputSockets()[0];
-        Socket bSocket = step.getInputSockets()[1];
-        Socket sumSocket = step.getOutputSockets()[0];
-        Socket differenceSocket = step.getOutputSockets()[1];
+        Socket aSocket = step.getInputSockets().get(0);
+        Socket bSocket = step.getInputSockets().get(1);
+        Socket sumSocket = step.getOutputSockets().get(0);
+        Socket differenceSocket = step.getOutputSockets().get(1);
 
         aSocket.setValue(a);
         bSocket.setValue(b);
@@ -90,9 +90,9 @@ public class PythonTest {
     public void testPythonWrongOutputCount() throws Exception {
         Operation additionWrongOutputCount = new PythonScriptOperation(isf, osf, PythonTest.class.getResource("/edu/wpi/grip/scripts/addition-wrong-output-count.py"));
         Step step = new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(additionWrongOutputCount);
-        Socket aSocket = step.getInputSockets()[0];
-        Socket bSocket = step.getInputSockets()[1];
-        Socket sumSocket = step.getOutputSockets()[0];
+        Socket aSocket = step.getInputSockets().get(0);
+        Socket bSocket = step.getInputSockets().get(1);
+        Socket sumSocket = step.getOutputSockets().get(0);
 
         aSocket.setValue(a);
         bSocket.setValue(b);
@@ -104,9 +104,9 @@ public class PythonTest {
     public void testPythonWrongOutputType() throws Exception {
         Operation additionWrongOutputType = new PythonScriptOperation(isf, osf, PythonTest.class.getResource("/edu/wpi/grip/scripts/addition-wrong-output-type.py"));
         Step step = new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(additionWrongOutputType);
-        Socket aSocket = step.getInputSockets()[0];
-        Socket bSocket = step.getInputSockets()[1];
-        Socket sumSocket = step.getOutputSockets()[0];
+        Socket aSocket = step.getInputSockets().get(0);
+        Socket bSocket = step.getInputSockets().get(1);
+        Socket sumSocket = step.getOutputSockets().get(0);
 
         aSocket.setValue(a);
         bSocket.setValue(b);

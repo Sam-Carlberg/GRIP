@@ -11,12 +11,14 @@ import org.bytedeco.javacpp.opencv_core.Scalar;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.junit.Assert.assertTrue;
 
 public class AddOperationTest {
 
     EventBus eventBus;
-    Operation addition;
+    AddOperation addition;
 
     @Before
     public void setUp() throws Exception {
@@ -50,10 +52,10 @@ public class AddOperationTest {
     @Test
     public void testAddMatrixOfOnesToMatrixOfTwosEqualsMatrixOfThrees() {
         // Given
-        InputSocket[] inputs = addition.getInputSockets();
-        OutputSocket[] outputs = addition.getOutputSockets();
-        InputSocket<Mat> a = inputs[0], b = inputs[1];
-        OutputSocket<Mat> c = outputs[0];
+        List<InputSocket> inputs = addition.getInputSockets();
+        List<OutputSocket> outputs = addition.getOutputSockets();
+        InputSocket a = inputs.get(0), b = inputs.get(1);
+        OutputSocket c = outputs.get(0);
 
         int sz[] = {256, 256};
 
@@ -70,6 +72,6 @@ public class AddOperationTest {
 
         //Then
         Mat expectedResult = new Mat(2, sz, opencv_core.CV_8U, Scalar.all(3));
-        assertTrue(isMatEqual(c.getValue().get(), expectedResult));
+        assertTrue(isMatEqual((Mat) c.getValue().get(), expectedResult));
     }
 }

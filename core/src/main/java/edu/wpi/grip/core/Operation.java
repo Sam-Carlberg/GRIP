@@ -2,11 +2,12 @@ package edu.wpi.grip.core;
 
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
-import edu.wpi.grip.core.sockets.SocketsProvider;
+
+import java.util.List;
 
 /**
- * The common interface used by <code>Step</code>s in a pipeline to call various operations.  There is usually only one
- * instance of any class that implements <code>Operation</code>, which is called whenever that operation is used.
+ * The common interface used by <code>Step</code>s in a pipeline to call various operations. Each instance of an
+ * operation in the pipeline is handled by a unique instance of that {@code Operation} class.
  */
 public interface Operation {
 
@@ -15,19 +16,19 @@ public interface Operation {
      */
     OperationDescription getDescription();
 
-    default SocketsProvider getSockets() {
-        return new SocketsProvider(getInputSockets(), getOutputSockets());
-    }
+    /**
+     * @return A list of sockets for the inputs that the operation expects.
+     *
+     * @implNote The returned list should be immutable (i.e. read-only)
+     */
+    List<InputSocket> getInputSockets();
 
     /**
-     * @return An array of sockets for the inputs that the operation expects.
+     * @return A list of sockets for the outputs that the operation produces.
+     *
+     * @implNote The returned list should be immutable (i.e. read-only)
      */
-    InputSocket<?>[] getInputSockets();
-
-    /**
-     * @return An array of sockets for the outputs that the operation produces.
-     */
-    OutputSocket<?>[] getOutputSockets();
+    List<OutputSocket> getOutputSockets();
 
     /**
      * Performs this {@code Operation}.

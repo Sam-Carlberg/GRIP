@@ -10,6 +10,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 
 public class OperationTest {
@@ -33,10 +35,10 @@ public class OperationTest {
 
     @Test
     public void testOperation() throws Exception {
-        InputSocket[] inputs = addition.getInputSockets();
-        OutputSocket[] outputs = addition.getOutputSockets();
-        InputSocket<Double> a = inputs[0], b = inputs[1];
-        OutputSocket c = outputs[0];
+        List<InputSocket> inputs = addition.getInputSockets();
+        List<OutputSocket> outputs = addition.getOutputSockets();
+        InputSocket<Double> a = inputs.get(0), b = inputs.get(1);
+        OutputSocket c = outputs.get(0);
 
         a.setValue(1234.0);
         b.setValue(5678.0);
