@@ -36,7 +36,7 @@ public class AddOperation implements Operation {
     public OperationDescription getDescription() {
         return OperationDescription.builder()
                 .name("OpenCV Add")
-                .description("Compute the per-pixel sum of two images.")
+                .summary("Compute the per-pixel sum of two images.")
                 .build();
     }
 

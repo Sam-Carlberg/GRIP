@@ -25,7 +25,7 @@ public class FindBlobsOperation implements Operation {
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("Find Blobs")
-                    .description("Detects groups of pixels in an image.")
+                    .summary("Detects groups of pixels in an image.")
                     .category(OperationDescription.Category.FEATURE_DETECTION)
                     .icon(Icons.iconStream("find-blobs"))
                     .build();

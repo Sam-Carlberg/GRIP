@@ -22,7 +22,7 @@ public class SwitchOperation implements Operation {
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("Switch")
-                    .description("Switch between two possible input sockets using a boolean")
+                    .summary("Switch between two possible input sockets using a boolean")
                     .category(OperationDescription.Category.LOGICAL)
                     .build();
 

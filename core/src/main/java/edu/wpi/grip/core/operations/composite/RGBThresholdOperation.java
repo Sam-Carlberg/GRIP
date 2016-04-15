@@ -25,7 +25,7 @@ public class RGBThresholdOperation extends ThresholdOperation {
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("RGB Threshold")
-                    .description("Segment an image based on color ranges")
+                    .summary("Segment an image based on color ranges")
                     .category(OperationDescription.Category.IMAGE_PROCESSING)
                     .icon(Icons.iconStream("threshold"))
                     .build();

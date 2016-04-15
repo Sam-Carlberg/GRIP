@@ -25,7 +25,7 @@ public class DesaturateOperation implements Operation {
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("Desaturate")
-                    .description("Convert a color image into shades of gray.")
+                    .summary("Convert a color image into shades of gray.")
                     .category(OperationDescription.Category.IMAGE_PROCESSING)
                     .icon(Icons.iconStream("desaturate"))
                     .build();

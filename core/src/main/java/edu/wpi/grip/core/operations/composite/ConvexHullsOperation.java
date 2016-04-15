@@ -22,7 +22,7 @@ public class ConvexHullsOperation implements Operation {
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("Convex Hulls")
-                    .description("Compute the convex hulls of contours")
+                    .summary("Compute the convex hulls of contours")
                     .category(OperationDescription.Category.FEATURE_DETECTION)
                     .build();
 

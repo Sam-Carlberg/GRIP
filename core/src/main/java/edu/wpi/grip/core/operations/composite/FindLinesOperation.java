@@ -26,7 +26,7 @@ public class FindLinesOperation implements Operation {
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("Find Lines")
-                    .description("Detects line segments in an image.")
+                    .summary("Detects line segments in an image.")
                     .category(OperationDescription.Category.FEATURE_DETECTION)
                     .icon(Icons.iconStream("find-lines"))
                     .build();

@@ -13,7 +13,7 @@ public class MockOperation implements Operation {
     public OperationDescription getDescription() {
         return OperationDescription.builder()
                 .name("Mock Operation")
-                .description("A mock operation description")
+                .summary("A mock operation summary")
                 .build();
     }
 

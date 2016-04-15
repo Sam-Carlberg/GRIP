@@ -33,7 +33,7 @@ public class SubtractionOperation implements Operation {
     public OperationDescription getDescription() {
         return OperationDescription.builder()
                 .name("Subtract")
-                .description("Computer the difference between two doubles")
+                .summary("Computer the difference between two doubles")
                 .build();
     }
 

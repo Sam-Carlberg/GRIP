@@ -35,7 +35,7 @@ public class PublishVideoOperation implements Operation {
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("Publish Video")
-                    .description("Publish an M_JPEG stream to the dashboard.")
+                    .summary("Publish an M_JPEG stream to the dashboard.")
                     .category(OperationDescription.Category.NETWORK)
                     .icon(Icons.iconStream("publish-video"))
                     .build();

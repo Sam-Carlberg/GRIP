@@ -27,7 +27,7 @@ public class HSVThresholdOperation extends ThresholdOperation {
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("HSV Threshold")
-                    .description("Segment an image based on hue, saturation, and value ranges.")
+                    .summary("Segment an image based on hue, saturation, and value ranges.")
                     .category(OperationDescription.Category.IMAGE_PROCESSING)
                     .icon(Icons.iconStream("threshold"))
                     .build();

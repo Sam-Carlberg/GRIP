@@ -30,7 +30,7 @@ public class DistanceTransformOperation implements Operation {
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("Distance Transform")
-                    .description("Sets the values of pixels in a binary image to their distance to the nearest black pixel.")
+                    .summary("Sets the values of pixels in a binary image to their distance to the nearest black pixel.")
                     .category(OperationDescription.Category.IMAGE_PROCESSING)
                     .icon(Icons.iconStream("opencv"))
                     .build();

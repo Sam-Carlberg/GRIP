@@ -27,7 +27,7 @@ public class AdditionOperation implements Operation {
     public OperationDescription getDescription() {
         return OperationDescription.builder()
                 .name("Add")
-                .description("Compute the sum of two doubles")
+                .summary("Compute the sum of two doubles")
                 .build();
     }
 

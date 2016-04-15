@@ -327,7 +327,7 @@ public class PipelineRunnerTest {
         default OperationDescription getDescription() {
             return OperationDescription.builder()
                     .name("Simple Operation")
-                    .description("A simple operation for testing")
+                    .summary("A simple operation for testing")
                     .build();
         }
 

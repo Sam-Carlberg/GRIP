@@ -26,7 +26,7 @@ public class FindContoursOperation implements Operation {
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("Find Contours")
-                    .description("Detects contours in a binary image.")
+                    .summary("Detects contours in a binary image.")
                     .category(OperationDescription.Category.FEATURE_DETECTION)
                     .icon(Icons.iconStream("find-contours"))
                     .build();

@@ -15,7 +15,7 @@ public class OperationMetaData {
     /**
      * Creates a metadata object for an {@link Operation}.
      *
-     * @param description       the description for the {@code Operation}
+     * @param description       the summary for the {@code Operation}
      * @param operationSupplier a supplier for the {@code Operation}. This should return a new instance each time it's called.
      */
     public OperationMetaData(OperationDescription description, Supplier<Operation> operationSupplier) {
@@ -24,7 +24,7 @@ public class OperationMetaData {
     }
 
     /**
-     * Gets the description of the operation.
+     * Gets the summary of the operation.
      */
     public OperationDescription getDescription() {
         return description;

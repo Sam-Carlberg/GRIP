@@ -17,7 +17,7 @@ public class NewPointOperation implements CVOperation {
     public static final OperationDescription DESCRIPTION =
             CVOperation.defaultBuilder()
                     .name("New Point")
-                    .description("Create a point by (x,y) value.")
+                    .summary("Create a point by (x,y) value.")
                     .icon(Icons.iconStream("point"))
                     .build();
 

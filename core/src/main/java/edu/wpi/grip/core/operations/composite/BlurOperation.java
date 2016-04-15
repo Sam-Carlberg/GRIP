@@ -29,7 +29,7 @@ public class BlurOperation implements Operation {
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("Blur")
-                    .description("Blurs an image to remove noise")
+                    .summary("Blurs an image to remove noise")
                     .category(OperationDescription.Category.IMAGE_PROCESSING)
                     .icon(Icons.iconStream("blur"))
                     .build();

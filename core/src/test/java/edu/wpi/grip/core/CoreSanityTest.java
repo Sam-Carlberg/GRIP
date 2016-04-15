@@ -28,8 +28,8 @@ public class CoreSanityTest extends AbstractPackageSanityTests {
         }));
         setDefault(ConnectionValidator.class, (outputSocket, inputSocket) -> true);
         setDefault(OperationMetaData.class,
-                new OperationMetaData(OperationDescription.builder().name("").description("").build(),
+                new OperationMetaData(OperationDescription.builder().name("").summary("").build(),
                 () -> null));
-        setDefault(OperationDescription.class, OperationDescription.builder().name("").description("").build());
+        setDefault(OperationDescription.class, OperationDescription.builder().name("").summary("").build());
     }
 }

@@ -33,7 +33,7 @@ public class FilterContoursOperation implements Operation {
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("Filter Contours")
-                    .description("Find contours matching certain criteria")
+                    .summary("Find contours matching certain criteria")
                     .category(OperationDescription.Category.FEATURE_DETECTION)
                     .icon(Icons.iconStream("find-contours"))
                     .build();

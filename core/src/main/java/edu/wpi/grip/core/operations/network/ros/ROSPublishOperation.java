@@ -18,7 +18,7 @@ public class ROSPublishOperation<D> extends NetworkPublishOperation<D> {
     public static OperationDescription descriptionFor(Class<?> dataType) {
         return OperationDescription.builder()
                 .name("ROSPublish " + dataType.getSimpleName())
-                .description("Publishes a " + dataType.getSimpleName() + " to a ROS node")
+                .summary("Publishes a " + dataType.getSimpleName() + " to a ROS node")
                 .icon(Icons.iconStream("rosorg-logo"))
                 .category(OperationDescription.Category.NETWORK)
                 .build();

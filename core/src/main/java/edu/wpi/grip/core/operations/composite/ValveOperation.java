@@ -18,7 +18,7 @@ public class ValveOperation implements Operation {
     public static OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("Valve")
-                    .description("Toggle an output socket on or off using a boolean")
+                    .summary("Toggle an output socket on or off using a boolean")
                     .category(OperationDescription.Category.LOGICAL)
                     .build();
 

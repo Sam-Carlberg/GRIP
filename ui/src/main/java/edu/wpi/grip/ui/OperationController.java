@@ -57,14 +57,14 @@ public class OperationController implements Controller {
     public void initialize() {
         root.setId(StyleClassNameUtility.idNameFor(this.operationDescription));
         this.name.setText(this.operationDescription.getName());
-        this.description.setText(this.operationDescription.getDescription());
+        this.description.setText(this.operationDescription.getSummary());
 
-        final Tooltip tooltip = new Tooltip(this.operationDescription.getDescription());
+        final Tooltip tooltip = new Tooltip(this.operationDescription.getSummary());
         tooltip.setPrefWidth(400.0);
         tooltip.setWrapText(true);
         Tooltip.install(root, tooltip);
 
-        this.description.setAccessibleHelp(this.operationDescription.getDescription());
+        this.description.setAccessibleHelp(this.operationDescription.getSummary());
 
         this.operationDescription.getIcon().ifPresent(icon -> this.icon.setImage(new Image(icon)));
 

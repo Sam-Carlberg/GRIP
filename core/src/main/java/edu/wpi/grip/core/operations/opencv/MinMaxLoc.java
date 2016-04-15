@@ -20,7 +20,7 @@ public class MinMaxLoc implements CVOperation {
     public static final OperationDescription DESCRIPTION =
             CVOperation.defaultBuilder()
                     .name("Find Min and Max")
-                    .description("Find the global minimum and manimum in a single channel grayscale image.")
+                    .summary("Find the global minimum and manimum in a single channel grayscale image.")
                     .build();
 
     private final SocketHint<Mat>

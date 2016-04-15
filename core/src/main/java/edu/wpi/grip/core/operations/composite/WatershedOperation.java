@@ -35,7 +35,7 @@ public class WatershedOperation implements Operation {
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("Watershed")
-                    .description("Isolates overlapping objects from the background and each other")
+                    .summary("Isolates overlapping objects from the background and each other")
                     .category(OperationDescription.Category.FEATURE_DETECTION)
                     .icon(Icons.iconStream("opencv"))
                     .build();

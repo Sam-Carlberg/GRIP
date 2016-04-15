@@ -125,7 +125,7 @@ public class PythonTest {
     @Test
     public void testDefaultDescription() throws Exception {
         Operation addition = new PythonScriptOperation(isf, osf, PythonTest.class.getResource("/edu/wpi/grip/scripts/addition.py"));
-        assertEquals("", addition.getDescription().getDescription());
+        assertEquals("", addition.getDescription().getSummary());
     }
 
     @Test
@@ -137,7 +137,7 @@ public class PythonTest {
     @Test
     public void testDescription() throws Exception {
         Operation addition = new PythonScriptOperation(isf, osf, PythonTest.class.getResource("/edu/wpi/grip/scripts/addition-with-name-and-description.py"));
-        assertEquals("Compute the sum of two integers", addition.getDescription().getDescription());
+        assertEquals("Compute the sum of two integers", addition.getDescription().getSummary());
     }
 
     @After

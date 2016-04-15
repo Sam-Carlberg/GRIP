@@ -29,7 +29,7 @@ public class ResizeOperation implements Operation {
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("Resize Image")
-                    .description("Scale an image to an exact size")
+                    .summary("Scale an image to an exact size")
                     .category(OperationDescription.Category.IMAGE_PROCESSING)
                     .icon(Icons.iconStream("resize"))
                     .build();

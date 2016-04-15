@@ -17,7 +17,7 @@ public class NewSizeOperation implements CVOperation {
     public static final OperationDescription DESCRIPTION =
             CVOperation.defaultBuilder()
                     .name("New Size")
-                    .description("Create a size.")
+                    .summary("Create a size.")
                     .icon(Icons.iconStream("size"))
                     .build();
 

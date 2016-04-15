@@ -7,7 +7,6 @@ import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.util.Icons;
-import jnr.ffi.annotations.Out;
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyFunction;
@@ -57,7 +56,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * return a + b
  * }</pre>
  *
- * Lastly, the script can optionally have global "name" and "description" strings to provide the user with more
+ * Lastly, the script can optionally have global "name" and "summary" strings to provide the user with more
  * information about what the operation does.
  */
 public class PythonScriptOperation implements Operation {
@@ -155,7 +154,7 @@ public class PythonScriptOperation implements Operation {
     public OperationDescription getDescription() {
         return OperationDescription.builder()
                 .name(this.name.getString())
-                .description(this.description.getString())
+                .summary(this.description.getString())
                 .icon(Icons.iconStream("python"))
                 .category(OperationDescription.Category.MISCELLANEOUS)
                 .build();

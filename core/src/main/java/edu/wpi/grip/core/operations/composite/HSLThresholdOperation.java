@@ -28,7 +28,7 @@ public class HSLThresholdOperation extends ThresholdOperation {
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("HSL Threshold")
-                    .description("Segment an image based on hue, saturation, and luminance ranges.")
+                    .summary("Segment an image based on hue, saturation, and luminance ranges.")
                     .category(OperationDescription.Category.IMAGE_PROCESSING)
                     .icon(Icons.iconStream("threshold"))
                     .build();

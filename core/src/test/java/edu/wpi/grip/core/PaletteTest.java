@@ -23,7 +23,7 @@ public class PaletteTest {
         eventBus.register(palette);
         operation = new OperationMetaData(OperationDescription.builder()
                 .name("Find Target")
-                .description("")
+                .summary("")
                 .build(),
                 () -> null);
     }

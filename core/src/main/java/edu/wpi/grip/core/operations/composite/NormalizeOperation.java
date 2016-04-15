@@ -29,7 +29,7 @@ public class NormalizeOperation implements Operation {
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("Normalize")
-                    .description("Normalizes or remaps the values of pixels in an image.")
+                    .summary("Normalizes or remaps the values of pixels in an image.")
                     .category(OperationDescription.Category.IMAGE_PROCESSING)
                     .icon(Icons.iconStream("opencv"))
                     .build();
