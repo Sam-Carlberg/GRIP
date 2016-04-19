@@ -89,7 +89,7 @@ public class PythonScriptOperation implements Operation {
     private List<OutputSocket> outputSockets; // intentionally using raw types
     private PyFunction performFunction;
     private PyString name;
-    private PyString description;
+    private PyString summary;
 
     public PythonScriptOperation(InputSocket.Factory isf, OutputSocket.Factory osf, URL url) throws PyException, IOException {
         this.isf = checkNotNull(isf);
@@ -105,8 +105,8 @@ public class PythonScriptOperation implements Operation {
             this.name = new PyString(path.substring(1 + Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\"))));
         }
 
-        if (this.description == null) {
-            this.description = new PyString(DEFAULT_DESCRIPTION);
+        if (this.summary == null) {
+            this.summary = new PyString(DEFAULT_DESCRIPTION);
         }
 
         this.inputSockets = inputSocketHints.stream()
@@ -130,8 +130,8 @@ public class PythonScriptOperation implements Operation {
             this.name = new PyString(DEFAULT_NAME);
         }
 
-        if (this.description == null) {
-            this.description = new PyString(DEFAULT_DESCRIPTION);
+        if (this.summary == null) {
+            this.summary = new PyString(DEFAULT_DESCRIPTION);
         }
 
         this.inputSockets = inputSocketHints.stream()
@@ -148,13 +148,14 @@ public class PythonScriptOperation implements Operation {
         this.outputSocketHints = this.interpreter.get("outputs", List.class);
         this.performFunction = this.interpreter.get("perform", PyFunction.class);
         this.name = this.interpreter.get("name", PyString.class);
-        this.description = this.interpreter.get("description", PyString.class);
+        this.summary = this.interpreter.get("summary", PyString.class);
     }
 
+    @Override
     public OperationDescription getDescription() {
         return OperationDescription.builder()
                 .name(this.name.getString())
-                .summary(this.description.getString())
+                .summary(this.summary.getString())
                 .icon(Icons.iconStream("python"))
                 .category(OperationDescription.Category.MISCELLANEOUS)
                 .build();
