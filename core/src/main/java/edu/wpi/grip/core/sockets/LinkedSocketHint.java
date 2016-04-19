@@ -1,5 +1,7 @@
 package edu.wpi.grip.core.sockets;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import edu.wpi.grip.core.Connection;
 
 import java.util.HashSet;
@@ -32,6 +34,7 @@ public final class LinkedSocketHint extends SocketHint.SocketHintDecorator {
     /**
      * Our own custom implementation of socket hint that interacts on this class when connections are added and removed.
      */
+    @XStreamAlias("grip:LinkedInput")
     private class LinkedInputSocket<T> extends InputSocket.Decorator<T> {
 
         /**

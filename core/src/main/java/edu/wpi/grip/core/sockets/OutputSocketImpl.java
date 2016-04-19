@@ -4,12 +4,15 @@ package edu.wpi.grip.core.sockets;
 import com.google.common.base.MoreObjects;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import edu.wpi.grip.core.events.SocketPreviewChangedEvent;
 
 /**
  *
  * @param <T>
  */
+@XStreamAlias("grip:Output")
 public class OutputSocketImpl<T> extends SocketImpl<T> implements OutputSocket<T> {
     private final EventBus eventBus;
     /**

@@ -4,12 +4,15 @@ package edu.wpi.grip.core.sockets;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import edu.wpi.grip.core.Connection;
 
 /**
  * Concrete implementation of the {@link InputSocket}
  * @param <T> The type of the value that this socket stores
  */
+@XStreamAlias("grip:Input")
 public class InputSocketImpl<T> extends SocketImpl<T> implements InputSocket<T> {
 
     /**

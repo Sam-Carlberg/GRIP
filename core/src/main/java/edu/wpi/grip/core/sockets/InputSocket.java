@@ -1,6 +1,5 @@
 package edu.wpi.grip.core.sockets;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 import edu.wpi.grip.core.Connection;
 import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.Source;
@@ -14,7 +13,6 @@ import java.util.Set;
  *
  * @param <T> The type of the value that this socket stores
  */
-@XStreamAlias(value = "grip:Input")
 public interface InputSocket<T> extends Socket<T> {
 
     interface Factory {

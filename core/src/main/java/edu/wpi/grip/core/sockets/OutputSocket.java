@@ -1,7 +1,6 @@
 package edu.wpi.grip.core.sockets;
 
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 import edu.wpi.grip.core.Operation;
 
 /**
@@ -9,7 +8,6 @@ import edu.wpi.grip.core.Operation;
  *
  * @param <T> The type of the value that this socket stores.
  */
-@XStreamAlias(value = "grip:Output")
 public interface OutputSocket<T> extends Socket<T> {
 
     interface Factory {
