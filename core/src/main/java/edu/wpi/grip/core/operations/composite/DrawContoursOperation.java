@@ -32,7 +32,7 @@ public class DrawContoursOperation implements Operation {
     private final SocketHint<Number> lineThicknessHint
             = SocketHints.Inputs.createNumberSpinnerSocketHint("Line thickness", -1, -1, Integer.MAX_VALUE);
 
-    private final SocketHint<Mat> outputHint = SocketHints.Inputs.createMatSocketHint("Mat", true);
+    private final SocketHint<Mat> outputHint = SocketHints.Outputs.createMatSocketHint("Mat");
 
     @Override
     public String getName() {
@@ -41,8 +41,7 @@ public class DrawContoursOperation implements Operation {
 
     @Override
     public String getDescription() {
-        return "Draws contours on an image.\n"
-                + "If 'colors' is selected, the image will be 8-bit, 3-channel; otherwise, it will be 8-bit single-channel.";
+        return "Draws contours on an image. If 'colors' is selected, the image will be 8-bit, 3-channel; otherwise, it will be 8-bit single-channel.";
     }
 
     @Override
@@ -58,16 +57,16 @@ public class DrawContoursOperation implements Operation {
     @Override
     public InputSocket<?>[] createInputSockets(EventBus eventBus) {
         return new InputSocket<?>[]{
-            new InputSocket<>(eventBus, contoursHint),
-            new InputSocket<>(eventBus, colorHint),
-            new InputSocket<>(eventBus, lineThicknessHint)
+                new InputSocket<>(eventBus, contoursHint),
+                new InputSocket<>(eventBus, colorHint),
+                new InputSocket<>(eventBus, lineThicknessHint)
         };
     }
 
     @Override
     public OutputSocket<?>[] createOutputSockets(EventBus eventBus) {
         return new OutputSocket<?>[]{
-            new OutputSocket<>(eventBus, outputHint)
+                new OutputSocket<>(eventBus, outputHint)
         };
     }
 
@@ -90,11 +89,60 @@ public class DrawContoursOperation implements Operation {
     }
 
     private static Scalar colorForContour(float contourNum, float numContours) {
-        int rgb = java.awt.Color.HSBtoRGB((contourNum / numContours), 1, 1);
+        int rgb = hsvToRgb((contourNum / numContours), 1, 1);
         return RGB(
                 (rgb & 0xff0000) >> 16,
                 (rgb & 0x00ff00) >> 8,
                 (rgb & 0x0000ff));
+    }
+
+    /**
+     * Converts 8-bit HSV to 8-bit RGB. Shamelessly copy-pasted from java.awt.Color.HSBtoRGB
+     */
+    private static int hsvToRgb(float hue, float saturation, float value) {
+        int r = 0, g = 0, b = 0;
+        if (saturation == 0) {
+            r = g = b = (int) (value * 255.0f + 0.5f);
+        } else {
+            float h = (hue - (float) Math.floor(hue)) * 6.0f;
+            float f = h - (float) Math.floor(h);
+            float p = value * (1.0f - saturation);
+            float q = value * (1.0f - saturation * f);
+            float t = value * (1.0f - (saturation * (1.0f - f)));
+            switch ((int) h) {
+                case 0:
+                    r = (int) (value * 255.0f + 0.5f);
+                    g = (int) (t * 255.0f + 0.5f);
+                    b = (int) (p * 255.0f + 0.5f);
+                    break;
+                case 1:
+                    r = (int) (q * 255.0f + 0.5f);
+                    g = (int) (value * 255.0f + 0.5f);
+                    b = (int) (p * 255.0f + 0.5f);
+                    break;
+                case 2:
+                    r = (int) (p * 255.0f + 0.5f);
+                    g = (int) (value * 255.0f + 0.5f);
+                    b = (int) (t * 255.0f + 0.5f);
+                    break;
+                case 3:
+                    r = (int) (p * 255.0f + 0.5f);
+                    g = (int) (q * 255.0f + 0.5f);
+                    b = (int) (value * 255.0f + 0.5f);
+                    break;
+                case 4:
+                    r = (int) (t * 255.0f + 0.5f);
+                    g = (int) (p * 255.0f + 0.5f);
+                    b = (int) (value * 255.0f + 0.5f);
+                    break;
+                case 5:
+                    r = (int) (value * 255.0f + 0.5f);
+                    g = (int) (p * 255.0f + 0.5f);
+                    b = (int) (q * 255.0f + 0.5f);
+                    break;
+            }
+        }
+        return (r << 16) | (g << 8) | (b << 0);
     }
 
 }
