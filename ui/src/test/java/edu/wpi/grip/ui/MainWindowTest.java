@@ -5,20 +5,30 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;
-import edu.wpi.grip.core.*;
+
+import edu.wpi.grip.core.AddOperation;
+import edu.wpi.grip.core.AdditionOperation;
+import edu.wpi.grip.core.Operation;
+import edu.wpi.grip.core.OperationMetaData;
+import edu.wpi.grip.core.Pipeline;
+import edu.wpi.grip.core.PipelineRunner;
 import edu.wpi.grip.core.events.OperationAddedEvent;
+import edu.wpi.grip.core.sockets.InputSocket;
+import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.ui.util.DPIUtility;
 import edu.wpi.grip.ui.util.StyleClassNameUtility;
 import edu.wpi.grip.util.GRIPCoreTestModule;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
+
 import org.junit.After;
 import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
 import org.testfx.matcher.base.NodeMatchers;
 import org.testfx.util.WaitForAsyncUtils;
+
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 import static org.junit.Assert.assertEquals;
 import static org.testfx.api.FxAssert.verifyThat;
@@ -48,10 +58,10 @@ public class MainWindowTest extends ApplicationTest {
         final EventBus eventBus = injector.getInstance(EventBus.class);
 
         addOperation = new AddOperation();
-        additionOperation = new AdditionOperation();
+        additionOperation = new AdditionOperation(injector.getInstance(InputSocket.Factory.class), injector.getInstance(OutputSocket.Factory.class));
 
-        eventBus.post(new OperationAddedEvent(addOperation));
-        eventBus.post(new OperationAddedEvent(additionOperation));
+        eventBus.post(new OperationAddedEvent(new OperationMetaData(addOperation.getDescription(), () -> addOperation)));
+        eventBus.post(new OperationAddedEvent(new OperationMetaData(additionOperation.getDescription(), () -> additionOperation)));
 
         stage.setScene(new Scene(root));
         stage.show();
@@ -66,7 +76,7 @@ public class MainWindowTest extends ApplicationTest {
     @Test
     public void testShouldCreateNewOperationInPipelineView() {
         // Given:
-        clickOn(addOperation.getName());
+        clickOn(addOperation.getDescription().getName());
 
         WaitForAsyncUtils.waitForFxEvents();
 
@@ -82,7 +92,7 @@ public class MainWindowTest extends ApplicationTest {
     @Test
     public void testDragOperationFromPaletteToPipeline() {
         // Given:
-        drag(addOperation.getName())
+        drag(addOperation.getDescription().getName())
                 .dropTo(".steps");
 
         WaitForAsyncUtils.waitForFxEvents();
@@ -102,7 +112,7 @@ public class MainWindowTest extends ApplicationTest {
         testDragOperationFromPaletteToPipeline();
 
         // Now add a second step before it
-        drag(additionOperation.getName())
+        drag(additionOperation.getDescription().getName())
                 // We drag to the input socket hint handle because this will always be on the left side of the
                 // step. This should cause the UI to put the new step on the left side
                 .dropTo(StyleClassNameUtility.cssSelectorForInputSocketHandleOnStepHolding(addOperation));
@@ -125,7 +135,7 @@ public class MainWindowTest extends ApplicationTest {
         testDragOperationFromPaletteToPipeline();
 
         // Now add a second step after it
-        drag(additionOperation.getName())
+        drag(additionOperation.getDescription().getName())
                 // We drag to the output socket hint handle because this will always be on the right side of the
                 // step. This should cause the UI to put the new step on the right side
                 .dropTo(StyleClassNameUtility.cssSelectorForOutputSocketHandleOnStepHolding(addOperation));
