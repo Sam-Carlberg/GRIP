@@ -28,6 +28,7 @@ import edu.wpi.grip.core.operations.composite.PublishVideoOperation;
 import edu.wpi.grip.core.operations.composite.RGBThresholdOperation;
 import edu.wpi.grip.core.operations.composite.ResizeOperation;
 import edu.wpi.grip.core.operations.composite.SwitchOperation;
+import edu.wpi.grip.core.operations.composite.ThresholdMoving;
 import edu.wpi.grip.core.operations.composite.ValveOperation;
 import edu.wpi.grip.core.operations.composite.WatershedOperation;
 import edu.wpi.grip.core.operations.network.BooleanPublishable;
@@ -87,6 +88,7 @@ public class Operations {
                 new OperationMetaData(SwitchOperation.DESCRIPTION, () -> new SwitchOperation(isf, osf)),
                 new OperationMetaData(ValveOperation.DESCRIPTION, () -> new ValveOperation(isf, osf)),
                 new OperationMetaData(WatershedOperation.DESCRIPTION, () -> new WatershedOperation(isf, osf)),
+                new OperationMetaData(ThresholdMoving.DESCRIPTION, () -> new ThresholdMoving(isf, osf)),
 
                 // OpenCV operations
                 new OperationMetaData(MatFieldAccessor.DESCRIPTION, () -> new MatFieldAccessor(isf, osf)),

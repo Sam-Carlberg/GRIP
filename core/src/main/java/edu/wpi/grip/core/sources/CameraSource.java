@@ -254,7 +254,7 @@ public class CameraSource extends Source implements RestartableService {
             synchronized (currentFrameTransferMat) {
                 currentFrameTransferMat.copyTo(frameOutputSocket.getValue().get());
             }
-            // Don't call frameOutputSocket.setValue the value is already set.
+            frameOutputSocket.setValueOptional(frameOutputSocket.getValue());
 
             // Update the frame rate value
             frameRateOutputSocket.setValue(frameRate);
