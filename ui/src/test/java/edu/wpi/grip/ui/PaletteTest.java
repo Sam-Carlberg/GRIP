@@ -17,6 +17,7 @@ import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.util.GRIPCoreTestModule;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
@@ -56,7 +57,7 @@ public class PaletteTest extends ApplicationTest {
     @Test
     public void testPalette() {
         // Given a single operation...
-        Operation operation = new SimpleOperation();
+        Operation operation = new TestOperation();
         eventBus.post(new OperationAddedEvent(new OperationMetaData(operation.getDescription(), () -> operation)));
 
         // Record when a a StepAddedEvent happens
@@ -69,7 +70,7 @@ public class PaletteTest extends ApplicationTest {
         });
 
         // If we click on the operation button in the palette...
-        clickOn("#add-operation");
+        clickOn("#test-operation");
         WaitForAsyncUtils.waitForFxEvents();
 
         // Then there should be a step added
@@ -77,21 +78,21 @@ public class PaletteTest extends ApplicationTest {
         assertEquals("Clicking on palette did not add the correct step", operation, step[0].getOperation());
     }
 
-    private static class SimpleOperation implements Operation {
+    private static class TestOperation implements Operation {
 
         @Override
         public OperationDescription getDescription() {
-            return OperationDescription.builder().name("add").summary("add").build();
+            return OperationDescription.builder().name("test").summary("test").build();
         }
 
         @Override
         public List<InputSocket> getInputSockets() {
-            return null;
+            return Collections.emptyList();
         }
 
         @Override
         public List<OutputSocket> getOutputSockets() {
-            return null;
+            return Collections.emptyList();
         }
 
         @Override
