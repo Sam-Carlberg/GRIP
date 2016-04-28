@@ -8,12 +8,16 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import edu.wpi.grip.core.Connection;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * Concrete implementation of the {@link InputSocket}
  * @param <T> The type of the value that this socket stores
  */
 @XStreamAlias("grip:Input")
 public class InputSocketImpl<T> extends SocketImpl<T> implements InputSocket<T> {
+
+    private final AtomicBoolean dirty = new AtomicBoolean(false);
 
     /**
      * Needed to get around Guice's inability to inject a generic typed factory
@@ -52,6 +56,21 @@ public class InputSocketImpl<T> extends SocketImpl<T> implements InputSocket<T> 
         if (this.getConnections().isEmpty()) {
             this.setValue(this.getSocketHint().createInitialValue().orElse(null));
         }
+    }
+
+    @Override
+    protected void onValueChanged() {
+        dirty.set(true);
+    }
+
+    /**
+     * Checks if the socket has been dirtied and rests it to false.
+     *
+     * @return True if the socket has been dirtied
+     */
+    @Override
+    public boolean dirtied() {
+        return dirty.compareAndSet(true, false);
     }
 
 }

@@ -3,6 +3,7 @@ package edu.wpi.grip.core;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.Socket;
@@ -118,6 +119,7 @@ public class Step {
      * default values.
      */
     protected final void runPerformIfPossible() {
+        boolean anyDirty = false;
         for (InputSocket<?> inputSocket : inputSockets) {
             // If there is a socket that isn't present then we have a problem.
             if (!inputSocket.getValue().isPresent()) {
@@ -125,6 +127,8 @@ public class Step {
                 resetOutputSockets();
                 return;  /* Only run the perform method if all of the input sockets are present. */
             }
+            // If one value is true then this will stay true
+            anyDirty |= inputSocket.dirtied();
         }
 
         try {

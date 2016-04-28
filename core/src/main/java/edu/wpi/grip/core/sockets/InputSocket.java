@@ -20,6 +20,13 @@ public interface InputSocket<T> extends Socket<T> {
     }
 
     /**
+     * Checks if the socket has been dirtied and resets it to false.
+     *
+     * @return true if the socket has been dirtied
+     */
+    boolean dirtied();
+
+    /**
      * A decorator for the {@link InputSocket}
      * @param <T> The type of the value that this socket stores
      */
@@ -87,6 +94,11 @@ public interface InputSocket<T> extends Socket<T> {
         @Override
         public void setValueOptional(Optional<? extends T> optionalValue) {
             decorated.setValueOptional(optionalValue);
+        }
+
+        @Override
+        public boolean dirtied() {
+            return decorated.dirtied();
         }
 
     }
