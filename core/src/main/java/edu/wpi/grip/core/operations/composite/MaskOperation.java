@@ -1,5 +1,6 @@
 package edu.wpi.grip.core.operations.composite;
 
+import com.google.common.collect.ImmutableList;
 import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
@@ -7,6 +8,8 @@ import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.sockets.SocketHints;
 import edu.wpi.grip.core.util.Icons;
+
+import java.util.List;
 
 import static org.bytedeco.javacpp.opencv_core.Mat;
 import static org.bytedeco.javacpp.opencv_core.bitwise_xor;
@@ -19,7 +22,7 @@ public class MaskOperation implements Operation {
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("Mask")
-                    .description("Filter out an area of interest in an image using a binary mask.")
+                    .summary("Filter out an area of interest in an image using a binary mask.")
                     .category(OperationDescription.Category.IMAGE_PROCESSING)
                     .icon(Icons.iconStream("mask"))
                     .build();
@@ -48,18 +51,18 @@ public class MaskOperation implements Operation {
     }
 
     @Override
-    public InputSocket<?>[] getInputSockets() {
-        return new InputSocket<?>[]{
+    public List<InputSocket> getInputSockets() {
+        return ImmutableList.of(
                 inputSocket,
                 maskSocket
-        };
+        );
     }
 
     @Override
-    public OutputSocket<?>[] getOutputSockets() {
-        return new OutputSocket<?>[]{
+    public List<OutputSocket> getOutputSockets() {
+        return ImmutableList.of(
                 outputSocket
-        };
+        );
     }
 
     @Override

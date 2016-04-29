@@ -57,7 +57,7 @@ public class OperationListController {
             long numMatches = operationsMapManager.keySet().stream()
                     .filter(key -> {
                         boolean visible = SearchUtility.fuzzyContains(key.getOperationDescription().getName(), filter)
-                                || SearchUtility.fuzzyContains(key.getOperationDescription().getDescription(), filter);
+                                || SearchUtility.fuzzyContains(key.getOperationDescription().getSummary(), filter);
                         operationsMapManager.get(key).setVisible(visible);
                         return visible;
                     }).count();

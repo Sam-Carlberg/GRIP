@@ -7,6 +7,7 @@ import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -150,11 +151,11 @@ public class PublishAnnotatedOperationTest {
     @Test
     public void testNTValueOrder() {
         Operation ntPublishOperation = new TestPublishAnnotatedOperation<>(SimpleReport.class);
-        InputSocket<?>[] sockets = ntPublishOperation.getInputSockets();
+        List<InputSocket> sockets = ntPublishOperation.getInputSockets();
 
-        assertEquals("Unexpected number of sockets", 4, sockets.length);
-        assertEquals("Wrong publish name", "Publish bar", sockets[2].getSocketHint().getIdentifier());
-        assertEquals("Wrong publish name", "Publish foo", sockets[3].getSocketHint().getIdentifier());
+        assertEquals("Unexpected number of sockets", 4, sockets.size());
+        assertEquals("Wrong publish name", "Publish bar", sockets.get(2).getSocketHint().getIdentifier());
+        assertEquals("Wrong publish name", "Publish foo", sockets.get(3).getSocketHint().getIdentifier());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -251,9 +252,9 @@ public class PublishAnnotatedOperationTest {
         };
         final TestPublishAnnotatedOperation<SimpleReport> testPublishAnnotatedOperation = new TestPublishAnnotatedOperation<>(SimpleReport.class, factory);
 
-        final InputSocket[] inputSockets = testPublishAnnotatedOperation.getInputSockets();
-        inputSockets[0].setValue(new SimpleReport());
-        inputSockets[1].setValue(PUBLISHER_NAME);
+        final List<InputSocket> inputSockets = testPublishAnnotatedOperation.getInputSockets();
+        inputSockets.get(0).setValue(new SimpleReport());
+        inputSockets.get(1).setValue(PUBLISHER_NAME);
 
         testPublishAnnotatedOperation.perform();
 

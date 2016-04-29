@@ -4,16 +4,19 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;
-import edu.wpi.grip.core.sockets.InputSocket;
+
 import edu.wpi.grip.core.Operation;
+import edu.wpi.grip.core.OperationMetaData;
 import edu.wpi.grip.core.Palette;
 import edu.wpi.grip.core.Step;
 import edu.wpi.grip.core.operations.OperationsFactory;
+import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.ui.GRIPUIModule;
 import edu.wpi.grip.util.GRIPCoreTestModule;
-import javafx.scene.Scene;
-import javafx.scene.layout.GridPane;
-import javafx.stage.Stage;
+
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,10 +24,13 @@ import org.junit.runners.Parameterized;
 import org.testfx.framework.junit.ApplicationTest;
 import org.testfx.matcher.base.NodeMatchers;
 
-import java.util.Arrays;
-import java.util.Collection;
+import javafx.scene.Scene;
+import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 
 import static org.testfx.api.FxAssert.verifyThat;
+
+//import edu.wpi.grip.generated.CVOperations;
 
 @RunWith(Parameterized.class)
 public class InputSocketControllerFactoryTest extends ApplicationTest {
@@ -47,14 +53,14 @@ public class InputSocketControllerFactoryTest extends ApplicationTest {
         final Palette palette = injector.getInstance(Palette.class);
         final EventBus eventBus = injector.getInstance(EventBus.class);
         OperationsFactory.create(eventBus).addOperations();
-        CVOperations.addOperations(eventBus);
-        Collection<Operation> operations = palette.getOperations();
+//        CVOperations.addOperations(eventBus);
+        Collection<OperationMetaData> operations = palette.getOperations();
 
         Object[][] params = new Object[operations.size()][2];
         final int[] index = {0};
         operations.forEach(operation -> {
-            params[index[0]][0] = operation;
-            params[index[0]][1] = operation.getName();
+            params[index[0]][0] = operation.getOperationSupplier().get();
+            params[index[0]][1] = operation.getDescription().getName();
             index[0]++;
         });
 
@@ -97,8 +103,8 @@ public class InputSocketControllerFactoryTest extends ApplicationTest {
     public void testCreateAllKnownInputSocketControllers() throws Exception {
         final Step step = stepFactory.create(operation);
         interact(() -> {
-            for (int i = 0; i < step.getInputSockets().length; i++) {
-                final InputSocket<?> inputSocket = step.getInputSockets()[i];
+            for (int i = 0; i < step.getInputSockets().size(); i++) {
+                final InputSocket<?> inputSocket = step.getInputSockets().get(i);
                 InputSocketController controller = inputSocketControllerFactory.create(inputSocket);
                 gridPane.add(controller.getRoot(), 0, i);
                 verifyThat(controller.getHandle(), NodeMatchers.isEnabled());

@@ -1,6 +1,8 @@
 
 package edu.wpi.grip.core.operations.composite;
 
+import com.google.common.collect.ImmutableList;
+
 import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
@@ -8,6 +10,8 @@ import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.sockets.SocketHints;
 import edu.wpi.grip.core.util.Icons;
+
+import java.util.List;
 
 import static org.bytedeco.javacpp.opencv_core.Mat;
 import static org.bytedeco.javacpp.opencv_core.NORM_INF;
@@ -25,7 +29,7 @@ public class NormalizeOperation implements Operation {
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("Normalize")
-                    .description("Normalizes or remaps the values of pixels in an image.")
+                    .summary("Normalizes or remaps the values of pixels in an image.")
                     .category(OperationDescription.Category.IMAGE_PROCESSING)
                     .icon(Icons.iconStream("opencv"))
                     .build();
@@ -82,20 +86,20 @@ public class NormalizeOperation implements Operation {
     }
 
     @Override
-    public InputSocket<?>[] getInputSockets() {
-        return new InputSocket<?>[]{
+    public List<InputSocket> getInputSockets() {
+        return ImmutableList.of(
                 srcSocket,
                 typeSocket,
                 alphaSocket,
                 betaSocket
-        };
+        );
     }
 
     @Override
-    public OutputSocket<?>[] getOutputSockets() {
-        return new OutputSocket<?>[]{
+    public List<OutputSocket> getOutputSockets() {
+        return ImmutableList.of(
                 outputSocket
-        };
+        );
     }
 
     @Override

@@ -1,5 +1,6 @@
 package edu.wpi.grip.core.operations.composite;
 
+import com.google.common.collect.ImmutableList;
 import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
@@ -32,7 +33,7 @@ public class FilterContoursOperation implements Operation {
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("Filter Contours")
-                    .description("Find contours matching certain criteria")
+                    .summary("Find contours matching certain criteria")
                     .category(OperationDescription.Category.FEATURE_DETECTION)
                     .icon(Icons.iconStream("find-contours"))
                     .build();
@@ -108,8 +109,8 @@ public class FilterContoursOperation implements Operation {
     }
 
     @Override
-    public InputSocket<?>[] getInputSockets() {
-        return new InputSocket<?>[]{
+    public List<InputSocket> getInputSockets() {
+        return ImmutableList.of(
                 contoursSocket,
                 minAreaSocket,
                 minPerimeterSocket,
@@ -122,14 +123,14 @@ public class FilterContoursOperation implements Operation {
                 minVertexSocket,
                 minRatioSocket,
                 maxRatioSocket
-        };
+        );
     }
 
     @Override
-    public OutputSocket<?>[] getOutputSockets() {
-        return new OutputSocket<?>[]{
+    public List<OutputSocket> getOutputSockets() {
+        return ImmutableList.of(
                 outputSocket
-        };
+        );
     }
 
     @Override

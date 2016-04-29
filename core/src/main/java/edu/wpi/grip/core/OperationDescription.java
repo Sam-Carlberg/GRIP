@@ -27,7 +27,7 @@ public class OperationDescription {
     }
 
     private final String name;
-    private final String description;
+    private final String summary;
     private final Category category;
     private final InputStream icon;
     private final ImmutableSet<String> aliases;
@@ -36,12 +36,12 @@ public class OperationDescription {
      * Private constructor - use {@link #builder} to instantiate this class.
      */
     protected OperationDescription(String name,
-                                 String description,
+                                 String summary,
                                  Category category,
                                  InputStream iconStream,
                                  Set<String> aliases) {
         this.name = checkNotNull(name);
-        this.description = checkNotNull(description);
+        this.summary = checkNotNull(summary);
         this.category = checkNotNull(category);
         this.icon = iconStream; // This is allowed to be null
         this.aliases = ImmutableSet.copyOf(checkNotNull(aliases));
@@ -55,10 +55,10 @@ public class OperationDescription {
     }
 
     /**
-     * @return A description of the operation.
+     * @return A summary of the operation.
      */
-    public String getDescription() {
-        return description;
+    public String getSummary() {
+        return summary;
     }
 
     /**
@@ -87,7 +87,7 @@ public class OperationDescription {
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("name", getName())
-                .add("description", getDescription())
+                .add("summary", getSummary())
                 .add("aliases", getAliases())
                 .add("category", getCategory())
                 .toString();
@@ -111,7 +111,7 @@ public class OperationDescription {
      */
     public static final class Builder {
         private String name;
-        private String description;
+        private String summary;
         private Category category;
         private InputStream icon;
         private ImmutableSet<String> aliases = ImmutableSet.of(); // default to empty Set to avoid NPE if not assigned
@@ -131,10 +131,10 @@ public class OperationDescription {
         }
 
         /**
-         * Sets the description
+         * Sets the summary
          */
-        public Builder description(String description) {
-            this.description = checkNotNull(description);
+        public Builder summary(String summary) {
+            this.summary = checkNotNull(summary);
             return this;
         }
 
@@ -168,7 +168,7 @@ public class OperationDescription {
         public OperationDescription build() {
             return new OperationDescription(
                     name,
-                    description,
+                    summary,
                     category,
                     icon,
                     aliases);

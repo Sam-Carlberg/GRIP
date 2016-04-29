@@ -1,5 +1,6 @@
 package edu.wpi.grip.core.operations.composite;
 
+import com.google.common.collect.ImmutableList;
 import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
@@ -25,7 +26,7 @@ public class FindLinesOperation implements Operation {
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("Find Lines")
-                    .description("Detects line segments in an image.")
+                    .summary("Detects line segments in an image.")
                     .category(OperationDescription.Category.FEATURE_DETECTION)
                     .icon(Icons.iconStream("find-lines"))
                     .build();
@@ -50,17 +51,17 @@ public class FindLinesOperation implements Operation {
     }
 
     @Override
-    public InputSocket<?>[] getInputSockets() {
-        return new InputSocket<?>[]{
+    public List<InputSocket> getInputSockets() {
+        return ImmutableList.of(
                 inputSocket
-        };
+        );
     }
 
     @Override
-    public OutputSocket<?>[] getOutputSockets() {
-        return new OutputSocket<?>[]{
+    public List<OutputSocket> getOutputSockets() {
+        return ImmutableList.of(
                 linesReportSocket
-        };
+        );
     }
 
     @Override

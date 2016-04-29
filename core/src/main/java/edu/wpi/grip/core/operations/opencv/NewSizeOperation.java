@@ -8,13 +8,16 @@ import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.sockets.SocketHints;
 import edu.wpi.grip.core.util.Icons;
 import org.bytedeco.javacpp.opencv_core.Size;
+import org.python.google.common.collect.ImmutableList;
+
+import java.util.List;
 
 public class NewSizeOperation implements CVOperation {
 
     public static final OperationDescription DESCRIPTION =
             CVOperation.defaultBuilder()
                     .name("New Size")
-                    .description("Create a size.")
+                    .summary("Create a size.")
                     .icon(Icons.iconStream("size"))
                     .build();
 
@@ -41,18 +44,18 @@ public class NewSizeOperation implements CVOperation {
     }
 
     @Override
-    public InputSocket<?>[] getInputSockets() {
-        return new InputSocket[]{
+    public List<InputSocket> getInputSockets() {
+        return ImmutableList.of(
                 widthSocket,
                 heightSocket
-        };
+        );
     }
 
     @Override
-    public OutputSocket<?>[] getOutputSockets() {
-        return new OutputSocket[]{
+    public List<OutputSocket> getOutputSockets() {
+        return ImmutableList.of(
                 outputSocket
-        };
+        );
     }
 
     @Override

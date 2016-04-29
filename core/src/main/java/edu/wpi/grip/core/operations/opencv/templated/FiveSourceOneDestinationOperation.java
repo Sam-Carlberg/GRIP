@@ -1,10 +1,13 @@
 package edu.wpi.grip.core.operations.opencv.templated;
 
+import com.google.common.collect.ImmutableList;
 import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
+
+import java.util.List;
 
 
 public class FiveSourceOneDestinationOperation<T1, T2, T3, T4, T5, R> implements Operation {
@@ -64,17 +67,13 @@ public class FiveSourceOneDestinationOperation<T1, T2, T3, T4, T5, R> implements
     }
 
     @Override
-    public InputSocket<?>[] getInputSockets() {
-        return new InputSocket<?>[]{
-                input1, input2, input3, input4, input5
-        };
+    public List<InputSocket> getInputSockets() {
+        return ImmutableList.of(input1, input2, input3, input4, input5);
     }
 
     @Override
-    public OutputSocket<?>[] getOutputSockets() {
-        return new OutputSocket<?>[]{
-                output
-        };
+    public List<OutputSocket> getOutputSockets() {
+        return ImmutableList.of(output);
     }
 
     @Override

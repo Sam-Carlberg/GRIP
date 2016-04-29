@@ -1,10 +1,13 @@
 package edu.wpi.grip.core.operations.composite;
 
+import com.google.common.collect.ImmutableList;
 import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
+
+import java.util.List;
 
 import static org.bytedeco.javacpp.opencv_core.MatVector;
 import static org.bytedeco.javacpp.opencv_imgproc.convexHull;
@@ -19,7 +22,7 @@ public class ConvexHullsOperation implements Operation {
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("Convex Hulls")
-                    .description("Compute the convex hulls of contours")
+                    .summary("Compute the convex hulls of contours")
                     .category(OperationDescription.Category.FEATURE_DETECTION)
                     .build();
 
@@ -41,17 +44,17 @@ public class ConvexHullsOperation implements Operation {
     }
 
     @Override
-    public InputSocket<?>[] getInputSockets() {
-        return new InputSocket<?>[]{
+    public List<InputSocket> getInputSockets() {
+        return ImmutableList.of(
                 inputSocket
-        };
+        );
     }
 
     @Override
-    public OutputSocket<?>[] getOutputSockets() {
-        return new OutputSocket<?>[]{
+    public List<OutputSocket> getOutputSockets() {
+        return ImmutableList.of(
                 outputSocket
-        };
+        );
     }
 
     @Override

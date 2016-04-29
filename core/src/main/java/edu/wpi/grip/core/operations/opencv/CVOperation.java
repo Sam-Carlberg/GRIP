@@ -13,6 +13,6 @@ public interface CVOperation extends Operation {
     }
 
     static OperationDescription defaults(String name, String description) {
-        return defaultBuilder().name(name).description(description).build();
+        return defaultBuilder().name(name).summary(description).build();
     }
 }

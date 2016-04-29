@@ -1,10 +1,13 @@
 package edu.wpi.grip.core;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import edu.wpi.grip.core.sockets.*;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
+
+import java.util.List;
 
 
 /**
@@ -33,22 +36,22 @@ public class AddOperation implements Operation {
     public OperationDescription getDescription() {
         return OperationDescription.builder()
                 .name("OpenCV Add")
-                .description("Compute the per-pixel sum of two images.")
+                .summary("Compute the per-pixel sum of two images.")
                 .build();
     }
 
     @Override
-    public InputSocket[] getInputSockets() {
-        return new InputSocket[]{
+    public List<InputSocket> getInputSockets() {
+        return ImmutableList.of(
                 a, b
-        };
+        );
     }
 
     @Override
-    public OutputSocket[] getOutputSockets() {
-        return new OutputSocket[]{
+    public List<OutputSocket> getOutputSockets() {
+        return ImmutableList.of(
                 sum
-        };
+        );
     }
 
     @Override

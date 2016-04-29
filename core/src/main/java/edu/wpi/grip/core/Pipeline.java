@@ -3,23 +3,38 @@ package edu.wpi.grip.core;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
-import edu.wpi.grip.core.events.*;
+
+import edu.wpi.grip.core.events.ConnectionAddedEvent;
+import edu.wpi.grip.core.events.ConnectionRemovedEvent;
+import edu.wpi.grip.core.events.ProjectSettingsChangedEvent;
+import edu.wpi.grip.core.events.SourceAddedEvent;
+import edu.wpi.grip.core.events.SourceRemovedEvent;
+import edu.wpi.grip.core.events.StepAddedEvent;
+import edu.wpi.grip.core.events.StepMovedEvent;
+import edu.wpi.grip.core.events.StepRemovedEvent;
 import edu.wpi.grip.core.settings.ProjectSettings;
+import edu.wpi.grip.core.settings.SettingsProvider;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
 
-import javax.inject.Inject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -33,7 +48,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Singleton
 @XStreamAlias(value = "grip:Pipeline")
-public class Pipeline implements ConnectionValidator {
+public class Pipeline implements ConnectionValidator, SettingsProvider {
 
     @Inject
     @XStreamOmitField
@@ -166,11 +181,8 @@ public class Pipeline implements ConnectionValidator {
         return Collections.unmodifiableSet(this.connections);
     }
 
-    /*
-     * @return The current per-project settings.  This object may become out of date if the settings are edited
-     * by the user, so objects requiring a preference value should also subscribe to {@link ProjectSettingsChangedEvent}
-     * to get updates.
-     */
+
+    @Override
     public ProjectSettings getProjectSettings() {
         return settings;
     }
@@ -230,6 +242,37 @@ public class Pipeline implements ConnectionValidator {
         for (OutputSocket<?> socket : event.getSource().getOutputSockets()) {
             socket.setPreviewed(false);
         }
+    }
+
+    /**
+     * Adds the step between two other steps.
+     * @param stepToAdd The step to add to the pipeline
+     * @param lower     The step to be added above
+     * @param higher    The step to be added below
+     */
+    public void addStepBetween(Step stepToAdd, @Nullable Step lower, @Nullable Step higher) {
+        checkNotNull(stepToAdd, "The step to add cannot be null");
+        int index = readStepsSafely(steps -> {
+            // If not in the list these can return -1
+            int lowerIndex = steps.indexOf(lower);
+            int upperIndex = steps.indexOf(higher);
+            if (lowerIndex != -1 && upperIndex != -1) {
+                assert lowerIndex <= upperIndex : "Upper step was before lower index";
+                int difference = Math.abs(upperIndex - lowerIndex); // Just in case
+                // Place the step halfway between these two steps
+                return lowerIndex + 1 + difference / 2;
+            } else if (lowerIndex != -1) {
+                // Place it above the lower one
+                return lowerIndex + 1;
+            } else if (upperIndex != -1) {
+                // Place it below the upper one
+                return upperIndex;
+            } else {
+                // Otherwise if they are both null place it at the end of the list
+                return steps.size();
+            }
+        });
+        addStep(index, stepToAdd);
     }
 
     public void addStep(int index, Step step) {

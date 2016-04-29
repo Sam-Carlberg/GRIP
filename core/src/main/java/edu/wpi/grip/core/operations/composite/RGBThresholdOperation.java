@@ -1,5 +1,6 @@
 package edu.wpi.grip.core.operations.composite;
 
+import com.google.common.collect.ImmutableList;
 import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
@@ -24,7 +25,7 @@ public class RGBThresholdOperation extends ThresholdOperation {
     public static final OperationDescription DESCRIPTION =
             OperationDescription.builder()
                     .name("RGB Threshold")
-                    .description("Segment an image based on color ranges")
+                    .summary("Segment an image based on color ranges")
                     .category(OperationDescription.Category.IMAGE_PROCESSING)
                     .icon(Icons.iconStream("threshold"))
                     .build();
@@ -60,20 +61,20 @@ public class RGBThresholdOperation extends ThresholdOperation {
     }
 
     @Override
-    public InputSocket<?>[] getInputSockets() {
-        return new InputSocket<?>[]{
+    public List<InputSocket> getInputSockets() {
+        return ImmutableList.of(
                 inputSocket,
                 redSocket,
                 greenSocket,
                 blueSocket
-        };
+        );
     }
 
     @Override
-    public OutputSocket<?>[] getOutputSockets() {
-        return new OutputSocket<?>[]{
+    public List<OutputSocket> getOutputSockets() {
+        return ImmutableList.of(
                 outputSocket
-        };
+        );
     }
 
     @Override

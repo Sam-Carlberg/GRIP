@@ -9,8 +9,10 @@ import com.google.inject.matcher.Matchers;
 import com.google.inject.spi.InjectionListener;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
+
 import edu.wpi.grip.core.events.UnexpectedThrowableEvent;
 import edu.wpi.grip.core.serialization.Project;
+import edu.wpi.grip.core.settings.SettingsProvider;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.InputSocketImpl;
 import edu.wpi.grip.core.sockets.OutputSocket;
@@ -21,9 +23,17 @@ import edu.wpi.grip.core.sources.MultiImageFileSource;
 import edu.wpi.grip.core.util.ExceptionWitness;
 import edu.wpi.grip.core.util.GRIPMode;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.logging.*;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.StreamHandler;
+
+import javax.annotation.Nullable;
 
 /**
  * A Guice {@link com.google.inject.Module} for GRIP's core package.  This is where instances of {@link Pipeline},
@@ -103,6 +113,9 @@ public class GRIPCoreModule extends AbstractModule {
         });
 
         bind(EventBus.class).toInstance(eventBus);
+
+        // Allow for just injecting the settings provider, instead of the whole pipeline
+        bind(SettingsProvider.class).to(Pipeline.class);
 
         install(new FactoryModuleBuilder().build(new TypeLiteral<Connection.Factory<Object>>() {
         }));

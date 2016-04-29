@@ -300,7 +300,7 @@ public class CameraSourceTest {
         source.updateOutputSockets();
 
         assertNotEquals("The frame rate was not updated when the camera was running",
-                Double.valueOf(0), source.createOutputSockets()[1].getValue().get());
+                Double.valueOf(0), source.createOutputSockets().get(1).getValue().get());
 
         try {
             source.stopAndAwait();

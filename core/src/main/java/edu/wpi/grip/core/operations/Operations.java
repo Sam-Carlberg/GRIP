@@ -7,7 +7,30 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import edu.wpi.grip.core.OperationMetaData;
 import edu.wpi.grip.core.events.OperationAddedEvent;
-import edu.wpi.grip.core.operations.composite.*;
+
+import edu.wpi.grip.core.operations.composite.BlobsReport;
+import edu.wpi.grip.core.operations.composite.BlurOperation;
+import edu.wpi.grip.core.operations.composite.ContoursReport;
+import edu.wpi.grip.core.operations.composite.ConvexHullsOperation;
+import edu.wpi.grip.core.operations.composite.DesaturateOperation;
+import edu.wpi.grip.core.operations.composite.DistanceTransformOperation;
+import edu.wpi.grip.core.operations.composite.FilterContoursOperation;
+import edu.wpi.grip.core.operations.composite.FilterLinesOperation;
+import edu.wpi.grip.core.operations.composite.FindBlobsOperation;
+import edu.wpi.grip.core.operations.composite.FindContoursOperation;
+import edu.wpi.grip.core.operations.composite.FindLinesOperation;
+import edu.wpi.grip.core.operations.composite.HSLThresholdOperation;
+import edu.wpi.grip.core.operations.composite.HSVThresholdOperation;
+import edu.wpi.grip.core.operations.composite.LinesReport;
+import edu.wpi.grip.core.operations.composite.MaskOperation;
+import edu.wpi.grip.core.operations.composite.NormalizeOperation;
+import edu.wpi.grip.core.operations.composite.PublishVideoOperation;
+import edu.wpi.grip.core.operations.composite.RGBThresholdOperation;
+import edu.wpi.grip.core.operations.composite.ResizeOperation;
+import edu.wpi.grip.core.operations.composite.SwitchOperation;
+import edu.wpi.grip.core.operations.composite.ThresholdMoving;
+import edu.wpi.grip.core.operations.composite.ValveOperation;
+import edu.wpi.grip.core.operations.composite.WatershedOperation;
 import edu.wpi.grip.core.operations.network.BooleanPublishable;
 import edu.wpi.grip.core.operations.network.MapNetworkPublisherFactory;
 import edu.wpi.grip.core.operations.network.NumberPublishable;
@@ -64,6 +87,7 @@ public class Operations {
                 new OperationMetaData(SwitchOperation.DESCRIPTION, () -> new SwitchOperation(isf, osf)),
                 new OperationMetaData(ValveOperation.DESCRIPTION, () -> new ValveOperation(isf, osf)),
                 new OperationMetaData(WatershedOperation.DESCRIPTION, () -> new WatershedOperation(isf, osf)),
+                new OperationMetaData(ThresholdMoving.DESCRIPTION, () -> new ThresholdMoving(isf, osf)),
 
                 // OpenCV operations
                 new OperationMetaData(MatFieldAccessor.DESCRIPTION, () -> new MatFieldAccessor(isf, osf)),

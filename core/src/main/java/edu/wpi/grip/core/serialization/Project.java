@@ -1,26 +1,26 @@
 package edu.wpi.grip.core.serialization;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.reflect.ClassPath;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import edu.wpi.grip.core.*;
-import edu.wpi.grip.core.sockets.InputSocket;
-import edu.wpi.grip.core.sockets.OutputSocket;
-import edu.wpi.grip.core.sources.CameraSource;
-import edu.wpi.grip.core.sources.ImageFileSource;
-import edu.wpi.grip.core.sources.MultiImageFileSource;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Helper for saving and loading a processing pipeline to and from a file
  */
 @Singleton
 public class Project {
+
+    private static final Logger logger = Logger.getLogger(Project.class.getName());
 
     @Inject
     private Pipeline pipeline;
@@ -40,8 +40,16 @@ public class Project {
         xstream.registerConverter(socketConverter);
         xstream.registerConverter(connectionConverter);
         xstream.registerConverter(projectSettingsConverter);
-        xstream.processAnnotations(new Class[]{Pipeline.class, Step.class, Connection.class, InputSocket.class,
-                OutputSocket.class, ImageFileSource.class, MultiImageFileSource.class, CameraSource.class});
+        try {
+            ClassPath cp = ClassPath.from(getClass().getClassLoader());
+            cp.getAllClasses()
+                    .stream()
+                    .filter(ci -> ci.getPackageName().startsWith("edu.wpi.grip"))
+                    .map(ClassPath.ClassInfo::load)
+                    .forEach(xstream::processAnnotations);
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Could not load classes for XStream annotation processing", e);
+        }
     }
 
     /**

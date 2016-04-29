@@ -1,5 +1,6 @@
 package edu.wpi.grip.core.sources;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.google.common.io.Files;
 import com.google.inject.assistedinject.Assisted;
@@ -18,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Properties;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -96,8 +98,8 @@ public final class ImageFileSource extends Source {
     }
 
     @Override
-    public OutputSocket[] createOutputSockets() {
-        return new OutputSocket[]{outputSocket};
+    public List<OutputSocket> createOutputSockets() {
+        return ImmutableList.of(outputSocket);
     }
 
     @Override

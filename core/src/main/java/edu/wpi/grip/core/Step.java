@@ -3,12 +3,13 @@ package edu.wpi.grip.core;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.Socket;
-import edu.wpi.grip.core.sockets.SocketsProvider;
 import edu.wpi.grip.core.util.ExceptionWitness;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,8 +28,8 @@ public class Step {
     private final ExceptionWitness witness;
 
     private final Operation operation;
-    private final InputSocket<?>[] inputSockets;
-    private final OutputSocket<?>[] outputSockets;
+    private final List<InputSocket> inputSockets;
+    private final List<OutputSocket> outputSockets;
     private final Object removedLock = new Object();
     private boolean removed = false;
 
@@ -44,9 +45,8 @@ public class Step {
         public Step create(Operation operation) {
             checkNotNull(operation, "The operation can not be null");
             // Create the list of input and output sockets, and mark this step as their owner.
-            final SocketsProvider socketsProvider = operation.getSockets();
-            final InputSocket<?>[] inputSockets = socketsProvider.inputSockets();
-            final OutputSocket<?>[] outputSockets = socketsProvider.outputSockets();
+            final List<InputSocket> inputSockets = operation.getInputSockets();
+            final List<OutputSocket> outputSockets = operation.getOutputSockets();
 
             final Step step = new Step(
                     operation,
@@ -73,8 +73,8 @@ public class Step {
      * @param exceptionWitnessFactory A factory used to create an {@link ExceptionWitness}
      */
     Step(Operation operation,
-         InputSocket<?>[] inputSockets,
-         OutputSocket<?>[] outputSockets,
+         List<InputSocket> inputSockets,
+         List<OutputSocket> outputSockets,
          ExceptionWitness.Factory exceptionWitnessFactory) {
         this.operation = operation;
         this.inputSockets = inputSockets;
@@ -92,14 +92,14 @@ public class Step {
     /**
      * @return An array of <code>Socket</code>s that hold the inputs to this step
      */
-    public InputSocket<?>[] getInputSockets() {
+    public List<InputSocket> getInputSockets() {
         return inputSockets;
     }
 
     /**
      * @return An array of <code>Socket</code>s that hold the outputs of this step
      */
-    public OutputSocket<?>[] getOutputSockets() {
+    public List<OutputSocket> getOutputSockets() {
         return outputSockets;
     }
 
@@ -119,6 +119,7 @@ public class Step {
      * default values.
      */
     protected final void runPerformIfPossible() {
+        boolean anyDirty = false;
         for (InputSocket<?> inputSocket : inputSockets) {
             // If there is a socket that isn't present then we have a problem.
             if (!inputSocket.getValue().isPresent()) {
@@ -126,6 +127,8 @@ public class Step {
                 resetOutputSockets();
                 return;  /* Only run the perform method if all of the input sockets are present. */
             }
+            // If one value is true then this will stay true
+            anyDirty |= inputSocket.dirtied();
         }
 
         try {

@@ -1,5 +1,6 @@
 package edu.wpi.grip.core.operations.network;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
 import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.OperationDescription;
@@ -9,7 +10,6 @@ import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.sockets.SocketHints;
 import edu.wpi.grip.core.util.Icons;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -48,12 +48,12 @@ public abstract class NetworkPublishOperation<D> implements Operation {
     }
 
     @Override
-    public InputSocket<?>[] getInputSockets() {
-        List<InputSocket<?>> sockets = new ArrayList<>();
-        sockets.add(dataSocket);
-        sockets.add(nameSocket);
-        sockets.addAll(createFlagSockets());
-        return sockets.toArray(new InputSocket[0]);
+    public List<InputSocket> getInputSockets() {
+        return ImmutableList.<InputSocket>builder()
+                .add(dataSocket)
+                .add(nameSocket)
+                .addAll(createFlagSockets())
+                .build();
     }
 
     /**
@@ -62,8 +62,8 @@ public abstract class NetworkPublishOperation<D> implements Operation {
     protected abstract List<InputSocket<Boolean>> createFlagSockets();
 
     @Override
-    public OutputSocket<?>[] getOutputSockets() {
-        return new OutputSocket[0];
+    public List<OutputSocket> getOutputSockets() {
+        return ImmutableList.of();
     }
 
     /**

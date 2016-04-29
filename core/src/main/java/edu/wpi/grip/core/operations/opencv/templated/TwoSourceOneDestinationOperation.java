@@ -1,11 +1,14 @@
 package edu.wpi.grip.core.operations.opencv.templated;
 
 
+import com.google.common.collect.ImmutableList;
 import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
+
+import java.util.List;
 
 /**
  * An Operation that takes two input values and produces one output value
@@ -60,17 +63,13 @@ public class TwoSourceOneDestinationOperation<T1, T2, R> implements Operation {
     }
 
     @Override
-    public InputSocket<?>[] getInputSockets() {
-        return new InputSocket<?>[]{
-                input1, input2
-        };
+    public List<InputSocket> getInputSockets() {
+        return ImmutableList.of(input1, input2);
     }
 
     @Override
-    public OutputSocket<?>[] getOutputSockets() {
-        return new OutputSocket<?>[]{
-                output
-        };
+    public List<OutputSocket> getOutputSockets() {
+        return ImmutableList.of(output);
     }
 
     @Override

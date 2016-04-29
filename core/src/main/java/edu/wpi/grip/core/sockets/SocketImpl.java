@@ -47,6 +47,14 @@ public class SocketImpl<T> implements Socket<T> {
         return socketHint;
     }
 
+    /**
+     * Called when the value for the socket is reassigned.
+     * Can be used by an implementing class to change behaviour when the value is changed.
+     */
+    protected void onValueChanged() {
+        // no-op
+    }
+
     @Override
     public synchronized void setValueOptional(Optional<? extends T> optionalValue) {
         checkNotNull(optionalValue, "The optional value can not be null");
@@ -54,6 +62,7 @@ public class SocketImpl<T> implements Socket<T> {
             getSocketHint().getType().cast(optionalValue.get());
         }
         this.value = optionalValue;
+        onValueChanged();
         eventBus.post(new SocketChangedEvent(this));
     }
 

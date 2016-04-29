@@ -5,7 +5,14 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;
-import edu.wpi.grip.core.*;
+
+import edu.wpi.grip.core.AdditionOperation;
+import edu.wpi.grip.core.Connection;
+import edu.wpi.grip.core.MockStep;
+import edu.wpi.grip.core.Operation;
+import edu.wpi.grip.core.Pipeline;
+import edu.wpi.grip.core.Step;
+import edu.wpi.grip.core.SubtractionOperation;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.util.MockExceptionWitness;
@@ -13,10 +20,11 @@ import edu.wpi.grip.ui.GRIPUIModule;
 import edu.wpi.grip.ui.util.StyleClassNameUtility;
 import edu.wpi.grip.ui.util.TestAnnotationFXMLLoader;
 import edu.wpi.grip.util.GRIPCoreTestModule;
-import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.input.MouseButton;
-import javafx.stage.Stage;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.After;
@@ -25,9 +33,10 @@ import org.testfx.framework.junit.ApplicationTest;
 import org.testfx.matcher.base.NodeMatchers;
 import org.testfx.util.WaitForAsyncUtils;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.input.MouseButton;
+import javafx.stage.Stage;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.fail;
@@ -50,7 +59,7 @@ public class PipelineUITest extends ApplicationTest {
         final Injector injector = Guice.createInjector(Modules.override(testModule).with(new GRIPUIModule()));
         eventBus = injector.getInstance(EventBus.class);
         pipeline = injector.getInstance(Pipeline.class);
-        additionOperation = new AdditionOperation();
+        additionOperation = new AdditionOperation(injector.getInstance(InputSocket.Factory.class), injector.getInstance(OutputSocket.Factory.class));
         subtractionOperation = new SubtractionOperation();
         pipelineController = injector.getInstance(PipelineController.class);
         final Scene scene = new Scene(TestAnnotationFXMLLoader.load(pipelineController), 800, 600);
@@ -76,8 +85,8 @@ public class PipelineUITest extends ApplicationTest {
         Step subtractStep = addOperation(1, subtractionOperation);
 
         // When
-        drag(".pipeline ." + StyleClassNameUtility.classNameFor(addStep) + " .socket-handle.output", MouseButton.PRIMARY)
-                .dropTo(".pipeline ." + StyleClassNameUtility.classNameFor(subtractStep) + " .socket-handle.input");
+        drag(StyleClassNameUtility.cssSelectorForOutputSocketHandleOn(addStep), MouseButton.PRIMARY)
+                .dropTo(StyleClassNameUtility.cssSelectorForInputSocketHandleOn(subtractStep));
 
         // Then
         Connection connection = assertStepConnected("The add step did not connect to the subtract step", addStep, subtractStep);
@@ -140,7 +149,7 @@ public class PipelineUITest extends ApplicationTest {
     }
 
     private Step addOperation(int count, Operation operation) {
-        final Step step = new Step.Factory(eventBus, origin -> new MockExceptionWitness(eventBus, origin)).create(operation);
+        final Step step = new Step.Factory(origin -> new MockExceptionWitness(eventBus, origin)).create(operation);
         pipeline.addStep(step);
 
         // Wait for the event to propagate to the UI
