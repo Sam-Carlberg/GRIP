@@ -99,10 +99,6 @@ public class DistanceTransformOperation implements Operation {
         this.outputSocket = outputSocketFactory.create(outputHint);
     }
 
-    @Override
-    public OperationDescription getDescription() {
-        return DESCRIPTION;
-    }
 
     @Override
     public List<InputSocket> getInputSockets() {

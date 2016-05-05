@@ -12,11 +12,6 @@ import java.util.List;
 public interface Operation {
 
     /**
-     * @return an object describing this {@code Operation}.
-     */
-    OperationDescription getDescription();
-
-    /**
      * @return A list of sockets for the inputs that the operation expects.
      *
      * @implNote The returned list should be immutable (i.e. read-only)

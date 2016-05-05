@@ -5,22 +5,12 @@ import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
-import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.util.Icons;
 import org.python.core.Py;
-import org.python.core.PyException;
-import org.python.core.PyFunction;
 import org.python.core.PyObject;
 import org.python.core.PySequence;
-import org.python.core.PyString;
-import org.python.core.PySystemState;
-import org.python.util.PythonInterpreter;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -61,113 +51,39 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class PythonScriptOperation implements Operation {
 
-    static {
-        Properties pythonProperties = new Properties();
-        pythonProperties.setProperty("python.import.site", "false");
-        PySystemState.initialize(pythonProperties, null);
-    }
-
-    private static final String DEFAULT_NAME = "Python Operation";
-    private static final String DEFAULT_DESCRIPTION = "";
-    private static final Logger logger =  Logger.getLogger(PythonScriptOperation.class.getName());
-
-
-    // Either a URL or a String of literal source code is stored in this field.  This allows a PythonScriptOperation to
-    // be serialized as a reference to some code rather than trying to save a bunch of Jython internal structures to a
-    // file, which is what would automatically happen otherwise.
-    private final Optional<URL> sourceURL;
-    private final Optional<String> sourceCode;
-
-    private final PythonInterpreter interpreter = new PythonInterpreter();
-
-    private InputSocket.Factory isf;
-    private OutputSocket.Factory osf;
-
-    private List<SocketHint<PyObject>> inputSocketHints;
-    private List<SocketHint<PyObject>> outputSocketHints;
-    private List<InputSocket> inputSockets; // intentionally using raw types
-    private List<OutputSocket> outputSockets; // intentionally using raw types
-    private PyFunction performFunction;
-    private PyString name;
-    private PyString summary;
-
-    public PythonScriptOperation(InputSocket.Factory isf, OutputSocket.Factory osf, URL url) throws PyException, IOException {
-        this.isf = checkNotNull(isf);
-        this.osf = checkNotNull(osf);
-        this.sourceURL = Optional.of(url);
-        this.sourceCode = Optional.empty();
-        this.interpreter.execfile(url.openStream());
-        this.getPythonVariables();
-
-        if (this.name == null) {
-            // If a name of the operation wasn't specified in the script, use the basename of the URL
-            final String path = url.getPath();
-            this.name = new PyString(path.substring(1 + Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\"))));
-        }
-
-        if (this.summary == null) {
-            this.summary = new PyString(DEFAULT_DESCRIPTION);
-        }
-
-        this.inputSockets = inputSocketHints.stream()
-                .map(isf::create)
-                .collect(Collectors.toList());
-
-        this.outputSockets = outputSocketHints.stream()
-                .map(osf::create)
-                .collect(Collectors.toList());
-    }
-
-    public PythonScriptOperation(InputSocket.Factory isf, OutputSocket.Factory osf, String code) throws PyException {
-        this.isf = checkNotNull(isf);
-        this.osf = checkNotNull(osf);
-        this.sourceURL = Optional.empty();
-        this.sourceCode = Optional.of(code);
-        this.interpreter.exec(code);
-        this.getPythonVariables();
-
-        if (this.name == null) {
-            this.name = new PyString(DEFAULT_NAME);
-        }
-
-        if (this.summary == null) {
-            this.summary = new PyString(DEFAULT_DESCRIPTION);
-        }
-
-        this.inputSockets = inputSocketHints.stream()
-                .map(isf::create)
-                .collect(Collectors.toList());
-
-        this.outputSockets = outputSocketHints.stream()
-                .map(osf::create)
-                .collect(Collectors.toList());
-    }
-
-    private void getPythonVariables() throws PyException {
-        this.inputSocketHints = this.interpreter.get("inputs", List.class);
-        this.outputSocketHints = this.interpreter.get("outputs", List.class);
-        this.performFunction = this.interpreter.get("perform", PyFunction.class);
-        this.name = this.interpreter.get("name", PyString.class);
-        this.summary = this.interpreter.get("summary", PyString.class);
-    }
-
-    @Override
-    public OperationDescription getDescription() {
+    public static OperationDescription descriptionFor(PythonScriptFile pythonScriptFile) {
         return OperationDescription.builder()
-                .name(this.name.getString())
-                .summary(this.summary.getString())
+                .name(pythonScriptFile.name())
+                .summary(pythonScriptFile.summary())
                 .icon(Icons.iconStream("python"))
                 .category(OperationDescription.Category.MISCELLANEOUS)
                 .build();
     }
 
-    public Optional<URL> getSourceURL() {
-        return this.sourceURL;
+    private static final String DEFAULT_NAME = "Python Operation";
+    private static final Logger logger =  Logger.getLogger(PythonScriptOperation.class.getName());
+
+
+    private final PythonScriptFile scriptFile;
+    private List<InputSocket> inputSockets; // intentionally using raw types
+    private List<OutputSocket> outputSockets; // intentionally using raw types
+
+
+    public PythonScriptOperation(InputSocket.Factory isf, OutputSocket.Factory osf, PythonScriptFile scriptFile) {
+        checkNotNull(isf);
+        checkNotNull(osf);
+
+        this.scriptFile = checkNotNull(scriptFile);
+
+        this.inputSockets = scriptFile.inputSocketHints().stream()
+                .map(isf::create)
+                .collect(Collectors.toList());
+
+        this.outputSockets = scriptFile.outputSocketHints().stream()
+                .map(osf::create)
+                .collect(Collectors.toList());
     }
 
-    public Optional<String> getSourceCode() {
-        return this.sourceCode;
-    }
 
     /**
      * @return An array of Sockets, based on the global "inputs" list in the Python script
@@ -203,7 +119,7 @@ public class PythonScriptOperation implements Operation {
         }
 
         try {
-            PyObject pyOutput = this.performFunction.__call__(pyInputs);
+            PyObject pyOutput = this.scriptFile.performFunction().__call__(pyInputs);
 
             if (pyOutput.isSequenceType()) {
                 /* If the Python function returned a sequence type, there must be multiple outputs for this step.

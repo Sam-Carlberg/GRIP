@@ -72,11 +72,6 @@ public class ResizeOperation implements Operation {
     }
 
     @Override
-    public OperationDescription getDescription() {
-        return DESCRIPTION;
-    }
-
-    @Override
     public List<InputSocket> getInputSockets() {
         return ImmutableList.of(
                 inputSocket,

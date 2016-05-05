@@ -3,6 +3,7 @@ package edu.wpi.grip.core;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 
+import javax.annotation.Nullable;
 import java.io.InputStream;
 import java.util.Optional;
 import java.util.Set;
@@ -40,11 +41,11 @@ public class OperationDescription {
                                  Category category,
                                  InputStream iconStream,
                                  Set<String> aliases) {
-        this.name = checkNotNull(name);
-        this.summary = checkNotNull(summary);
-        this.category = checkNotNull(category);
+        this.name = checkNotNull(name, "Name cannot be null");
+        this.summary = checkNotNull(summary, "Summary cannot be null");
+        this.category = checkNotNull(category, "Category cannot be null");
         this.icon = iconStream; // This is allowed to be null
-        this.aliases = ImmutableSet.copyOf(checkNotNull(aliases));
+        this.aliases = ImmutableSet.copyOf(checkNotNull(aliases, "Aliases cannot be null"));
     }
 
     /**
@@ -84,6 +85,31 @@ public class OperationDescription {
     }
 
     @Override
+    public boolean equals(@Nullable Object o) {
+        if (this == o) return true;
+        if (!(o instanceof OperationDescription)) return false;
+
+        OperationDescription that = (OperationDescription) o;
+
+        if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null) return false;
+        if (getSummary() != null ? !getSummary().equals(that.getSummary()) : that.getSummary() != null) return false;
+        if (getCategory() != that.getCategory()) return false;
+        if (getIcon() != null ? !getIcon().equals(that.getIcon()) : that.getIcon() != null) return false;
+        return getAliases() != null ? getAliases().equals(that.getAliases()) : that.getAliases() == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getName() != null ? getName().hashCode() : 0;
+        result = 31 * result + (getSummary() != null ? getSummary().hashCode() : 0);
+        result = 31 * result + (getCategory() != null ? getCategory().hashCode() : 0);
+        result = 31 * result + (getIcon() != null ? getIcon().hashCode() : 0);
+        result = 31 * result + (getAliases() != null ? getAliases().hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("name", getName())
@@ -111,7 +137,7 @@ public class OperationDescription {
      */
     public static final class Builder {
         private String name;
-        private String summary;
+        private String summary = "PLEASE PROVIDE A DESCRIPTION TO THE OPERATION DESCRIPTION!";
         private Category category;
         private InputStream icon;
         private ImmutableSet<String> aliases = ImmutableSet.of(); // default to empty Set to avoid NPE if not assigned

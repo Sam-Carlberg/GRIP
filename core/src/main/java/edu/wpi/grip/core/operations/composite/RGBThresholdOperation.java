@@ -56,11 +56,6 @@ public class RGBThresholdOperation extends ThresholdOperation {
     }
 
     @Override
-    public OperationDescription getDescription() {
-        return DESCRIPTION;
-    }
-
-    @Override
     public List<InputSocket> getInputSockets() {
         return ImmutableList.of(
                 inputSocket,

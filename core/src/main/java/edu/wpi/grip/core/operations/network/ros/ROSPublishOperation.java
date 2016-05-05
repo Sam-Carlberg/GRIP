@@ -27,13 +27,11 @@ public class ROSPublishOperation<D> extends NetworkPublishOperation<D> {
     private final JavaToMessageConverter<D, ?> converter;
     private final ROSMessagePublisher publisher;
 
-    private final OperationDescription description;
 
     public ROSPublishOperation(InputSocket.Factory inputSocketFactory, Class<D> dataType, ROSNetworkPublisherFactory rosNetworkPublisherFactory, JavaToMessageConverter<D, ?> converter) {
         super(inputSocketFactory, dataType);
         this.converter = converter;
         this.publisher = rosNetworkPublisherFactory.create(converter);
-        this.description = descriptionFor(dataType);
     }
 
     @Override
@@ -47,8 +45,4 @@ public class ROSPublishOperation<D> extends NetworkPublishOperation<D> {
         publisher.publish((m, f) -> converter.convert(dataSocket.getValue().get(), m, f));
     }
 
-    @Override
-    public OperationDescription getDescription() {
-        return description;
-    }
 }

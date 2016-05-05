@@ -3,31 +3,22 @@ package edu.wpi.grip.core;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-
 import edu.wpi.grip.core.events.ConnectionAddedEvent;
 import edu.wpi.grip.core.events.ConnectionRemovedEvent;
 import edu.wpi.grip.core.events.SourceAddedEvent;
 import edu.wpi.grip.core.events.SourceRemovedEvent;
-import edu.wpi.grip.core.sockets.InputSocket;
-import edu.wpi.grip.core.sockets.MockInputSocket;
-import edu.wpi.grip.core.sockets.MockOutputSocket;
-import edu.wpi.grip.core.sockets.OutputSocket;
-import edu.wpi.grip.core.sockets.SocketHint;
-import edu.wpi.grip.core.sockets.SocketHints;
+import edu.wpi.grip.core.sockets.*;
 import edu.wpi.grip.util.GRIPCoreTestModule;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class PipelineTest {
 
@@ -35,7 +26,7 @@ public class PipelineTest {
     private Step.Factory stepFactory;
     private EventBus eventBus;
     private Pipeline pipeline;
-    private Operation addition;
+    private OperationMetaData additionMeta;
     private InputSocket.Factory isf;
     private OutputSocket.Factory osf;
 
@@ -60,7 +51,7 @@ public class PipelineTest {
         pipeline = injector.getInstance(Pipeline.class);
         isf = injector.getInstance(InputSocket.Factory.class);
         osf = injector.getInstance(OutputSocket.Factory.class);
-        addition = new AdditionOperation(isf, osf);
+        additionMeta = new OperationMetaData(AdditionOperation.DESCRIPTION, () -> new AdditionOperation(isf, osf));
     }
 
     @After
@@ -202,8 +193,8 @@ public class PipelineTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testPipeline() {
-        Step step1 = stepFactory.create(new AdditionOperation(isf, osf));
-        Step step2 = stepFactory.create(new AdditionOperation(isf, osf));
+        Step step1 = stepFactory.create(new OperationMetaData(AdditionOperation.DESCRIPTION, () -> new AdditionOperation(isf, osf)));
+        Step step2 = stepFactory.create(new OperationMetaData(AdditionOperation.DESCRIPTION, () -> new AdditionOperation(isf, osf)));
         InputSocket<Double> a1 = (InputSocket<Double>) step1.getInputSockets().get(0);
         InputSocket<Double> b1 = (InputSocket<Double>) step1.getInputSockets().get(1);
         OutputSocket<Double> sum1 = (OutputSocket<Double>) step1.getOutputSockets().get(0);
@@ -237,8 +228,8 @@ public class PipelineTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testPipelineRemoved() {
-        Step step1 = stepFactory.create(new AdditionOperation(isf, osf));
-        Step step2 = stepFactory.create(new AdditionOperation(isf, osf));
+        Step step1 = stepFactory.create(new OperationMetaData(AdditionOperation.DESCRIPTION, () -> new AdditionOperation(isf, osf)));
+        Step step2 = stepFactory.create(new OperationMetaData(AdditionOperation.DESCRIPTION, () -> new AdditionOperation(isf, osf)));
         InputSocket<Double> a1 = (InputSocket<Double>) step1.getInputSockets().get(0);
         InputSocket<Double> b1 = (InputSocket<Double>) step1.getInputSockets().get(1);
         OutputSocket<Double> sum1 = (OutputSocket<Double>) step1.getOutputSockets().get(0);
@@ -270,8 +261,8 @@ public class PipelineTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testCannotConnectBackwards() {
-        Step step1 = stepFactory.create(addition);
-        Step step2 = stepFactory.create(addition);
+        Step step1 = stepFactory.create(additionMeta);
+        Step step2 = stepFactory.create(additionMeta);
         InputSocket<Double> a1 = (InputSocket<Double>) step1.getInputSockets().get(0);
         OutputSocket<Double> sum2 = (OutputSocket<Double>) step2.getOutputSockets().get(0);
 

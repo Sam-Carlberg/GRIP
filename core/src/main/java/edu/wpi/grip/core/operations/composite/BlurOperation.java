@@ -13,10 +13,7 @@ import java.util.List;
 
 import static org.bytedeco.javacpp.opencv_core.Mat;
 import static org.bytedeco.javacpp.opencv_core.Size;
-import static org.bytedeco.javacpp.opencv_imgproc.GaussianBlur;
-import static org.bytedeco.javacpp.opencv_imgproc.bilateralFilter;
-import static org.bytedeco.javacpp.opencv_imgproc.blur;
-import static org.bytedeco.javacpp.opencv_imgproc.medianBlur;
+import static org.bytedeco.javacpp.opencv_imgproc.*;
 
 /**
  * An {@link Operation} that softens an image using one of several different filters
@@ -67,11 +64,6 @@ public class BlurOperation implements Operation {
         this.radiusSocket = inputSocketFactory.create(radiusHint);
 
         this.outputSocket = outputSocketFactory.create(outputHint);
-    }
-
-    @Override
-    public OperationDescription getDescription() {
-        return DESCRIPTION;
     }
 
     @Override

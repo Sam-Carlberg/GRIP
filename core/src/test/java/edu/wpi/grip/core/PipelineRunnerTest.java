@@ -95,6 +95,8 @@ public class PipelineRunnerTest {
                     throw new IllegalArgumentException(illegalAugmentExceptionMessage);
                 }
             }
+            final Operation operation = new OperationThatThrowsExceptionOnPerform();
+            final OperationMetaData operationMetaData = new OperationMetaData(OperationDescription.builder().name("OperationThatThrowsExceptionOnPerform").build(), () -> operation);
             class ExceptionEventReceiver {
                 private int callCount = 0;
                 private ExceptionEvent event;
@@ -108,7 +110,7 @@ public class PipelineRunnerTest {
             eventBus.register(exceptionEventReceiver);
             eventBus.register(new RenderWaiterResumer(renderWaiter));
 
-            final Step throwingStep = new Step.Factory(MockExceptionWitness.simpleFactory(eventBus)).create(new OperationThatThrowsExceptionOnPerform());
+            final Step throwingStep = new Step.Factory(MockExceptionWitness.simpleFactory(eventBus)).create(operationMetaData);
             final PipelineRunner runner = new PipelineRunner(eventBus, () -> ImmutableList.of(), () -> ImmutableList.of(throwingStep));
             runner.addListener(failureListener, MoreExecutors.directExecutor());
 
@@ -146,7 +148,7 @@ public class PipelineRunnerTest {
             renderWaiter = new Waiter();
             sourceCounter = new RunSourceCounter();
             operationCounter = new RunCounterOperation();
-            runCounterStep = new Step.Factory(MockExceptionWitness.MOCK_FACTORY).create(operationCounter);
+            runCounterStep = new Step.Factory(MockExceptionWitness.MOCK_FACTORY).create(new OperationMetaData(RunCounterOperation.DESCRIPTION, () -> operationCounter));
             failureListener = new FailureListener();
 
         }
@@ -307,6 +309,7 @@ public class PipelineRunnerTest {
     }
 
     static class RunCounterOperation implements SimpleOperation {
+        private static final OperationDescription DESCRIPTION = OperationDescription.builder().name("Simple").build();
         private int performCount = 0;
         private int cleanUpCount = 0;
 
@@ -322,14 +325,10 @@ public class PipelineRunnerTest {
     }
 
     interface SimpleOperation extends Operation {
-
-        @Override
-        default OperationDescription getDescription() {
-            return OperationDescription.builder()
-                    .name("Simple Operation")
-                    .summary("A simple operation for testing")
-                    .build();
-        }
+        OperationDescription DESCRIPTION = OperationDescription.builder()
+                .name("Simple Operation")
+                .summary("A simple operation for testing")
+                .build();
 
         @Override
         default List<InputSocket> getInputSockets() {

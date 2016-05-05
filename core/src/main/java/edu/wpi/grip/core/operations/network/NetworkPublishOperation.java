@@ -30,8 +30,8 @@ public abstract class NetworkPublishOperation<D> implements Operation {
 
     protected final Class<D> dataType;
 
-    private final SocketHint<D> dataHint = (SocketHint<D>)
-            new SocketHint.Builder<>(new TypeToken<D>(getClass()){}.getRawType())
+    private final SocketHint<D> dataHint =
+            new SocketHint.Builder<>((Class<D>)new TypeToken<D>(getClass()){}.getRawType())
                     .identifier("Data")
                     .build();
     private final SocketHint<String> nameHint = SocketHints.Inputs.createTextSocketHint("Name", "");

@@ -41,11 +41,6 @@ public class ValveOperation implements Operation {
     }
 
     @Override
-    public OperationDescription getDescription() {
-        return DESCRIPTION;
-    }
-
-    @Override
     public List<InputSocket> getInputSockets() {
         return ImmutableList.of(switcherSocket, inputSocket);
     }

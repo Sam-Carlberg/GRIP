@@ -12,19 +12,8 @@ import edu.wpi.grip.core.util.Icons;
 
 import java.util.List;
 
-import static org.bytedeco.javacpp.opencv_core.CV_32SC1;
-import static org.bytedeco.javacpp.opencv_core.CV_8UC1;
-import static org.bytedeco.javacpp.opencv_core.CV_8UC3;
-import static org.bytedeco.javacpp.opencv_core.LINE_8;
-import static org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_core.MatVector;
-import static org.bytedeco.javacpp.opencv_core.Point;
-import static org.bytedeco.javacpp.opencv_core.Scalar;
-import static org.bytedeco.javacpp.opencv_core.bitwise_not;
-import static org.bytedeco.javacpp.opencv_imgproc.CV_FILLED;
-import static org.bytedeco.javacpp.opencv_imgproc.circle;
-import static org.bytedeco.javacpp.opencv_imgproc.drawContours;
-import static org.bytedeco.javacpp.opencv_imgproc.watershed;
+import static org.bytedeco.javacpp.opencv_core.*;
+import static org.bytedeco.javacpp.opencv_imgproc.*;
 
 /**
  * GRIP {@link Operation} for
@@ -56,11 +45,6 @@ public class WatershedOperation implements Operation {
         srcSocket = inputSocketFactory.create(srcHint);
         contoursSocket = inputSocketFactory.create(contoursHint);
         outputSocket = outputSocketFactory.create(outputHint);
-    }
-
-    @Override
-    public OperationDescription getDescription() {
-        return DESCRIPTION;
     }
 
     @Override

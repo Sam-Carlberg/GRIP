@@ -3,7 +3,10 @@ package edu.wpi.grip.core;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import edu.wpi.grip.core.sockets.*;
+import edu.wpi.grip.core.sockets.InputSocket;
+import edu.wpi.grip.core.sockets.OutputSocket;
+import edu.wpi.grip.core.sockets.SocketHint;
+import edu.wpi.grip.core.sockets.SocketHints;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
 
@@ -14,6 +17,8 @@ import java.util.List;
  * Performs the opencv add operation
  */
 public class AddOperation implements Operation {
+    public static final OperationDescription DESCRIPTION = OperationDescription
+            .builder().name("OpenCV Add").summary("Compute the per-pixel sum of two images.").build();
     private SocketHint<Mat>
             aHint = SocketHints.Inputs.createMatSocketHint("a", false),
             bHint = SocketHints.Inputs.createMatSocketHint("b", false),
@@ -31,13 +36,6 @@ public class AddOperation implements Operation {
         a = isf.create(aHint);
         b = isf.create(bHint);
         sum = osf.create(sumHint);
-    }
-
-    public OperationDescription getDescription() {
-        return OperationDescription.builder()
-                .name("OpenCV Add")
-                .summary("Compute the per-pixel sum of two images.")
-                .build();
     }
 
     @Override

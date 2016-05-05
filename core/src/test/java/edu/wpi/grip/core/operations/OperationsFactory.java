@@ -52,4 +52,11 @@ public class OperationsFactory {
                                     OutputSocket.Factory osf) {
         return new Operations(eventBus, mapFactory, rosFactory, isf, osf);
     }
+
+    public static CVOperations createCV(EventBus eventBus) {
+        Injector injector = Guice.createInjector(new GRIPCoreModule());
+        InputSocket.Factory isf = injector.getInstance(InputSocket.Factory.class);
+        OutputSocket.Factory osf = injector.getInstance(OutputSocket.Factory.class);
+        return new CVOperations(eventBus, isf, osf);
+    }
 }

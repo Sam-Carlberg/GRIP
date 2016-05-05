@@ -3,7 +3,6 @@ package edu.wpi.grip.core;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.Socket;
@@ -28,6 +27,7 @@ public class Step {
     private final ExceptionWitness witness;
 
     private final Operation operation;
+    private final OperationDescription description;
     private final List<InputSocket> inputSockets;
     private final List<OutputSocket> outputSockets;
     private final Object removedLock = new Object();
@@ -42,14 +42,16 @@ public class Step {
             this.exceptionWitnessFactory = exceptionWitnessFactory;
         }
 
-        public Step create(Operation operation) {
-            checkNotNull(operation, "The operation can not be null");
+        public Step create(OperationMetaData operationData) {
+            checkNotNull(operationData, "The operationMetaData cannot be null");
+            final Operation operation = operationData.getOperationSupplier().get();
             // Create the list of input and output sockets, and mark this step as their owner.
             final List<InputSocket> inputSockets = operation.getInputSockets();
             final List<OutputSocket> outputSockets = operation.getOutputSockets();
 
             final Step step = new Step(
                     operation,
+                    operationData.getDescription(),
                     inputSockets,
                     outputSockets,
                     exceptionWitnessFactory
@@ -68,25 +70,28 @@ public class Step {
 
     /**
      * @param operation               The operation that is performed at this step.
+     * @param description             The description of the operation
      * @param inputSockets            The input sockets from the operation.
      * @param outputSockets           The output sockets provided by the operation.
      * @param exceptionWitnessFactory A factory used to create an {@link ExceptionWitness}
      */
     Step(Operation operation,
+         OperationDescription description,
          List<InputSocket> inputSockets,
          List<OutputSocket> outputSockets,
          ExceptionWitness.Factory exceptionWitnessFactory) {
         this.operation = operation;
+        this.description = description;
         this.inputSockets = inputSockets;
         this.outputSockets = outputSockets;
         this.witness = exceptionWitnessFactory.create(this);
     }
 
     /**
-     * @return The underlying <code>Operation</code> that this step performs
+     * @return The description for the step
      */
-    public Operation getOperation() {
-        return this.operation;
+    public OperationDescription getOperationDescription() {
+        return this.description;
     }
 
     /**
@@ -142,7 +147,7 @@ public class Step {
         } catch (RuntimeException e) {
             // We do not want to catch all exceptions, only runtime exceptions.
             // This is especially important when it comes to InterruptedExceptions
-            final String operationFailedMessage = String.format("The %s operation did not perform correctly.", operation.getDescription().getName());
+            final String operationFailedMessage = String.format("The %s operation did not perform correctly.", getOperationDescription().getName());
             logger.log(Level.WARNING, operationFailedMessage, e);
             witness.flagException(e, operationFailedMessage);
             resetOutputSockets();

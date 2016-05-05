@@ -3,7 +3,7 @@ package edu.wpi.grip.core;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import edu.wpi.grip.core.operations.PythonScriptOperation;
+import edu.wpi.grip.core.operations.PythonScriptFile;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.Socket;
@@ -24,7 +24,7 @@ public class PythonTest {
     private OutputSocket.Factory osf;
 
     @Before
-    public void setUp () {
+    public void setUp() {
         testModule = new GRIPCoreTestModule();
         testModule.setUp();
         final Injector injector = Guice.createInjector(testModule);
@@ -35,8 +35,8 @@ public class PythonTest {
 
     @Test
     public void testPython() throws Exception {
-        Operation addition = new PythonScriptOperation(isf, osf, PythonTest.class.getResource("/edu/wpi/grip/scripts/addition.py"));
-        Step step = new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(addition);
+        PythonScriptFile pythonScriptFile = PythonScriptFile.create(PythonTest.class.getResource("/edu/wpi/grip/scripts/addition.py"));
+        Step step = new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(pythonScriptFile.toOperationMetaData(isf, osf));
         Socket aSocket = step.getInputSockets().get(0);
         Socket bSocket = step.getInputSockets().get(1);
         Socket sumSocket = step.getOutputSockets().get(0);
@@ -51,11 +51,11 @@ public class PythonTest {
 
     @Test
     public void testPythonAdditionFromString() throws Exception {
-        Operation additionFromString = new PythonScriptOperation(isf, osf, "import edu.wpi.grip.core.sockets as grip\nimport java" +
-                ".lang.Integer\n\ninputs = [\n    grip.SocketHints.createNumberSocketHint(\"a\", 0.0),\n    grip.SocketHints.createNumberSocketHint(" +
+        PythonScriptFile pythonScriptFile = PythonScriptFile.create("import edu.wpi.grip.core.sockets as grip\nimport java" +
+                ".lang.Integer\n\nname = \"Addition Operation\"\n\ninputs = [\n    grip.SocketHints.createNumberSocketHint(\"a\", 0.0),\n    grip.SocketHints.createNumberSocketHint(" +
                 "\"b\", 0.0),\n]\n\noutputs = [\n    grip.SocketHints.Outputs.createNumberSocketHint(\"sum\", 0.0)," +
                 "\n]\n\ndef perform(a, b):\n    return a + b\n");
-        Step step = new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(additionFromString);
+        Step step = new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(pythonScriptFile.toOperationMetaData(isf, osf));
         Socket aSocket = step.getInputSockets().get(0);
         Socket bSocket = step.getInputSockets().get(1);
         Socket sumSocket = step.getOutputSockets().get(0);
@@ -70,8 +70,10 @@ public class PythonTest {
 
     @Test
     public void testPythonMultipleOutputs() throws Exception {
-        Operation additionSubtraction = new PythonScriptOperation(isf, osf, PythonTest.class.getResource("/edu/wpi/grip/scripts/addition-subtraction.py"));
-        Step step = new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(additionSubtraction);
+
+        Step step = new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(
+                PythonScriptFile.create(PythonTest.class.getResource("/edu/wpi/grip/scripts/addition-subtraction.py")).toOperationMetaData(isf, osf)
+        );
         Socket aSocket = step.getInputSockets().get(0);
         Socket bSocket = step.getInputSockets().get(1);
         Socket sumSocket = step.getOutputSockets().get(0);
@@ -88,8 +90,9 @@ public class PythonTest {
 
     @Test
     public void testPythonWrongOutputCount() throws Exception {
-        Operation additionWrongOutputCount = new PythonScriptOperation(isf, osf, PythonTest.class.getResource("/edu/wpi/grip/scripts/addition-wrong-output-count.py"));
-        Step step = new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(additionWrongOutputCount);
+        Step step = new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(
+                PythonScriptFile.create(PythonTest.class.getResource("/edu/wpi/grip/scripts/addition-wrong-output-count.py")).toOperationMetaData(isf, osf)
+        );
         Socket aSocket = step.getInputSockets().get(0);
         Socket bSocket = step.getInputSockets().get(1);
         Socket sumSocket = step.getOutputSockets().get(0);
@@ -102,8 +105,8 @@ public class PythonTest {
 
     @Test
     public void testPythonWrongOutputType() throws Exception {
-        Operation additionWrongOutputType = new PythonScriptOperation(isf, osf, PythonTest.class.getResource("/edu/wpi/grip/scripts/addition-wrong-output-type.py"));
-        Step step = new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(additionWrongOutputType);
+        Step step = new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(
+                PythonScriptFile.create(PythonTest.class.getResource("/edu/wpi/grip/scripts/addition-wrong-output-type.py")).toOperationMetaData(isf, osf));
         Socket aSocket = step.getInputSockets().get(0);
         Socket bSocket = step.getInputSockets().get(1);
         Socket sumSocket = step.getOutputSockets().get(0);
@@ -118,26 +121,30 @@ public class PythonTest {
 
     @Test
     public void testDefaultName() throws Exception {
-        Operation addition = new PythonScriptOperation(isf, osf, PythonTest.class.getResource("/edu/wpi/grip/scripts/addition.py"));
-        assertEquals("addition.py", addition.getDescription().getName());
+        OperationDescription additionDescription = PythonScriptFile.create(PythonTest.class.getResource("/edu/wpi/grip/scripts/addition.py"))
+                .toOperationMetaData(isf, osf).getDescription();
+        assertEquals("addition.py", additionDescription.getName());
     }
 
     @Test
     public void testDefaultDescription() throws Exception {
-        Operation addition = new PythonScriptOperation(isf, osf, PythonTest.class.getResource("/edu/wpi/grip/scripts/addition.py"));
-        assertEquals("", addition.getDescription().getSummary());
+        OperationDescription additionDescription = PythonScriptFile.create(PythonTest.class.getResource("/edu/wpi/grip/scripts/addition.py"))
+                .toOperationMetaData(isf, osf).getDescription();
+        assertEquals("", additionDescription.getSummary());
     }
 
     @Test
     public void testName() throws Exception {
-        Operation addition = new PythonScriptOperation(isf, osf, PythonTest.class.getResource("/edu/wpi/grip/scripts/addition-with-name-and-description.py"));
-        assertEquals("Add", addition.getDescription().getName());
+        OperationDescription additionDescription = PythonScriptFile.create(PythonTest.class.getResource("/edu/wpi/grip/scripts/addition-with-name-and-description.py"))
+                .toOperationMetaData(isf, osf).getDescription();
+        assertEquals("Add", additionDescription.getName());
     }
 
     @Test
     public void testSummary() throws Exception {
-        Operation addition = new PythonScriptOperation(isf, osf, PythonTest.class.getResource("/edu/wpi/grip/scripts/addition-with-name-and-description.py"));
-        assertEquals("Compute the sum of two integers", addition.getDescription().getSummary());
+        OperationDescription additionDescription = PythonScriptFile.create(PythonTest.class.getResource("/edu/wpi/grip/scripts/addition-with-name-and-description.py"))
+                .toOperationMetaData(isf, osf).getDescription();
+        assertEquals("Compute the sum of two integers", additionDescription.getSummary());
     }
 
     @After

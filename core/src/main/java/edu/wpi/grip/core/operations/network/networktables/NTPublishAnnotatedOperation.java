@@ -40,7 +40,6 @@ public class NTPublishAnnotatedOperation<D, P extends Publishable> extends Publi
                 .build();
     }
 
-    private final OperationDescription description;
 
     /**
      * Creates an NTPublishAnnotatedOperation for a type that already implements {@link Publishable} (e.g.
@@ -72,12 +71,6 @@ public class NTPublishAnnotatedOperation<D, P extends Publishable> extends Publi
                                        MapNetworkPublisherFactory publisherFactory) {
         super(inputSocketFactory, dataType, publishType, converter, publisherFactory);
         super.nameSocket.setValue("my" + dataType.getSimpleName());
-        this.description = descriptionFor(dataType);
-    }
-
-    @Override
-    public OperationDescription getDescription() {
-        return description;
     }
 
 }

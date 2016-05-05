@@ -86,11 +86,11 @@ public class OperationListController {
 
     @Subscribe
     public void onOperationAdded(OperationAddedEvent event) {
-        OperationMetaData operationDescription = event.getOperation();
+        OperationMetaData operationMetaData = event.getOperation();
 
-        if (root.getUserData() == null || operationDescription.getDescription().getCategory() == root.getUserData()) {
+        if (root.getUserData() == null || operationMetaData.getDescription().getCategory() == root.getUserData()) {
             PlatformImpl.runAndWait(() ->
-                    operationsMapManager.add(operationControllerFactory.create(operationDescription.getDescription(), operationDescription.getOperationSupplier())));
+                    operationsMapManager.add(operationControllerFactory.create(operationMetaData)));
         }
     }
 

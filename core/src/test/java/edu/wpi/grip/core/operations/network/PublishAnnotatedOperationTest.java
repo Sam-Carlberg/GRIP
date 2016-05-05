@@ -3,7 +3,6 @@ package edu.wpi.grip.core.operations.network;
 import com.google.inject.Guice;
 import edu.wpi.grip.core.GRIPCoreModule;
 import edu.wpi.grip.core.Operation;
-import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
 import org.junit.Test;
 
@@ -14,9 +13,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * Tests for error handling in the publish operations' reflection stuff.
@@ -139,11 +136,6 @@ public class PublishAnnotatedOperationTest {
 
         public TestPublishAnnotatedOperation(Class<T> type) {
             this(type, MockMapNetworkPublisher::new);
-        }
-
-        @Override
-        public OperationDescription getDescription() {
-            return null;
         }
     }
 

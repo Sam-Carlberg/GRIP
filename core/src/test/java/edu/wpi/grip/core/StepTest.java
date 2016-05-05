@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 
 public class StepTest {
     private EventBus eventBus;
-    private Operation addition;
+    private OperationMetaData additionMeta;
     private GRIPCoreTestModule testModule = new GRIPCoreTestModule();
 
     @Before
@@ -25,7 +25,7 @@ public class StepTest {
         Injector injector = Guice.createInjector(testModule);
         InputSocket.Factory isf = injector.getInstance(InputSocket.Factory.class);
         OutputSocket.Factory osf = injector.getInstance(OutputSocket.Factory.class);
-        addition = new AdditionOperation(isf, osf);
+        additionMeta = new OperationMetaData(AdditionOperation.DESCRIPTION, () -> new AdditionOperation(isf, osf));
         eventBus = injector.getInstance(EventBus.class);
     }
 
@@ -41,7 +41,7 @@ public class StepTest {
 
     @Test
     public void testStep() {
-        Step step = new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(addition);
+        Step step = new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(additionMeta);
         Socket<Double> a = (Socket<Double>) step.getInputSockets().get(0);
         Socket<Double> b = (Socket<Double>) step.getInputSockets().get(1);
         Socket<Double> c = (Socket<Double>) step.getOutputSockets().get(0);
@@ -56,7 +56,7 @@ public class StepTest {
 
     @Test
     public void testSocketDirection() {
-        Step step = new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(addition);
+        Step step = new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(additionMeta);
         Socket<Double> a = (Socket<Double>) step.getInputSockets().get(0);
         Socket<Double> b = (Socket<Double>) step.getInputSockets().get(1);
         Socket<Double> c = (Socket<Double>) step.getOutputSockets().get(0);
@@ -68,8 +68,8 @@ public class StepTest {
 
     @Test
     public void testGetOperation() {
-        Step step = new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(addition);
+        Step step = new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(additionMeta);
 
-        assertEquals(addition, step.getOperation());
+        assertEquals(additionMeta.getDescription(), step.getOperationDescription());
     }
 }

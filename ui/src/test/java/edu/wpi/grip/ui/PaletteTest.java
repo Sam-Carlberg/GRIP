@@ -5,7 +5,6 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;
-
 import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.OperationMetaData;
@@ -15,18 +14,16 @@ import edu.wpi.grip.core.events.StepAddedEvent;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.util.GRIPCoreTestModule;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
 import org.testfx.util.WaitForAsyncUtils;
 
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -58,7 +55,7 @@ public class PaletteTest extends ApplicationTest {
     public void testPalette() {
         // Given a single operation...
         Operation operation = new TestOperation();
-        eventBus.post(new OperationAddedEvent(new OperationMetaData(operation.getDescription(), () -> operation)));
+        eventBus.post(new OperationAddedEvent(new OperationMetaData(TestOperation.DESCRIPTION, () -> operation)));
 
         // Record when a a StepAddedEvent happens
         Step[] step = new Step[]{null};
@@ -75,15 +72,12 @@ public class PaletteTest extends ApplicationTest {
 
         // Then there should be a step added
         assertNotNull("Clicking on palette did not add a new step", step[0]);
-        assertEquals("Clicking on palette did not add the correct step", operation, step[0].getOperation());
+        assertEquals("Clicking on palette did not add the correct step", TestOperation.DESCRIPTION, step[0].getOperationDescription());
     }
 
     private static class TestOperation implements Operation {
-
-        @Override
-        public OperationDescription getDescription() {
-            return OperationDescription.builder().name("test").summary("test").build();
-        }
+        public static final OperationDescription DESCRIPTION
+                = OperationDescription.builder().name("test").summary("test").build();
 
         @Override
         public List<InputSocket> getInputSockets() {

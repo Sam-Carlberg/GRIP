@@ -3,11 +3,10 @@ package edu.wpi.grip.core.operations;
 import com.google.common.base.Throwables;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import edu.wpi.grip.core.Operation;
+import edu.wpi.grip.core.OperationMetaData;
 import edu.wpi.grip.core.Step;
 import edu.wpi.grip.core.events.OperationAddedEvent;
 import edu.wpi.grip.core.util.MockExceptionWitness;
-//import edu.wpi.grip.generated.CVOperations;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,15 +15,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+//import edu.wpi.grip.generated.CVOperations;
+
 public class OperationsTest {
-    private List<Operation> operationList;
+    private List<OperationMetaData> operationList;
     private Optional<Throwable> throwableOptional;
     private EventBus eventBus;
 
     private class OperationGrabber {
         @Subscribe
         public void onOperationAddedEvent(OperationAddedEvent event) {
-            operationList.add(event.getOperation().getOperationSupplier().get());
+            operationList.add(event.getOperation());
         }
     }
 
@@ -45,23 +46,23 @@ public class OperationsTest {
         }
     }
 
-//    @Test
-//    public void testCreateAllCVSteps() {
-//        CVOperations.addOperations(eventBus);
-//        for (Operation operation : operationList) {
-//            final Step step =
-//                    new Step.Factory(eventBus, (origin) -> new MockExceptionWitness(eventBus, origin)).create(operation);
-//            step.setRemoved();
-//        }
-//    }
+    @Test
+    public void testCreateAllCVSteps() {
+        OperationsFactory.createCV(eventBus).addOperations();
+        for (OperationMetaData operationMeta : operationList) {
+            final Step step =
+                    new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(operationMeta);
+            step.setRemoved();
+        }
+    }
 
     @Test
     public void testCreateAllCoreSteps() {
         OperationsFactory.create(eventBus)
                 .addOperations();
-        for (Operation operation : operationList) {
+        for (OperationMetaData operationMeta : operationList) {
             final Step step =
-                    new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(operation);
+                    new Step.Factory((origin) -> new MockExceptionWitness(eventBus, origin)).create(operationMeta);
             step.setRemoved();
         }
     }

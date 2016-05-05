@@ -82,8 +82,8 @@ public class StepController implements Controller {
         outputSocketMapManager = new ControllerMap<>(outputs.getChildren());
 
         root.getStyleClass().add(StyleClassNameUtility.classNameFor(step));
-        title.setText(step.getOperation().getDescription().getName());
-        step.getOperation().getDescription().getIcon().ifPresent(icon -> this.icon.setImage(new Image(InputStream.class.cast(icon))));
+        title.setText(step.getOperationDescription().getName());
+        step.getOperationDescription().getIcon().ifPresent(icon -> this.icon.setImage(new Image(InputStream.class.cast(icon))));
         buttons.getChildren().add(0, exceptionWitnessResponderButtonFactory.create(step, "Step Error"));
 
         // Add a SocketControlView for each input socket and output socket

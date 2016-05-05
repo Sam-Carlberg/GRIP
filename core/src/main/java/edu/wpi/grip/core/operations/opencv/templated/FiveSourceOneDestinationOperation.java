@@ -2,7 +2,6 @@ package edu.wpi.grip.core.operations.opencv.templated;
 
 import com.google.common.collect.ImmutableList;
 import edu.wpi.grip.core.Operation;
-import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
@@ -59,11 +58,6 @@ public class FiveSourceOneDestinationOperation<T1, T2, T3, T4, T5, R> implements
                 new SocketHint.Builder<>(t4).identifier("src4").build(),
                 new SocketHint.Builder<>(t5).identifier("src5").build(),
                 new SocketHint.Builder<>(r).identifier("dst").build());
-    }
-
-    @Override
-    public OperationDescription getDescription() {
-        return null;
     }
 
     @Override

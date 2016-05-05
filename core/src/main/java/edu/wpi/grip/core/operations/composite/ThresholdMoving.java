@@ -1,18 +1,16 @@
 package edu.wpi.grip.core.operations.composite;
 
 import com.google.common.collect.ImmutableList;
-
 import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHints;
-
-import java.util.List;
-
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Size;
+
+import java.util.List;
 
 /**
  * Finds the absolute difference between the current image and the previous image.
@@ -34,11 +32,6 @@ public class ThresholdMoving implements Operation {
         this.imageSocket = isf.create(SocketHints.Inputs.createMatSocketHint("image", false));
         this.outputSocket = osf.create(SocketHints.Outputs.createMatSocketHint("moved"));
         this.lastImage = new Mat();
-    }
-
-    @Override
-    public OperationDescription getDescription() {
-        return DESCRIPTION;
     }
 
     @Override

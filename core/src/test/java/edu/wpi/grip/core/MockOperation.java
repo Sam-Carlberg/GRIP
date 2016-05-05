@@ -8,14 +8,11 @@ import edu.wpi.grip.core.sockets.OutputSocket;
 import java.util.List;
 
 public class MockOperation implements Operation {
-
-    @Override
-    public OperationDescription getDescription() {
-        return OperationDescription.builder()
-                .name("Mock Operation")
-                .summary("A mock operation summary")
-                .build();
-    }
+    public static final OperationDescription DESCRIPTION
+            = OperationDescription.builder()
+            .name("Mock Operation")
+            .summary("A mock operation summary")
+            .build();
 
     @Override
     public List<InputSocket> getInputSockets() {

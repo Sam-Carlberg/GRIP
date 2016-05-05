@@ -39,11 +39,6 @@ public class NewSizeOperation implements CVOperation {
     }
 
     @Override
-    public OperationDescription getDescription() {
-        return DESCRIPTION;
-    }
-
-    @Override
     public List<InputSocket> getInputSockets() {
         return ImmutableList.of(
                 widthSocket,

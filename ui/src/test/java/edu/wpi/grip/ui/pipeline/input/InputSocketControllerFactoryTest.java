@@ -4,8 +4,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;
-
-import edu.wpi.grip.core.Operation;
 import edu.wpi.grip.core.OperationMetaData;
 import edu.wpi.grip.core.Palette;
 import edu.wpi.grip.core.Step;
@@ -13,10 +11,9 @@ import edu.wpi.grip.core.operations.OperationsFactory;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.ui.GRIPUIModule;
 import edu.wpi.grip.util.GRIPCoreTestModule;
-
-import java.util.Arrays;
-import java.util.Collection;
-
+import javafx.scene.Scene;
+import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,9 +21,8 @@ import org.junit.runners.Parameterized;
 import org.testfx.framework.junit.ApplicationTest;
 import org.testfx.matcher.base.NodeMatchers;
 
-import javafx.scene.Scene;
-import javafx.scene.layout.GridPane;
-import javafx.stage.Stage;
+import java.util.Arrays;
+import java.util.Collection;
 
 import static org.testfx.api.FxAssert.verifyThat;
 
@@ -40,7 +36,7 @@ public class InputSocketControllerFactoryTest extends ApplicationTest {
     private InputSocketControllerFactory inputSocketControllerFactory;
     private GridPane gridPane;
 
-    private final Operation operation;
+    private final OperationMetaData operationMeta;
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final String name;
 
@@ -53,14 +49,14 @@ public class InputSocketControllerFactoryTest extends ApplicationTest {
         final Palette palette = injector.getInstance(Palette.class);
         final EventBus eventBus = injector.getInstance(EventBus.class);
         OperationsFactory.create(eventBus).addOperations();
-//        CVOperations.addOperations(eventBus);
-        Collection<OperationMetaData> operations = palette.getOperations();
+        OperationsFactory.createCV(eventBus).addOperations();
+        Collection<OperationMetaData> operationMetas = palette.getOperations();
 
-        Object[][] params = new Object[operations.size()][2];
+        Object[][] params = new Object[operationMetas.size()][2];
         final int[] index = {0};
-        operations.forEach(operation -> {
-            params[index[0]][0] = operation.getOperationSupplier().get();
-            params[index[0]][1] = operation.getDescription().getName();
+        operationMetas.forEach(operationMeta -> {
+            params[index[0]][0] = operationMeta;
+            params[index[0]][1] = operationMeta.getDescription().getName();
             index[0]++;
         });
 
@@ -70,12 +66,12 @@ public class InputSocketControllerFactoryTest extends ApplicationTest {
     }
 
     /**
-     * @param operation The operation under test
-     * @param name      The name. This is used for logging if the tests fail
+     * @param operationMeta The operation under test
+     * @param name          The name. This is used for logging if the tests fail
      */
-    public InputSocketControllerFactoryTest(Operation operation, String name) {
+    public InputSocketControllerFactoryTest(OperationMetaData operationMeta, String name) {
         super();
-        this.operation = operation;
+        this.operationMeta = operationMeta;
         this.name = name;
     }
 
@@ -101,7 +97,7 @@ public class InputSocketControllerFactoryTest extends ApplicationTest {
     @Test
     @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     public void testCreateAllKnownInputSocketControllers() throws Exception {
-        final Step step = stepFactory.create(operation);
+        final Step step = stepFactory.create(operationMeta);
         interact(() -> {
             for (int i = 0; i < step.getInputSockets().size(); i++) {
                 final InputSocket<?> inputSocket = step.getInputSockets().get(i);

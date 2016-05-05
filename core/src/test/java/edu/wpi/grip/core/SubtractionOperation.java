@@ -11,6 +11,11 @@ import edu.wpi.grip.core.sockets.SocketHints;
 import java.util.List;
 
 public class SubtractionOperation implements Operation {
+    public static final OperationDescription DESCRIPTION =
+            OperationDescription.builder()
+                    .name("Subtract")
+                    .summary("Computer the difference between two doubles")
+                    .build();
     private SocketHint<Number>
             aHint = SocketHints.createNumberSocketHint("a", 0.0),
             bHint = SocketHints.createNumberSocketHint("b", 0.0),
@@ -29,13 +34,6 @@ public class SubtractionOperation implements Operation {
         c = osf.create(cHint);
     }
 
-    @Override
-    public OperationDescription getDescription() {
-        return OperationDescription.builder()
-                .name("Subtract")
-                .summary("Computer the difference between two doubles")
-                .build();
-    }
 
     @Override
     public List<InputSocket> getInputSockets() {

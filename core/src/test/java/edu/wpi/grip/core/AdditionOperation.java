@@ -9,6 +9,11 @@ import edu.wpi.grip.core.sockets.SocketHints;
 import java.util.List;
 
 public class AdditionOperation implements Operation {
+    public static final OperationDescription DESCRIPTION =
+            OperationDescription.builder()
+                    .name("Add")
+                    .summary("Compute the sum of two doubles")
+                    .build();
     private SocketHint<Number>
             aHint = SocketHints.createNumberSocketHint("a", 0.0),
             bHint = SocketHints.createNumberSocketHint("b", 0.0),
@@ -21,14 +26,6 @@ public class AdditionOperation implements Operation {
         a = isf.create(aHint);
         b = isf.create(bHint);
         c = osf.create(cHint);
-    }
-
-    @Override
-    public OperationDescription getDescription() {
-        return OperationDescription.builder()
-                .name("Add")
-                .summary("Compute the sum of two doubles")
-                .build();
     }
 
     @Override
