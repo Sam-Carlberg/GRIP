@@ -1,6 +1,7 @@
 package edu.wpi.grip.ui.preview;
 
 import edu.wpi.grip.core.events.RenderEvent;
+import edu.wpi.grip.core.operations.composite.BoundingBoxReport;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.ui.util.GRIPPlatform;
 import edu.wpi.grip.ui.util.ImageConverter;
@@ -28,11 +29,9 @@ import static org.bytedeco.javacpp.opencv_core.bitwise_xor;
 import static org.bytedeco.javacpp.opencv_imgproc.line;
 
 /**
- * Created on 6/14/16
- *
- * @author Sam Carlberg
+ * View for best-fit bounding box reports.
  */
-public class RotatedRectSocketPreviewView extends SocketPreviewView<List<RotatedRect>> {
+public class RotatedRectSocketPreviewView extends SocketPreviewView<BoundingBoxReport<RotatedRect>> {
 
     private final ImageConverter imageConverter = new ImageConverter();
     private final ImageView imageView = new ImageView();
@@ -53,7 +52,7 @@ public class RotatedRectSocketPreviewView extends SocketPreviewView<List<Rotated
     /**
      * @param socket An output socket to preview
      */
-    RotatedRectSocketPreviewView(GRIPPlatform platform, OutputSocket<List<RotatedRect>> socket) {
+    RotatedRectSocketPreviewView(GRIPPlatform platform, OutputSocket<BoundingBoxReport<RotatedRect>> socket) {
         super(socket);
         this.platform = platform;
         this.colorRects = new CheckBox("Color Rectangles");
@@ -70,8 +69,12 @@ public class RotatedRectSocketPreviewView extends SocketPreviewView<List<Rotated
     @Subscribe
     private void render(RenderEvent renderEvent) {
         synchronized (this) {
-            final List<RotatedRect> rects = getSocket().getValue().get();
-            tmp.create(480, 640, CV_8UC3);
+            @SuppressWarnings("OptionalGetWithoutIsPresent")
+            BoundingBoxReport<RotatedRect> report = getSocket().getValue().get();
+            final int rows = report.getRows();
+            final int cols = report.getCols();
+            final List<RotatedRect> rects = report.getBoundingBoxes();
+            tmp.create(rows, cols, CV_8UC3);
             bitwise_xor(tmp, tmp, tmp);
             int whichColor = 0;
             final boolean doColor = colorRects.isSelected();

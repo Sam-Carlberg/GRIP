@@ -4,6 +4,8 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+
+import edu.wpi.grip.core.operations.composite.BoundingBoxReport;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.operations.composite.BlobsReport;
 import edu.wpi.grip.core.operations.composite.ContoursReport;
@@ -49,8 +51,8 @@ public class SocketPreviewViewFactory {
             previewView = (SocketPreviewView) new LinesSocketPreviewView(platform, (OutputSocket<LinesReport>) socket);
         } else if (socket.getSocketHint().getType() == BlobsReport.class) {
             previewView = (SocketPreviewView) new BlobsSocketPreviewView(platform, (OutputSocket<BlobsReport>) socket);
-        } else if (socket.getSocketHint().getType().equals(new TypeToken<List<RotatedRect>>(){}.getRawType())) {
-            previewView = (SocketPreviewView) new RotatedRectSocketPreviewView(platform, (OutputSocket<List<RotatedRect>>) socket);
+        } else if (socket.getSocketHint().getType().equals(new TypeToken<BoundingBoxReport<RotatedRect>>(){}.getRawType())) {
+            previewView = (SocketPreviewView) new RotatedRectSocketPreviewView(platform, (OutputSocket<BoundingBoxReport<RotatedRect>>) socket);
         } else {
             previewView = new TextAreaSocketPreviewView<>(platform, socket);
         }

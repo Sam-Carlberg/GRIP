@@ -39,14 +39,14 @@ public class ContourBoundsOperation implements Operation {
             .build();
 
     @SuppressWarnings("unchecked")
-    private final SocketHint<List<RotatedRect>> boundingBoxesHint =
-        new SocketHint.Builder<>((Class<List<RotatedRect>>) new TypeToken<List<RotatedRect>>() {}.getRawType())
-            .initialValue(Collections.emptyList())
+    private final SocketHint<BoundingBoxReport<RotatedRect>> boundingBoxesHint =
+        new SocketHint.Builder<>((Class<BoundingBoxReport<RotatedRect>>) new TypeToken<BoundingBoxReport<RotatedRect>>() {}.getRawType())
+            .initialValue(BoundingBoxReport.emptyReport())
             .identifier("Bounding boxes")
             .build();
 
     private final InputSocket<ContoursReport> contoursSocket;
-    private final OutputSocket<List<RotatedRect>> boundingBoxesSocket;
+    private final OutputSocket<BoundingBoxReport<RotatedRect>> boundingBoxesSocket;
 
     public ContourBoundsOperation(InputSocket.Factory isf, OutputSocket.Factory osf) {
         this.contoursSocket = isf.create(contoursHint);
@@ -69,14 +69,16 @@ public class ContourBoundsOperation implements Operation {
 
     @Override
     public void perform() {
-        // Don't actually need the image; it's just for displaying the bounding boxes in the UI
-        MatVector contours = contoursSocket.getValue().get().getContours();
+        ContoursReport contoursReport = contoursSocket.getValue().get();
+        final int rows = contoursReport.getRows();
+        final int cols = contoursReport.getCols();
+        MatVector contours = contoursReport.getContours();
         List<RotatedRect> boundingBoxes = new ArrayList<>();
         for (int i = 0; i < contours.size(); i++) {
             Mat contour = contours.get(i);
             RotatedRect boundingBox = minAreaRect(contour);
             boundingBoxes.add(boundingBox);
         }
-        boundingBoxesSocket.setValue(boundingBoxes);
+        boundingBoxesSocket.setValue(BoundingBoxReport.bestFitReport(rows, cols, boundingBoxes));
     }
 }
