@@ -66,6 +66,7 @@ public class Operations {
                 new OperationMetaData(ValveOperation.DESCRIPTION, () -> new ValveOperation(isf, osf)),
                 new OperationMetaData(WatershedOperation.DESCRIPTION, () -> new WatershedOperation(isf, osf)),
                 new OperationMetaData(ThresholdMoving.DESCRIPTION, () -> new ThresholdMoving(isf, osf)),
+                new OperationMetaData(ContourBoundsOperation.DESCRIPTION, () -> new ContourBoundsOperation(isf, osf)),
 
                 // OpenCV operations
                 new OperationMetaData(MatFieldAccessor.DESCRIPTION, () -> new MatFieldAccessor(isf, osf)),
