@@ -52,6 +52,9 @@ public final class Converters {
             }
             try {
                 Object value = m.invoke(obj);
+                if (value == null) {
+                    throw new NotConvertibleException("Null value cannot be converted");
+                }
                 if (needsConversion(value) && needsConversion(value.getClass())) {
                     builder.put(name, convert(value, name, false));
                 } else {

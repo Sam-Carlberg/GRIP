@@ -23,10 +23,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class NTPublishAnyOperation extends NetworkPublishOperation<Object> {
 
     public static final OperationDescription DESCRIPTION =
-        OperationDescription.builder()
+        defaultBuilder
             .name("NTPublish")
             .summary("Publishes data to a network table")
-            .category(OperationDescription.Category.NETWORK)
             .icon(Icon.iconStream("first"))
             .build();
 
