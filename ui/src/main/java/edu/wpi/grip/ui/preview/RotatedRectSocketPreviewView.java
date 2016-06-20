@@ -86,7 +86,7 @@ public class RotatedRectSocketPreviewView extends SocketPreviewView<BoundingBoxR
                 Point2f points = new Point2f(4);
                 rect.points(points);
                 for (int i = 0; i < 4; i++) {
-                    line(tmp, point_cast(points.position(i)), point_cast(points.position((i + 1) % 4)), doColor ? COLORS[whichColor] : Scalar.WHITE, 1, LINE_8, 0);
+                    line(tmp, point2fToPoint(points.position(i)), point2fToPoint(points.position((i + 1) % 4)), doColor ? COLORS[whichColor] : Scalar.WHITE, 1, LINE_8, 0);
                 }
                 whichColor = (whichColor + 1) % (COLORS.length);
             }
@@ -103,7 +103,7 @@ public class RotatedRectSocketPreviewView extends SocketPreviewView<BoundingBoxR
     // The JavaCV API can be pretty stupid.
     // It doesn't include lines(Mat, Point2f, Point2f, int, int, int)
     // So we have to cast Point2f to Point in order to draw the lines
-    private static Point point_cast(Point2f pt) {
+    private static Point point2fToPoint(Point2f pt) {
         return new Point((int) pt.x(), (int) pt.y());
     }
 
