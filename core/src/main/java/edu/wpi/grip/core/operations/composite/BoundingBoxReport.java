@@ -1,5 +1,6 @@
 package edu.wpi.grip.core.operations.composite;
 
+import edu.wpi.grip.core.operations.network.PublishValue;
 import edu.wpi.grip.core.operations.network.Publishable;
 
 import com.google.common.collect.ImmutableList;
@@ -46,6 +47,7 @@ public class BoundingBoxReport<T> implements Publishable {
     /**
      * @return the bounding boxes of this report
      */
+    @PublishValue(key = "boundingBoxes", weight = 0)
     public List<T> getBoundingBoxes() {
         return ImmutableList.copyOf(boundingBoxes);
     }

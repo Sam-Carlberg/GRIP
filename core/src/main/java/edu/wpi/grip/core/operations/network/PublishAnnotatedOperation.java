@@ -139,7 +139,7 @@ public abstract class PublishAnnotatedOperation<D, P extends Publishable> extend
     protected void doPublish() {
         publisher.setName(nameSocket.getValue().get());
         D data = dataSocket.getValue().get();
-        Map<String, Object> dataMap = Converters.convert(data, nameSocket.getValue().get());
+        Map<String, ?> dataMap = publishableConverter.convert(converter.apply(data));
         publisher.publish(dataMap);
     }
 

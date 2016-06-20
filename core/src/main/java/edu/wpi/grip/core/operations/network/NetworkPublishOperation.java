@@ -11,6 +11,7 @@ import edu.wpi.grip.core.sockets.SocketHints;
 import edu.wpi.grip.core.util.Icon;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -30,21 +31,25 @@ public abstract class NetworkPublishOperation<D> implements Operation {
 
     protected final Class<D> dataType;
 
-    private final SocketHint<D> dataHint =
-            new SocketHint.Builder<>((Class<D>)new TypeToken<D>(getClass()){}.getRawType())
-                    .identifier("Data")
-                    .build();
     private final SocketHint<String> nameHint = SocketHints.Inputs.createTextSocketHint("Name", "");
 
     protected final InputSocket<D> dataSocket;
     protected final InputSocket<String> nameSocket;
 
-    protected NetworkPublishOperation(InputSocket.Factory isf, Class<D> dataType) {
+    protected NetworkPublishOperation(InputSocket.Factory isf, Class<D> dataType, Predicate<Class<? super D>> dataFilter) {
         checkNotNull(isf);
         checkNotNull(dataType);
         this.dataType = dataType;
+        SocketHint<D> dataHint = new SocketHint.Builder<>((Class<D>) new TypeToken<D>(getClass()) {}.getRawType())
+            .identifier("Data")
+            .filter(dataFilter)
+            .build();
         this.dataSocket = isf.create(dataHint);
         this.nameSocket = isf.create(nameHint);
+    }
+
+    protected NetworkPublishOperation(InputSocket.Factory isf, Class<D> dataType) {
+        this(isf, dataType, x -> true);
     }
 
     @Override

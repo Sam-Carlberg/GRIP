@@ -1,45 +1,47 @@
 package edu.wpi.grip.core.operations.network.networktables;
 
+import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.operations.network.MapNetworkPublisher;
 import edu.wpi.grip.core.operations.network.MapNetworkPublisherFactory;
 import edu.wpi.grip.core.operations.network.NetworkPublishOperation;
 import edu.wpi.grip.core.operations.publishing.Converters;
 import edu.wpi.grip.core.sockets.InputSocket;
-import edu.wpi.grip.core.sockets.SocketHints;
+import edu.wpi.grip.core.util.Icon;
 
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Operation for publishing any type of data to Network Tables.
+ * Operation for publishing any type of data to Network Tables, as long as a
+ * {@link edu.wpi.grip.core.operations.publishing.Converter Converter} exists
+ * for it.
  */
 public class NTPublishAnyOperation extends NetworkPublishOperation<Object> {
 
-    private final InputSocket.Factory isf;
+    public static final OperationDescription DESCRIPTION =
+        OperationDescription.builder()
+            .name("NTPublish")
+            .summary("Publishes data to a network table")
+            .category(OperationDescription.Category.NETWORK)
+            .icon(Icon.iconStream("first"))
+            .build();
+
     private final MapNetworkPublisherFactory publisherFactory;
     private MapNetworkPublisher<Object> publisher;
-    private Map<String, Object> dataMap;
 
     public NTPublishAnyOperation(InputSocket.Factory isf, MapNetworkPublisherFactory f) {
-        super(isf, Object.class);
-        this.isf = isf;
-        this.publisherFactory = f;
+        super(isf, Object.class, Converters::isConvertible);
+        this.publisherFactory = checkNotNull(f);
     }
 
     @Override
     protected List<InputSocket<Boolean>> createFlagSockets() {
-        if (dataMap == null) {
-            System.out.println("Data map is null, returning empty list for sockets");
-            return ImmutableList.of();
-        } else {
-            System.out.println("Creating sockets from data map");
-            return dataMap.keySet().stream()
-                .map(field -> isf.create(SocketHints.createBooleanSocketHint(field, true)))
-                .collect(Collectors.toList());
-        }
+        // No flag sockets, everything gets published
+        return ImmutableList.of();
     }
 
     @Override
@@ -47,7 +49,7 @@ public class NTPublishAnyOperation extends NetworkPublishOperation<Object> {
     protected void doPublish() {
         final Object data = dataSocket.getValue().get();
         final String dataName = nameSocket.getValue().get();
-        dataMap = Converters.convert(data);
+        Map<String, Object> dataMap = Converters.convert(data);
         if (publisher == null) {
             publisher = publisherFactory.create(dataMap.keySet());
         }

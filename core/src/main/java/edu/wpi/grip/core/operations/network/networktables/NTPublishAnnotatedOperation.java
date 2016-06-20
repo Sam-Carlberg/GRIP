@@ -18,9 +18,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * To be publishable, a type should have one or more accessor methods annotated with {@link PublishValue}.  This is done
  * with annotations instead of methods
  *
+ * @deprecated Use {@link NTPublishAnyOperation} instead -- it can publish any kind of data that a
+ * {@link edu.wpi.grip.core.operations.publishing.Converter Converter} exists for and only takes one
+ * spot in the palette, while this class takes one spot for each kind of {@link Publishable} class,
+ * which is inherently limited and can easily clog up the UI with tons of near-identical operations.
+ *
  * @param <D> the type of the data to publish (e.g. {@link Number})
  * @param <P> the publishable analog of the data (e.g. {@link edu.wpi.grip.core.operations.network.NumberPublishable NumberPublishable})
  */
+@Deprecated
 public class NTPublishAnnotatedOperation<D, P extends Publishable> extends PublishAnnotatedOperation<D, P> {
 
     /**

@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -29,6 +30,7 @@ public interface SocketHint<T> {
         private final Optional<Supplier<T>> initialValueSupplier;
         private final View view;
         private final Optional<T[]> domain;
+        private final Predicate<Class<? super T>> dataFilter;
 
         /**
          * @param type                 The type of value held by the socket.
@@ -39,12 +41,13 @@ public interface SocketHint<T> {
          *                             can consist of two elements that correspond to a minimum and maximum value.  The
          *                             property does not make sense for all types and is left unspecified for some
          */
-        private BasicSocketHint(Class<T> type, String identifier, Optional<Supplier<T>> initialValueSupplier, View view, Optional<T[]> domain) {
+        private BasicSocketHint(Class<T> type, String identifier, Optional<Supplier<T>> initialValueSupplier, View view, Optional<T[]> domain, Predicate<Class<? super T>> dataFilter) {
             this.type = type;
             this.identifier = identifier;
             this.initialValueSupplier = initialValueSupplier;
             this.view = view;
             this.domain = domain;
+            this.dataFilter = dataFilter;
         }
 
         @Override
@@ -91,7 +94,7 @@ public interface SocketHint<T> {
 
         @Override
         public boolean isCompatibleWith(SocketHint other) {
-            return getType().isAssignableFrom(other.getType());
+            return getType().isAssignableFrom(other.getType()) && dataFilter.test(other.getType());
         }
 
         @Override
@@ -213,6 +216,7 @@ public interface SocketHint<T> {
         private Optional<Supplier<T>> initialValueSupplier = Optional.empty();
         private View view = View.NONE;
         private Optional<T[]> domain = Optional.empty();
+        private Predicate<Class<? super T>> dataFilter = x -> true;
 
         public Builder(Class<T> type) {
             this.type = type;
@@ -243,6 +247,11 @@ public interface SocketHint<T> {
             return this;
         }
 
+        public Builder<T> filter(Predicate<Class<? super T>> filter) {
+            this.dataFilter = checkNotNull(filter, "Filter cannot be null");
+            return this;
+        }
+
         public SocketHint<T> build() throws NoSuchElementException {
             if (!view.equals(View.NONE)) {
                 initialValueSupplier.orElseThrow(() -> new NoSuchElementException("A View other than `NONE` was supplied but not an initial value"));
@@ -252,7 +261,8 @@ public interface SocketHint<T> {
                     identifier.orElseThrow(() -> new NoSuchElementException("The identifier was not supplied")),
                     initialValueSupplier,
                     view,
-                    domain
+                    domain,
+                    dataFilter
             );
         }
     }

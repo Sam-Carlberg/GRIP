@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -18,11 +17,21 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public final class Converters {
 
-    private static final Map<Pair<Class<?>, String>, Converter<?>> converters = new HashMap<>();
+    // Store converters in insertion order.
+    private static final Map<Pair<Class<?>, String>, Converter<?>> converters = new LinkedHashMap<>();
 
     /**
      * Converter that uses accessor methods to get the data to publish.
-     * Methods named with the {@code getX} JavaBeans pattern will be converted to
+     * Methods named with the {@code getX} JavaBeans pattern will be converted to the form
+     * {@code x = y}, e.g.
+     * <pre><code>
+     *     public Foo getFoo() {
+     *         return myFoo;
+     *     }
+     * </code></pre>
+     * will be converted to {@code foo = [value of myFoo]}. Note that this will fail if {@code Foo}
+     * is not a publishable type (i.e. String, primitive, boxed primitive, or an array of any of
+     * those types) and does not have an associated converter.
      */
     public static final Converter<Object> reflectiveByMethod = obj -> {
         ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
@@ -85,7 +94,8 @@ public final class Converters {
     }
 
     /**
-     * Sets the converter for data with the given type and name.
+     * Sets the converter for data with the given type and name. This will overwrite any previous
+     * call with the same data type and name.
      *
      * @param dataType  the type of the data
      * @param name      the name of the data. Only data by this name will be converted with the given converter.
@@ -253,7 +263,24 @@ public final class Converters {
         return false;
     }
 
-    public static boolean isConvertible(Object data) {
+    /**
+     * Checks if the given data type can be converted
+     *
+     * @param dataType the type of data to check
+     * @return true if the given data type is explicitly convertible, or if a supertype of it is
+     * convertible
+     */
+    public static boolean isConvertible(Class<?> dataType) {
+        checkNotNull(dataType);
+        return converters.entrySet().stream()
+            .map(e -> e.getKey().getLeft())
+            .anyMatch(dataType::equals) ||
+            converters.entrySet().stream()
+                .map(e -> e.getKey().getLeft())
+                .anyMatch(c -> c.isAssignableFrom(dataType));
+    }
+
+    private static boolean isConvertible(Object data) {
         if (data == null) {
             return false;
         }
@@ -267,7 +294,7 @@ public final class Converters {
         return false;
     }
 
-    public static boolean isConvertible(Object data, String name) {
+    private static boolean isConvertible(Object data, String name) {
         if (data == null) {
             return false;
         }
