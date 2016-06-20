@@ -41,6 +41,7 @@ public class Operations {
     private final ImmutableList<OperationMetaData> operations;
 
     @Inject
+    @SuppressWarnings("deprecation")
     Operations(EventBus eventBus,
                @Named("ntManager") MapNetworkPublisherFactory ntPublisherFactory,
                @Named("rosManager") ROSNetworkPublisherFactory rosPublishFactory,

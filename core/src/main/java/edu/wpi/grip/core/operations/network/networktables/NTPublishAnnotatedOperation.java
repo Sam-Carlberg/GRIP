@@ -39,7 +39,7 @@ public class NTPublishAnnotatedOperation<D, P extends Publishable> extends Publi
         final String name = dataType.getSimpleName();
         return OperationDescription.builder()
                 .name(String.format("NTPublish %s", name))
-                .summary(String.format("Publishes a %s to a network table", name))
+                .summary(String.format("Publishes a %s to a network table.\nNOTE: This operation is deprecated. Use 'NTPublish' instead", name))
                 .aliases(String.format("Publish %s", name))
                 .icon(Icon.iconStream("first"))
                 .category(OperationDescription.Category.NETWORK)
