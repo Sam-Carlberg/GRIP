@@ -1,12 +1,5 @@
 package edu.wpi.grip.core.operations.network.networktables;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
-import com.google.common.eventbus.Subscribe;
-import com.google.inject.Singleton;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.networktables.NetworkTablesJNI;
-import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.grip.core.PipelineRunner;
 import edu.wpi.grip.core.events.ProjectSettingsChangedEvent;
 import edu.wpi.grip.core.operations.network.Manager;
@@ -15,15 +8,27 @@ import edu.wpi.grip.core.operations.network.MapNetworkPublisherFactory;
 import edu.wpi.grip.core.settings.ProjectSettings;
 import edu.wpi.grip.core.util.GRIPMode;
 
-import javax.inject.Inject;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import com.google.common.eventbus.Subscribe;
+import com.google.inject.Singleton;
+
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.networktables.NetworkTablesJNI;
+import edu.wpi.first.wpilibj.tables.ITable;
+
 import java.io.File;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.inject.Inject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -111,12 +116,12 @@ public class NTManager implements Manager, MapNetworkPublisherFactory {
     }
 
     private static final class NTPublisher<P> extends MapNetworkPublisher<P> {
-        private final ImmutableSet<String> keys;
+        private final Set<String> keys;
         private Optional<String> name = Optional.empty();
 
         protected NTPublisher(Set<String> keys) {
             super(keys);
-            this.keys = ImmutableSet.copyOf(keys);
+            this.keys = new LinkedHashSet<>(keys);
         }
 
         @Override
@@ -127,10 +132,49 @@ public class NTManager implements Manager, MapNetworkPublisherFactory {
             this.name = Optional.of(newName);
         }
 
+        /**
+         * Publishes a nested map of values. This is called recursively on any values
+         * that are themselves maps.
+         *
+         * @param table    the table to publish the nested map to
+         * @param valueMap the nested map to publish
+         */
+        private void publishNested(ITable table, Map<String, ?> valueMap) {
+            valueMap.forEach((k, v) -> {
+                if (v instanceof Map) {
+                    publishNested(table.getSubTable(k), (Map<String, ?>) v);
+                } else if (v instanceof Collection) {
+                    table.putValue(k, ((Collection) v).toArray());
+                } else if (v instanceof Number) {
+                    table.putNumber(k, ((Number) v).doubleValue());
+                } else {
+                    table.putValue(k, v);
+                }
+            });
+        }
+
         @Override
+        @SuppressWarnings("unchecked")
         protected void doPublish(Map<String, P> publishValueMap) {
-            publishValueMap.forEach(getTable()::putValue);
-            Sets.difference(keys, publishValueMap.keySet()).forEach(getTable()::delete);
+            keys.clear();
+            keys.addAll(publishValueMap.keySet());
+            deleteOldTable(name.get()); // delete the table before repopulating
+            NetworkTable.flush(); // force network tables to clear
+            publishValueMap.forEach((k, v) -> {
+                if (v instanceof Map) {
+                    publishNested(getTable().getSubTable(k), (Map<String, ?>) v);
+                } else if (v instanceof Collection) {
+                    getTable().putValue(k, ((Collection) v).toArray());
+                } else {
+                    if (v instanceof Number) {
+                        // putValue only supports doubles, so convert number to double and use the explicit putNumber for efficiency
+                        getTable().putNumber(k, ((Number) v).doubleValue());
+                    } else {
+                        getTable().putValue(k, v);
+                    }
+                }
+            });
+            NetworkTable.flush(); // push updates
         }
 
         @Override
@@ -151,8 +195,14 @@ public class NTManager implements Manager, MapNetworkPublisherFactory {
                 root = getRootTable();
                 subTable = root.getSubTable(tableName);
             }
-            keys.forEach(subTable::delete);
+            deleteNestedTable(subTable);
             root.delete(tableName);
+        }
+
+        private void deleteNestedTable(ITable table) {
+            table.getKeys().forEach(table::delete); // delete all entries in this table
+            table.getSubTables().forEach(t -> deleteNestedTable(table.getSubTable(t))); // delete all entries in nested tables
+            table.getSubTables().forEach(table::delete); // delete all nested tables
         }
 
         @Override
@@ -169,7 +219,7 @@ public class NTManager implements Manager, MapNetworkPublisherFactory {
             }
         }
 
-        private ITable getTable() {
+        ITable getTable() {
             synchronized (NetworkTable.class) {
                 return getRootTable().getSubTable(name.get());
             }

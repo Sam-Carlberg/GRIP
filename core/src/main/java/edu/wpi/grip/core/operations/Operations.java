@@ -6,6 +6,8 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+
+import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.OperationMetaData;
 import edu.wpi.grip.core.events.OperationAddedEvent;
 import edu.wpi.grip.core.operations.composite.*;
@@ -14,6 +16,7 @@ import edu.wpi.grip.core.operations.network.MapNetworkPublisherFactory;
 import edu.wpi.grip.core.operations.network.NumberPublishable;
 import edu.wpi.grip.core.operations.network.Vector2D;
 import edu.wpi.grip.core.operations.network.networktables.NTPublishAnnotatedOperation;
+import edu.wpi.grip.core.operations.network.networktables.NTPublishAnyOperation;
 import edu.wpi.grip.core.operations.network.ros.JavaToMessageConverter;
 import edu.wpi.grip.core.operations.network.ros.ROSNetworkPublisherFactory;
 import edu.wpi.grip.core.operations.network.ros.ROSPublishOperation;
@@ -21,6 +24,7 @@ import edu.wpi.grip.core.operations.opencv.MatFieldAccessor;
 import edu.wpi.grip.core.operations.opencv.MinMaxLoc;
 import edu.wpi.grip.core.operations.opencv.NewPointOperation;
 import edu.wpi.grip.core.operations.opencv.NewSizeOperation;
+import edu.wpi.grip.core.operations.publishing.CvConverterManager;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import org.bytedeco.javacpp.opencv_core.Point;
@@ -89,6 +93,8 @@ public class Operations {
                         () -> new NTPublishAnnotatedOperation<>(isf, Number.class, NumberPublishable.class, NumberPublishable::new, ntPublisherFactory)),
                 new OperationMetaData(NTPublishAnnotatedOperation.descriptionFor(Boolean.class),
                         () -> new NTPublishAnnotatedOperation<>(isf, Boolean.class, BooleanPublishable.class, BooleanPublishable::new, ntPublisherFactory)),
+                new OperationMetaData(OperationDescription.builder().name("NT Publish Any").summary("Publishes any data type to Network Tables").build(),
+                        () -> new NTPublishAnyOperation(isf, ntPublisherFactory)),
 
                 // ROS publishing operations
                 new OperationMetaData(ROSPublishOperation.descriptionFor(Number.class),
@@ -110,6 +116,7 @@ public class Operations {
     }
 
     public void addOperations() {
+        new CvConverterManager().addConverters();
         operations.stream()
                 .map(OperationAddedEvent::new)
                 .forEach(eventBus::post);

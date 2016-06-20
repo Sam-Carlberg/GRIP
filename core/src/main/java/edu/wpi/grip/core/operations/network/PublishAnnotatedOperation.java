@@ -1,8 +1,9 @@
 package edu.wpi.grip.core.operations.network;
 
+import edu.wpi.grip.core.operations.publishing.Converter;
+import edu.wpi.grip.core.operations.publishing.Converters;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.SocketHints;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -13,6 +14,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -27,6 +30,11 @@ public abstract class PublishAnnotatedOperation<D, P extends Publishable> extend
     private final Class<P> publishType;
     private final Function<D, P> converter;
     private final MapNetworkPublisher publisher;
+
+    public static final Converter<Publishable> publishableConverter = data -> Stream.of(data.getClass().getMethods())
+        .filter(m -> m.isAnnotationPresent(PublishValue.class))
+        .sorted(Comparator.comparing(m -> m.getAnnotation(PublishValue.class).weight()))
+        .collect(Collectors.toMap(m -> m.getAnnotation(PublishValue.class).key(), m -> get(m, data)));
 
     protected PublishAnnotatedOperation(InputSocket.Factory isf,
                                         Class<D> dataType,
@@ -131,9 +139,7 @@ public abstract class PublishAnnotatedOperation<D, P extends Publishable> extend
     protected void doPublish() {
         publisher.setName(nameSocket.getValue().get());
         D data = dataSocket.getValue().get();
-        Map<String, Object> dataMap = valueMethodStream()
-                .map(m -> Pair.of(m.getAnnotation(PublishValue.class).key(), get(m, converter.apply(data))))
-                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+        Map<String, Object> dataMap = Converters.convert(data, nameSocket.getValue().get());
         publisher.publish(dataMap);
     }
 
@@ -148,7 +154,7 @@ public abstract class PublishAnnotatedOperation<D, P extends Publishable> extend
      * @param instance the object to invoke the accessor on
      * @return the value returned by the accessor method, or {@code null} if the method could not be invoked.
      */
-    protected Object get(Method accessor, Object instance) {
+    private static Object get(Method accessor, Object instance) {
         try {
             return accessor.invoke(instance);
         } catch (IllegalAccessException | InvocationTargetException e) {
