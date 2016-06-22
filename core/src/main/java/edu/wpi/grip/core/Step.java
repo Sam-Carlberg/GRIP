@@ -89,6 +89,13 @@ public class Step {
     }
 
     /**
+     * @return The operation for the step
+     */
+    public Operation getOperation() {
+        return this.operation;
+    }
+
+    /**
      * @return The description for the step
      */
     public OperationDescription getOperationDescription() {

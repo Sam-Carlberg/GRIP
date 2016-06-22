@@ -37,4 +37,23 @@ public interface Operation {
     default void cleanUp() {
         /* no-op */
     }
+
+    /**
+     * Called when a new connection has been added to this operation.
+     *
+     * @param connection the new connection
+     */
+    default void connectionAdded(Connection<?> connection) {
+        /* no-op */
+    }
+
+    /**
+     * Called when a connection has been removed from this operation
+     *
+     * @param connection the connection that was removed
+     */
+    default void connectionRemoved(Connection<?> connection) {
+        /* no-op */
+    }
+
 }

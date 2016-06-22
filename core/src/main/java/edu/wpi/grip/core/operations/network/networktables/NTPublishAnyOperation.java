@@ -1,5 +1,6 @@
 package edu.wpi.grip.core.operations.network.networktables;
 
+import edu.wpi.grip.core.Connection;
 import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.operations.network.MapNetworkPublisher;
 import edu.wpi.grip.core.operations.network.MapNetworkPublisherFactory;
@@ -29,18 +30,45 @@ public class NTPublishAnyOperation extends NetworkPublishOperation<Object> {
             .icon(Icon.iconStream("first"))
             .build();
 
+    /** The type of the most recently attached data (e.g. ContoursReport, LinesReport...). */
+    private Class<?> lastDataType;
     private final MapNetworkPublisherFactory publisherFactory;
     private MapNetworkPublisher<Object> publisher;
+
+    /** The default data name. */
+    private static final String DEFAULT_NAME = "myData";
 
     public NTPublishAnyOperation(InputSocket.Factory isf, MapNetworkPublisherFactory f) {
         super(isf, Object.class, Converters::isConvertible);
         this.publisherFactory = checkNotNull(f);
+        nameSocket.setValue(DEFAULT_NAME);
     }
 
     @Override
     protected List<InputSocket<Boolean>> createFlagSockets() {
         // No flag sockets, everything gets published
         return ImmutableList.of();
+    }
+
+    @Override
+    public void connectionAdded(Connection<?> connection) {
+        if (connection.getInputSocket() != dataSocket) {
+            // Use reference equality -- don't want to run this if the data socket for another
+            // NTPublishAnyOperation got changed
+            return;
+        }
+        // Change the value of the name socket if the data type has changed and
+        // it's using the default name
+        Class<?> type = connection.getOutputSocket().getSocketHint().getType();
+        String dataName = nameSocket.getValue().get();
+        if (type != lastDataType) {
+            if (dataName.equals(DEFAULT_NAME) || dataName.equals("my" + lastDataType.getSimpleName())) {
+                // Change name if using the default
+                dataName = "my" + type.getSimpleName();
+                nameSocket.setValue(dataName);
+            }
+            lastDataType = type;
+        }
     }
 
     @Override

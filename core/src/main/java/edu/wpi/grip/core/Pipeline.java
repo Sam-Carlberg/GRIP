@@ -334,15 +334,24 @@ public class Pipeline implements ConnectionValidator, SettingsProvider {
 
     @Subscribe
     public void onConnectionAdded(ConnectionAddedEvent event) {
-        final Connection connection = event.getConnection();
+        final Connection<?> connection = event.getConnection();
+        Step first = connection.getOutputSocket().getStep().orElseThrow(() -> new IllegalStateException("Socket has no Step"));
+        Step second = connection.getInputSocket().getStep().orElseThrow(() -> new IllegalStateException("Socket has no Step"));
+        first.getOperation().connectionAdded(connection);
+        second.getOperation().connectionAdded(connection);
         this.connections.add(connection);
         this.eventBus.register(connection);
     }
 
     @Subscribe
     public void onConnectionRemoved(ConnectionRemovedEvent event) {
-        this.connections.remove(event.getConnection());
-        this.eventBus.unregister(event.getConnection());
+        final Connection<?> connection = event.getConnection();
+        Step first = connection.getOutputSocket().getStep().orElseThrow(() -> new IllegalStateException("Socket has no Step"));
+        Step second = connection.getInputSocket().getStep().orElseThrow(() -> new IllegalStateException("Socket has no Step"));
+        first.getOperation().connectionRemoved(connection);
+        second.getOperation().connectionRemoved(connection);
+        this.connections.remove(connection);
+        this.eventBus.unregister(connection);
     }
 
     @Subscribe
