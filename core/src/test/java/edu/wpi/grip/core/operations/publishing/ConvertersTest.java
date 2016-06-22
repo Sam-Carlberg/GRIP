@@ -1,13 +1,20 @@
 package edu.wpi.grip.core.operations.publishing;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-import org.python.google.common.collect.ImmutableMap;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -157,6 +164,69 @@ public class ConvertersTest {
         assertEquals("A", ((Map) converted.get("nested")).get("value"));
         assertEquals(ImmutableMap.of("value", "A"), converted.get("nested"));
         assertEquals("B", converted.get("value"));
+    }
+
+    @Test(expected = NotConvertibleException.class)
+    public void testNoConverter() {
+        class NoConverter {}
+        converters.convert(new NoConverter());
+        fail("There shouldn't be a converter for " + NoConverter.class);
+    }
+
+    @Test(expected = NotConvertibleException.class)
+    public void testNotConvertibleNestedMap() {
+        class NotConvertible {}
+        Map<String, Map<String, ?>> map = ImmutableMap.of("root", ImmutableMap.of("nested", new NotConvertible()));
+        converters.convert(map);
+        fail("Nested conversion should have failed");
+    }
+
+    @Test(expected = NotConvertibleException.class)
+    public void testNotConvertibleNestedCollection() {
+        class NotConvertible {}
+        Map<String, Collection> map = new HashMap<>();
+        map.put("key", Arrays.asList(new NotConvertible()));
+        converters.convert(map);
+    }
+
+    @Test
+    public void testConvertEmptyNestedCollection() {
+        Map<String, ?> converted = converters.convert(ImmutableMap.of("key", new ArrayList<>()));
+        assertTrue("Conversion of empty list was not empty", ((Map) converted.get("key")).isEmpty());
+    }
+
+    @Test
+    public void testConvertibleNestedCollection() {
+        Map<String, Object> converted = converters.convert(ImmutableMap.of("key", ImmutableList.of("value")));
+        assertEquals("value", ((Map) converted.get("key")).get("Value #0"));
+    }
+
+    @Test
+    public void testUse() {
+        class Foo {
+            private final String bar = "foo";
+        }
+        ConverterManager manager = converters -> converters.setDefaultConverter(Foo.class, foo -> ImmutableMap.of("bar", foo.bar));
+        converters.use(manager);
+        assertEquals("foo", converters.convert(new Foo()).get("bar"));
+    }
+
+    @Test
+    public void testIsConvertible() {
+        try {
+            converters.isConvertible(null);
+            fail("Should fail if given null");
+        } catch (NullPointerException expected) {}
+        abstract class ListSubClass implements List {}
+        abstract class MapSubClass implements Map {}
+        class MaybeConvertible {}
+        assertTrue(converters.isConvertible(Collection.class)); // has explicit converter
+        assertTrue(converters.isConvertible(ListSubClass.class)); // has implicit converter (Collection)
+        assertTrue(converters.isConvertible(Map.class)); // has explicit converter
+        assertTrue(converters.isConvertible(MapSubClass.class)); // has implicit converter (Map)
+        assertFalse(converters.isConvertible(MaybeConvertible.class)); // no converter set
+        converters.setDefaultConverter(MaybeConvertible.class, c -> new HashMap<>());
+        assertTrue(converters.isConvertible(MaybeConvertible.class)); // converter has been set
     }
 
 }
