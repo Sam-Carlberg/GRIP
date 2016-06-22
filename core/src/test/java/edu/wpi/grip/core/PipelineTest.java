@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
 import static org.junit.Assert.*;
 
@@ -175,6 +176,8 @@ public class PipelineTest {
     @SuppressWarnings("unchecked")
     public void testAddConnection() {
         Connection connection = new MockConnection(eventBus, pipeline);
+        connection.getInputSocket().setStep(Optional.of(MockStep.createMockStepWithOperation()));
+        connection.getOutputSocket().setStep(Optional.of(MockStep.createMockStepWithOperation()));
         eventBus.post(new ConnectionAddedEvent(connection));
 
         assertEquals("The connection was not added to the pipeline", Collections.singleton(connection), pipeline.getConnections());
@@ -184,6 +187,11 @@ public class PipelineTest {
     @SuppressWarnings("unchecked")
     public void testRemoveConnection() {
         Connection connection = new MockConnection(eventBus, pipeline);
+        Step firstStep = MockStep.createMockStepWithOperation();
+        Step secondStep = MockStep.createMockStepWithOperation();
+        connection.getOutputSocket().setStep(Optional.of(firstStep));
+        connection.getInputSocket().setStep(Optional.of(secondStep));
+
         eventBus.post(new ConnectionAddedEvent(connection));
         eventBus.post(new ConnectionRemovedEvent(connection));
 

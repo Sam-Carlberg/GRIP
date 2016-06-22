@@ -240,7 +240,7 @@ public final class Converters {
         return out;
     }
 
-    private static boolean needsConversion(Class<?> dataType) {
+    private boolean needsConversion(Class<?> dataType) {
         if (String.class.equals(dataType) ||
             Number.class.isAssignableFrom(dataType) ||
             Boolean.class.equals(dataType) ||
