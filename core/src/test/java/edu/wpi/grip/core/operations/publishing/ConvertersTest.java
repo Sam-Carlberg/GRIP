@@ -16,6 +16,8 @@ import static org.junit.Assert.fail;
  */
 public class ConvertersTest {
 
+    private final Converters converters = new Converters();
+
     @SuppressWarnings("unused")
     private static final class TestJavaBean {
         private final String str;
@@ -74,17 +76,17 @@ public class ConvertersTest {
 
     @Test(expected = NotConvertibleException.class)
     public void testBadReflective() {
-        Converters.setDefaultConverter(TestJavaBean.class, Converters.reflectiveByMethod);
+        converters.setDefaultConverter(TestJavaBean.class, converters.reflectiveByMethod);
         TestJavaBean bad = new TestJavaBean(null, 0, 0, null); // null value should throw exception
-        Converters.convert(bad);
+        converters.convert(bad);
         fail("Call to convert() should have thrown an exception with null values");
     }
 
     @Test
     public void testValidReflective() {
-        Converters.setDefaultConverter(TestJavaBean.class, Converters.reflectiveByMethod);
+        converters.setDefaultConverter(TestJavaBean.class, converters.reflectiveByMethod);
         TestJavaBean valid = new TestJavaBean("valid", 10, 20, new int[] {1, 2, 3});
-        Map<String, Object> converted = Converters.convert(valid);
+        Map<String, Object> converted = converters.convert(valid);
         assertEquals("String value was not as expected", "valid", converted.get("str"));
         assertEquals("int value was not as expected", 10, converted.get("i"));
         assertEquals("double value was not as expected", 20.0, converted.get("d"));
@@ -97,7 +99,7 @@ public class ConvertersTest {
     public void testMapWithNonStringKeys() {
         Map<Object, Object> map = new HashMap<>();
         map.put(1234, 5678);
-        Converters.convert(map);
+        converters.convert(map);
         fail("Call to convert() should have thrown an exception with non-String keys");
     }
 
@@ -105,7 +107,7 @@ public class ConvertersTest {
     public void testMapWithNonConvertibleValues() {
         Map<String, Object> map = new HashMap<>();
         map.put("key", new Object());
-        Converters.convert(map);
+        converters.convert(map);
         fail("Call to convert() should have thrown an exception with non-convertible values");
     }
 
@@ -113,51 +115,48 @@ public class ConvertersTest {
     public void testValidMap() {
         Map<String, Object> map = new HashMap<>();
         map.put("key", "value");
-        Map<String, Object> converted = Converters.convert(map);
+        Map<String, Object> converted = converters.convert(map);
         assertEquals("Converted map was not as expected", "value", converted.get("key"));
     }
 
     @Test(expected = NotConvertibleException.class)
     public void testDoesNotNeedConversion() {
         String noConversionNeeded = "No conversion needed";
-        Converters.convert(noConversionNeeded);
+        converters.convert(noConversionNeeded);
         fail("String doesn't need conversion");
     }
 
     @Test
     public void testDefaults() {
-        Converters.setDefaultConverter(ClassWithDefaultConverter.class, o -> ImmutableMap.of("x", o.x, "y", o.y, "z", o.z));
-        Map<String, Object> converted = Converters.convert(new ClassWithDefaultConverter());
+        class ClassWithDefaultConverter {
+            private final double x = 12.34;
+            private final int y = 1234;
+            private final String z = "z";
+        }
+        converters.setDefaultConverter(ClassWithDefaultConverter.class, o -> ImmutableMap.of("x", o.x, "y", o.y, "z", o.z));
+        Map<String, Object> converted = converters.convert(new ClassWithDefaultConverter());
         assertEquals(12.34, converted.get("x"));
         assertEquals(1234, converted.get("y"));
         assertEquals("z", converted.get("z"));
     }
 
-    private static final class ClassWithDefaultConverter {
-        private final double x = 12.34;
-        private final int y = 1234;
-        private final String z = "z";
-    }
-
     @Test
     public void testNested() {
-        Converters.setDefaultConverter(A.class, a -> ImmutableMap.of("value", a.value));
-        Converters.setNamedConverter(B.class, "B", b -> ImmutableMap.of("nested", b.nested, "value", b.value));
-        Map<String, Object> converted = Converters.convert(new B(), "B");
+        class A {
+            private final String value = "A";
+        }
+        class B {
+            private final A nested = new A();
+            private final String value = "B";
+        }
+        converters.setDefaultConverter(A.class, a -> ImmutableMap.of("value", a.value));
+        converters.setNamedConverter(B.class, "B", b -> ImmutableMap.of("nested", b.nested, "value", b.value));
+        Map<String, Object> converted = converters.convert(new B(), "B");
         System.out.println(converted);
         assertTrue("Nested convertible type was not converted", converted.get("nested") instanceof Map);
         assertEquals("A", ((Map) converted.get("nested")).get("value"));
         assertEquals(ImmutableMap.of("value", "A"), converted.get("nested"));
         assertEquals("B", converted.get("value"));
-    }
-
-    private static final class A {
-        private final String value = "A";
-    }
-
-    private static final class B {
-        private final A nested = new A();
-        private final String value = "B";
     }
 
 }

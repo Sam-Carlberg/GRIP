@@ -23,6 +23,7 @@ import edu.wpi.grip.core.operations.opencv.MatFieldAccessor;
 import edu.wpi.grip.core.operations.opencv.MinMaxLoc;
 import edu.wpi.grip.core.operations.opencv.NewPointOperation;
 import edu.wpi.grip.core.operations.opencv.NewSizeOperation;
+import edu.wpi.grip.core.operations.publishing.Converters;
 import edu.wpi.grip.core.operations.publishing.CvConverterManager;
 import edu.wpi.grip.core.operations.publishing.GripConverterManager;
 import edu.wpi.grip.core.sockets.InputSocket;
@@ -37,6 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Operations {
 
     private final EventBus eventBus;
+    private final Converters converters;
 
     private final ImmutableList<OperationMetaData> operations;
 
@@ -48,6 +50,7 @@ public class Operations {
                InputSocket.Factory isf,
                OutputSocket.Factory osf) {
         this.eventBus = checkNotNull(eventBus, "EventBus cannot be null");
+        this.converters = new Converters();
         checkNotNull(ntPublisherFactory, "ntPublisherFactory cannot be null");
         checkNotNull(rosPublishFactory, "rosPublishFactory cannot be null");
         this.operations = ImmutableList.of(
@@ -96,7 +99,7 @@ public class Operations {
                 new OperationMetaData(NTPublishAnnotatedOperation.descriptionFor(Boolean.class),
                         () -> new NTPublishAnnotatedOperation<>(isf, Boolean.class, BooleanPublishable.class, BooleanPublishable::new, ntPublisherFactory)),
                 new OperationMetaData(NTPublishAnyOperation.DESCRIPTION,
-                        () -> new NTPublishAnyOperation(isf, ntPublisherFactory)),
+                        () -> new NTPublishAnyOperation(isf, ntPublisherFactory, converters)),
 
                 // ROS publishing operations
                 new OperationMetaData(ROSPublishOperation.descriptionFor(Number.class),
@@ -118,8 +121,8 @@ public class Operations {
     }
 
     public void addOperations() {
-        new CvConverterManager().addConverters();
-        new GripConverterManager().addConverters();
+        converters.use(new CvConverterManager());
+        converters.use(new GripConverterManager());
         operations.stream()
                 .map(OperationAddedEvent::new)
                 .forEach(eventBus::post);

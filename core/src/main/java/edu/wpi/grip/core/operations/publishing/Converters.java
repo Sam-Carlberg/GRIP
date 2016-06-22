@@ -18,7 +18,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public final class Converters {
 
     // Store converters in insertion order.
-    private static final Map<Pair<Class<?>, String>, Converter<?>> converters = new LinkedHashMap<>();
+    private final Map<Pair<Class<?>, String>, Converter<?>> converters = new LinkedHashMap<>();
 
     /**
      * Converter that uses accessor methods to get the data to publish.
@@ -33,7 +33,7 @@ public final class Converters {
      * is not a publishable type (i.e. String, primitive, boxed primitive, or an array of any of
      * those types) and does not have an associated converter.
      */
-    public static final Converter<Object> reflectiveByMethod = obj -> {
+    public final Converter<Object> reflectiveByMethod = obj -> {
         ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
         for (Method m : obj.getClass().getDeclaredMethods()) {
             int mod = m.getModifiers();
@@ -67,33 +67,56 @@ public final class Converters {
         return builder.build();
     };
 
-    static {
-        // Add defaults for collections and maps
-        setDefaultConverter(Collection.class, c -> {
-            ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
-            int i = 0;
-            for (Object o : c) {
-                if (!isConvertible(o)) {
-                    throw new NotConvertibleException("Not convertible: " + o);
-                }
-                builder.put("Value #".concat(String.valueOf(i++)), needsConversion(o) ? convert(o) : o);
+    /**
+     * Default {@link Collection} converter.
+     */
+    public final Converter<Collection> collectionConverter = c -> {
+        ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
+        int i = 0;
+        for (Object o : c) {
+            if (!isConvertible(o)) {
+                throw new NotConvertibleException("Not convertible: " + o);
             }
-            return builder.build();
+            builder.put("Value #".concat(String.valueOf(i++)), needsConversion(o) ? convert(o) : o);
+        }
+        return builder.build();
+    };
+
+    /**
+     * Default {@link Map} converter. Note that this will only accept {@code Map<String, ?>}.
+     */
+    public final Converter<Map> mapConverter = m -> {
+        ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
+        m.forEach((k, v) -> {
+            if (!(k instanceof String)) {
+                throw new NotConvertibleException("Non-string key: " + k);
+            }
+            if (!isConvertible(v)) {
+                throw new NotConvertibleException("Not convertible: " + v);
+            }
+            builder.put((String) k, needsConversion(v) ? convert(v) : v);
         });
-        setDefaultConverter(Map.class, m -> {
-            ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
-            m.forEach((k, v) -> {
-                if (!(k instanceof String)) {
-                    throw new NotConvertibleException(
-                        "Map key is not a String: " + k + " (" + k.getClass().getName() + ")");
-                }
-                if (!isConvertible(v)) {
-                    throw new NotConvertibleException("Not convertible: " + v);
-                }
-                builder.put((String) k, needsConversion(v) ? convert(v) : v);
-            });
-            return builder.build();
-        });
+        return builder.build();
+    };
+
+    /**
+     * Constructor. This adds default converters for {@link Collection collections} and
+     * {@link Map maps}.
+     */
+    public Converters() {
+        // Add defaults for collections and maps
+        setDefaultConverter(Collection.class, collectionConverter);
+        setDefaultConverter(Map.class, mapConverter);
+    }
+
+    /**
+     * Uses converters as specified by the given {@code ConverterManager}.
+     *
+     * @param manager the converter manager to use converters from
+     */
+    public void use(ConverterManager manager) {
+        checkNotNull(manager);
+        manager.addConverters(this);
     }
 
     /**
@@ -105,7 +128,7 @@ public final class Converters {
      * @param converter the converter to use to convert data by the given type and name
      * @param <T>       the type of the data to convert
      */
-    public static <T> void setNamedConverter(Class<? extends T> dataType, String name, Converter<? super T> converter) {
+    public <T> void setNamedConverter(Class<? extends T> dataType, String name, Converter<? super T> converter) {
         checkNotNull(dataType);
         checkNotNull(name);
         checkNotNull(converter);
@@ -122,14 +145,14 @@ public final class Converters {
      * @param converter the default converter to use for the given data type
      * @param <T>       the type of the data to convert
      */
-    public static <T> void setDefaultConverter(Class<? extends T> dataType, Converter<? super T> converter) {
+    public <T> void setDefaultConverter(Class<? extends T> dataType, Converter<? super T> converter) {
         checkNotNull(dataType);
         checkNotNull(converter);
         converters.put(Pair.of(dataType, null), converter);
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> Converter<? super T> getNamedConverter(Class<? extends T> type, String name) {
+    private <T> Converter<? super T> getNamedConverter(Class<? extends T> type, String name) {
         Converter<? super T> converter = (Converter<? super T>) converters.get(Pair.of(type, name));
         if (converter == null) {
             // No converter for that exact type and name combination, try a default one (if set)
@@ -143,7 +166,7 @@ public final class Converters {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> Converter<? super T> getDefaultConverter(Class<? extends T> type) {
+    private <T> Converter<? super T> getDefaultConverter(Class<? extends T> type) {
         Converter<? super T> converter = (Converter<? super T>) converters.get(Pair.of(type, null));
         if (converter == null) {
             // Use a converter for a superclass or superinterface
@@ -156,7 +179,7 @@ public final class Converters {
         return converter;
     }
 
-    private static boolean hasNamedConverter(Class<?> type, String name) {
+    private boolean hasNamedConverter(Class<?> type, String name) {
         boolean hasExplicit = converters.containsKey(Pair.of(type, name));
         if (hasExplicit) {
             // There's a converter for that exact type and name
@@ -169,7 +192,7 @@ public final class Converters {
             .anyMatch(c -> c.isAssignableFrom(type));
     }
 
-    private static boolean hasDefaultConverter(Class<?> type) {
+    private boolean hasDefaultConverter(Class<?> type) {
         return hasNamedConverter(type, null);
     }
 
@@ -182,7 +205,7 @@ public final class Converters {
      * as well as for all nested data types encountered while converting
      */
     @SuppressWarnings("unchecked")
-    public static Map<String, Object> convert(Object data, String name) {
+    public Map<String, Object> convert(Object data, String name) {
         checkNotNull(data);
         checkNotNull(name);
         return convert(data, name, true);
@@ -196,14 +219,14 @@ public final class Converters {
      * @return a {@code Map} of value names to values as defined by the converters for the given data type
      * as well as for all nested data types encountered while converting
      */
-    public static Map<String, Object> convert(Object data) {
+    public Map<String, Object> convert(Object data) {
         checkNotNull(data);
         return convert(data, null, true);
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> Map<String, Object> convert(T data, String name, boolean first) {
-        if (!needsConversion(data.getClass())) {
+    private <T> Map<String, Object> convert(T data, String name, boolean first) {
+        if (!needsConversion(data)) {
             throw new NotConvertibleException(String.format("%s (%s) should not be converted", data, data.getClass()));
         }
         if ((!isConvertible(data, name) && !isConvertible(data)) && (!first && needsConversion(data.getClass()))) {
@@ -233,7 +256,7 @@ public final class Converters {
         return true;
     }
 
-    private static boolean needsConversion(Object data) {
+    private boolean needsConversion(Object data) {
         if (data instanceof Map) {
             // Can only convert Map<String, SomeConvertibleType>
             Map<?, ?> map = (Map<?, ?>) data;
@@ -263,7 +286,7 @@ public final class Converters {
             }
             return true;
         }
-        return false;
+        return needsConversion(data.getClass());
     }
 
     /**
@@ -273,7 +296,7 @@ public final class Converters {
      * @return true if the given data type is explicitly convertible, or if a supertype of it is
      * convertible
      */
-    public static boolean isConvertible(Class<?> dataType) {
+    public boolean isConvertible(Class<?> dataType) {
         checkNotNull(dataType);
         return converters.entrySet().stream()
             .map(e -> e.getKey().getLeft())
@@ -283,7 +306,7 @@ public final class Converters {
                 .anyMatch(c -> c.isAssignableFrom(dataType));
     }
 
-    private static boolean isConvertible(Object data) {
+    private boolean isConvertible(Object data) {
         if (data == null) {
             return false;
         }
@@ -297,7 +320,7 @@ public final class Converters {
         return false;
     }
 
-    private static boolean isConvertible(Object data, String name) {
+    private boolean isConvertible(Object data, String name) {
         if (data == null) {
             return false;
         }

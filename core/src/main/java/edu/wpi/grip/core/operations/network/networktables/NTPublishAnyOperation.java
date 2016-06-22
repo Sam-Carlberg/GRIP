@@ -34,13 +34,15 @@ public class NTPublishAnyOperation extends NetworkPublishOperation<Object> {
     private Class<?> lastDataType;
     private final MapNetworkPublisherFactory publisherFactory;
     private MapNetworkPublisher<Object> publisher;
+    private final Converters converters;
 
     /** The default data name. */
     private static final String DEFAULT_NAME = "myData";
 
-    public NTPublishAnyOperation(InputSocket.Factory isf, MapNetworkPublisherFactory f) {
-        super(isf, Object.class, Converters::isConvertible);
+    public NTPublishAnyOperation(InputSocket.Factory isf, MapNetworkPublisherFactory f, Converters converters) {
+        super(isf, Object.class, converters::isConvertible);
         this.publisherFactory = checkNotNull(f);
+        this.converters = checkNotNull(converters);
         nameSocket.setValue(DEFAULT_NAME);
     }
 
@@ -76,7 +78,7 @@ public class NTPublishAnyOperation extends NetworkPublishOperation<Object> {
     protected void doPublish() {
         final Object data = dataSocket.getValue().get();
         final String dataName = nameSocket.getValue().get();
-        Map<String, Object> dataMap = Converters.convert(data);
+        Map<String, Object> dataMap = converters.convert(data);
         if (publisher == null) {
             publisher = publisherFactory.create(dataMap.keySet());
         }

@@ -8,6 +8,6 @@ public interface ConverterManager {
     /**
      * Adds converters
      */
-    void addConverters();
+    void addConverters(Converters converters);
 
 }

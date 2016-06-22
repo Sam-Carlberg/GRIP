@@ -9,7 +9,7 @@ import edu.wpi.grip.core.operations.network.Publishable;
 public class GripConverterManager implements ConverterManager {
 
     @Override
-    public void addConverters() {
-        Converters.setDefaultConverter(Publishable.class, PublishAnnotatedOperation.publishableConverter);
+    public void addConverters(Converters converters) {
+        converters.setDefaultConverter(Publishable.class, PublishAnnotatedOperation.publishableConverter);
     }
 }

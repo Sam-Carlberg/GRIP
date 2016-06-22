@@ -15,7 +15,6 @@ import org.bytedeco.javacpp.opencv_core.RotatedRect;
 import org.bytedeco.javacpp.opencv_core.Size;
 import org.bytedeco.javacpp.opencv_core.Size2f;
 
-import static edu.wpi.grip.core.operations.publishing.Converters.reflectiveByMethod;
 import static org.bytedeco.javacpp.opencv_imgproc.boundingRect;
 import static org.bytedeco.javacpp.opencv_imgproc.contourArea;
 import static org.bytedeco.javacpp.opencv_imgproc.convexHull;
@@ -61,15 +60,14 @@ public class CvConverterManager implements ConverterManager {
     };
 
     @Override
-    public void addConverters() {
-        Converters.setNamedConverter(MatVector.class, "contours", contourConverter);
-        Converters.setDefaultConverter(ContoursReport.class, PublishAnnotatedOperation.publishableConverter);
-        Converters.setDefaultConverter(Point.class, reflectiveByMethod);
-        Converters.setDefaultConverter(Point2f.class, reflectiveByMethod);
-        Converters.setDefaultConverter(Size.class, reflectiveByMethod);
-        Converters.setDefaultConverter(Size2f.class, reflectiveByMethod);
-        Converters.setDefaultConverter(Rect.class, reflectiveByMethod);
-        Converters.setDefaultConverter(RotatedRect.class, reflectiveByMethod);
+    public void addConverters(Converters converters) {
+        converters.setNamedConverter(MatVector.class, "contours", contourConverter);
+        converters.setDefaultConverter(Point.class, converters.reflectiveByMethod);
+        converters.setDefaultConverter(Point2f.class, converters.reflectiveByMethod);
+        converters.setDefaultConverter(Size.class, converters.reflectiveByMethod);
+        converters.setDefaultConverter(Size2f.class, converters.reflectiveByMethod);
+        converters.setDefaultConverter(Rect.class, converters.reflectiveByMethod);
+        converters.setDefaultConverter(RotatedRect.class, converters.reflectiveByMethod);
     }
 
 }
