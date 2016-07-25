@@ -7,11 +7,11 @@ import edu.wpi.grip.ui.util.ImageConverter;
 
 import com.google.common.eventbus.Subscribe;
 
+import org.opencv.core.Mat;
+
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-
-import static org.bytedeco.javacpp.opencv_core.Mat;
 
 /**
  * A <code>SocketPreviewView</code> that previews sockets containing OpenCV Mats.

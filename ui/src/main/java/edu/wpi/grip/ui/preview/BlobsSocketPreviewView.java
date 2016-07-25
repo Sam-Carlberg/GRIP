@@ -8,6 +8,10 @@ import edu.wpi.grip.ui.util.ImageConverter;
 
 import com.google.common.eventbus.Subscribe;
 
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+
 import javafx.application.Platform;
 import javafx.geometry.Orientation;
 import javafx.scene.control.CheckBox;
@@ -17,14 +21,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 
-import static org.bytedeco.javacpp.opencv_core.LINE_8;
-import static org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_core.Point;
-import static org.bytedeco.javacpp.opencv_core.Scalar;
-import static org.bytedeco.javacpp.opencv_core.bitwise_xor;
-import static org.bytedeco.javacpp.opencv_imgproc.CV_GRAY2BGR;
-import static org.bytedeco.javacpp.opencv_imgproc.circle;
-import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
+import static org.opencv.core.Core.LINE_8;
+import static org.opencv.core.Core.bitwise_xor;
+import static org.opencv.imgproc.Imgproc.COLOR_GRAY2BGR;
+import static org.opencv.imgproc.Imgproc.circle;
+import static org.opencv.imgproc.Imgproc.cvtColor;
 
 /**
  * A SocketPreviewView for BlobsReports that shows the original image with circles overlayed onto
@@ -76,7 +77,7 @@ public class BlobsSocketPreviewView extends SocketPreviewView<BlobsReport> {
       if (input.channels() == 3) {
         input.copyTo(tmp);
       } else {
-        cvtColor(input, tmp, CV_GRAY2BGR);
+        cvtColor(input, tmp, COLOR_GRAY2BGR);
       }
       // If we don't want to see the background image, set it to black
       if (!this.showInputImage) {
@@ -88,7 +89,7 @@ public class BlobsSocketPreviewView extends SocketPreviewView<BlobsReport> {
         // For each line in the report, draw a line along with the starting and ending points
         for (BlobsReport.Blob blob : blobsReport.getBlobs()) {
           final Point point = new Point((int) blob.x, (int) blob.y);
-          circle(tmp, point, (int) (blob.size / 2), Scalar.WHITE, 2, LINE_8, 0);
+          circle(tmp, point, (int) (blob.size / 2), Scalar.all(255), 2, LINE_8, 0);
         }
       }
 

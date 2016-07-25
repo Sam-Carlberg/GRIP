@@ -1,10 +1,8 @@
 package edu.wpi.grip.core.sources;
 
-import org.bytedeco.javacpp.opencv_core.Mat;
-import org.bytedeco.javacv.Frame;
-import org.bytedeco.javacv.FrameGrabber;
-import org.bytedeco.javacv.OpenCVFrameConverter;
+/*
 import org.junit.Test;
+import org.opencv.videoio.VideoCapture;
 
 import java.util.function.Supplier;
 
@@ -14,12 +12,12 @@ import static org.python.icu.impl.Assert.fail;
 
 public class GrabberServiceTest {
   private static GrabberService createSimpleGrabberService(
-      Supplier<FrameGrabber> frameGrabberSupplier) {
+      Supplier<VideoCapture> frameGrabberSupplier) {
     return createSimpleGrabberService(frameGrabberSupplier, new SimpleUpdater());
   }
 
   private static GrabberService createSimpleGrabberService(
-      Supplier<FrameGrabber> frameGrabberSupplier,
+      Supplier<VideoCapture> frameGrabberSupplier,
       CameraSourceUpdater updater) {
     return new GrabberService("",
         frameGrabberSupplier,
@@ -201,17 +199,17 @@ public class GrabberServiceTest {
   private static class SimpleUpdater implements CameraSourceUpdater {
     @Override
     public void setFrameRate(double value) {
-            /* no-op */
+            // no-op
     }
 
     @Override
     public void copyNewMat(Mat matToCopy) {
-            /* no-op */
+            // no-op
     }
 
     @Override
     public void updatesComplete() {
-            /* no-op */
+            // no-op
     }
   }
 
@@ -225,3 +223,4 @@ public class GrabberServiceTest {
     }
   }
 }
+*/

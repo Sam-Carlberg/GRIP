@@ -10,12 +10,13 @@ import edu.wpi.grip.core.util.Icon;
 
 import com.google.common.collect.ImmutableList;
 
+import org.opencv.core.Mat;
+
 import java.util.List;
 
-import static org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_imgproc.COLOR_BGR2GRAY;
-import static org.bytedeco.javacpp.opencv_imgproc.COLOR_BGRA2GRAY;
-import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
+import static org.opencv.imgproc.Imgproc.COLOR_BGR2GRAY;
+import static org.opencv.imgproc.Imgproc.COLOR_BGRA2GRAY;
+import static org.opencv.imgproc.Imgproc.cvtColor;
 
 /**
  * An {@link Operation} that converts a color image into shades of gray.

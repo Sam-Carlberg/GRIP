@@ -10,8 +10,8 @@ import edu.wpi.grip.core.sockets.SocketHints;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 
-import org.bytedeco.javacpp.opencv_core;
-import org.bytedeco.javacpp.opencv_core.Mat;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
 
 import java.util.List;
 
@@ -56,6 +56,6 @@ public class AddOperation implements Operation {
 
   @Override
   public void perform() {
-    opencv_core.add(a.getValue().get(), b.getValue().get(), sum.getValue().get());
+    Core.add(a.getValue().get(), b.getValue().get(), sum.getValue().get());
   }
 }

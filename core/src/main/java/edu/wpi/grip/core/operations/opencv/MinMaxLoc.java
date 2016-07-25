@@ -8,14 +8,16 @@ import edu.wpi.grip.core.sockets.SocketHints;
 
 import com.google.common.collect.ImmutableList;
 
-import org.bytedeco.javacpp.opencv_core;
-import org.bytedeco.javacpp.opencv_core.Mat;
-import org.bytedeco.javacpp.opencv_core.Point;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
 
 import java.util.List;
 
+import static org.opencv.core.Core.minMaxLoc;
+
 /**
- * Operation to call {@link opencv_core#minMaxLoc}.
+ * Operation to call {@link Core#minMaxLoc}.
  */
 public class MinMaxLoc implements CVOperation {
 
@@ -85,15 +87,11 @@ public class MinMaxLoc implements CVOperation {
     if (mask.empty()) {
       mask = null;
     }
-    final double[] minVal = new double[1];
-    final double[] maxVal = new double[1];
-    final Point minLoc = minLocSocket.getValue().get();
-    final Point maxLoc = maxLocSocket.getValue().get();
 
-    opencv_core.minMaxLoc(src, minVal, maxVal, minLoc, maxLoc, mask);
-    minValSocket.setValue(minVal[0]);
-    maxValSocket.setValue(maxVal[0]);
-    minLocSocket.setValue(minLocSocket.getValue().get());
-    maxLocSocket.setValue(maxLocSocket.getValue().get());
+    Core.MinMaxLocResult result = minMaxLoc(src, mask);
+    minValSocket.setValue(result.minVal);
+    maxValSocket.setValue(result.maxVal);
+    minLocSocket.setValue(result.minLoc);
+    maxLocSocket.setValue(result.maxLoc);
   }
 }

@@ -3,9 +3,9 @@ package edu.wpi.grip.core.sockets;
 
 import com.google.common.reflect.TypeToken;
 
-import org.bytedeco.javacpp.opencv_core.Mat;
-import org.bytedeco.javacpp.opencv_core.Point;
-import org.bytedeco.javacpp.opencv_core.Size;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Size;
 
 import java.util.ArrayList;
 import java.util.Arrays;

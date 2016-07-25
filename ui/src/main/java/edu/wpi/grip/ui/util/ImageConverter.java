@@ -2,7 +2,8 @@ package edu.wpi.grip.ui.util;
 
 import com.google.common.primitives.UnsignedBytes;
 
-import java.nio.ByteBuffer;
+import org.opencv.core.Mat;
+
 import java.nio.IntBuffer;
 
 import javafx.application.Platform;
@@ -10,9 +11,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.WritableImage;
 
-import static org.bytedeco.javacpp.opencv_core.CV_8S;
-import static org.bytedeco.javacpp.opencv_core.CV_8U;
-import static org.bytedeco.javacpp.opencv_core.Mat;
+import static org.opencv.core.CvType.CV_8S;
+import static org.opencv.core.CvType.CV_8U;
 
 /**
  * Utility class for creating a JavaFX image from an OpenCV image.  This used by the preview views
@@ -68,16 +68,15 @@ public final class ImageConverter {
       this.pixels = IntBuffer.allocate(width * height);
     }
 
-    final ByteBuffer buffer = mat.<ByteBuffer>createBuffer();
-    final int stride = buffer.capacity() / height;
-
     // Convert the data from the Mat into ARGB data that we can put into a JavaFX WritableImage
     switch (channels) {
       case 1:
         // 1 channel - convert grayscale to ARGB
         for (int y = 0; y < height; y++) {
           for (int x = 0; x < width; x++) {
-            final int value = UnsignedBytes.toInt(buffer.get(stride * y + channels * x));
+            byte[] buf = new byte[1];
+            mat.get(y, x, buf);
+            final int value = UnsignedBytes.toInt(buf[0]);
             this.pixels.put(width * y + x, (0xff << 24) | (value << 16) | (value << 8) | value);
           }
         }
@@ -88,9 +87,11 @@ public final class ImageConverter {
         // 3 channels - convert BGR to RGBA
         for (int y = 0; y < height; y++) {
           for (int x = 0; x < width; x++) {
-            final int b = UnsignedBytes.toInt(buffer.get(stride * y + channels * x));
-            final int g = UnsignedBytes.toInt(buffer.get(stride * y + channels * x + 1));
-            final int r = UnsignedBytes.toInt(buffer.get(stride * y + channels * x + 2));
+            byte[] buf = new byte[3];
+            mat.get(y, x, buf);
+            final int b = UnsignedBytes.toInt(buf[0]);
+            final int g = UnsignedBytes.toInt(buf[1]);
+            final int r = UnsignedBytes.toInt(buf[2]);
             this.pixels.put(width * y + x, (0xff << 24) | (r << 16) | (g << 8) | b);
           }
         }

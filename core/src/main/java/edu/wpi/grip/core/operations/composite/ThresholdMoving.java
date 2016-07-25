@@ -8,11 +8,12 @@ import edu.wpi.grip.core.sockets.SocketHints;
 
 import com.google.common.collect.ImmutableList;
 
-import org.bytedeco.javacpp.opencv_core;
-import org.bytedeco.javacpp.opencv_core.Mat;
-import org.bytedeco.javacpp.opencv_core.Size;
+import org.opencv.core.Mat;
+import org.opencv.core.Size;
 
 import java.util.List;
+
+import static org.opencv.core.Core.absdiff;
 
 /**
  * Finds the absolute difference between the current image and the previous image.
@@ -54,9 +55,9 @@ public class ThresholdMoving implements Operation {
     final Mat input = imageSocket.getValue().get();
     final Size lastSize = lastImage.size();
     final Size inputSize = input.size();
-    if (!lastImage.empty() && lastSize.height() == inputSize.height()
-        && lastSize.width() == inputSize.width()) {
-      opencv_core.absdiff(input, lastImage, outputSocket.getValue().get());
+    if (!lastImage.empty() && lastSize.height == inputSize.height
+        && lastSize.width == inputSize.width) {
+      absdiff(input, lastImage, outputSocket.getValue().get());
     }
     input.copyTo(lastImage);
     outputSocket.setValue(outputSocket.getValue().get());

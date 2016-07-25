@@ -8,8 +8,8 @@ import edu.wpi.grip.core.sockets.SocketHints;
 
 import com.google.common.collect.ImmutableList;
 
-import org.bytedeco.javacpp.opencv_core.Mat;
-import org.bytedeco.javacpp.opencv_core.Size;
+import org.opencv.core.Mat;
+import org.opencv.core.Size;
 
 import java.util.List;
 
@@ -32,8 +32,6 @@ public class MatFieldAccessor implements CVOperation {
       .createNumberSocketHint("cols", defaultsMat.rows());
   private final SocketHint<Number> rowsHint = SocketHints.Outputs
       .createNumberSocketHint("rows", defaultsMat.rows());
-  private final SocketHint<Number> highValueHint = SocketHints.Outputs
-      .createNumberSocketHint("high value", defaultsMat.highValue());
 
 
   private final InputSocket<Mat> inputSocket;
@@ -43,7 +41,6 @@ public class MatFieldAccessor implements CVOperation {
   private final OutputSocket<Number> channelsSocket;
   private final OutputSocket<Number> colsSocket;
   private final OutputSocket<Number> rowsSocket;
-  private final OutputSocket<Number> highValueSocket;
 
   @SuppressWarnings("JavadocMethod")
   public MatFieldAccessor(InputSocket.Factory inputSocketFactory, OutputSocket.Factory
@@ -55,7 +52,6 @@ public class MatFieldAccessor implements CVOperation {
     this.channelsSocket = outputSocketFactory.create(channelsHint);
     this.colsSocket = outputSocketFactory.create(colsHint);
     this.rowsSocket = outputSocketFactory.create(rowsHint);
-    this.highValueSocket = outputSocketFactory.create(highValueHint);
   }
 
   @Override
@@ -72,8 +68,7 @@ public class MatFieldAccessor implements CVOperation {
         emptySocket,
         channelsSocket,
         colsSocket,
-        rowsSocket,
-        highValueSocket
+        rowsSocket
     );
   }
 
@@ -86,6 +81,5 @@ public class MatFieldAccessor implements CVOperation {
     channelsSocket.setValue(inputMat.channels());
     colsSocket.setValue(inputMat.cols());
     rowsSocket.setValue(inputMat.rows());
-    highValueSocket.setValue(inputMat.highValue());
   }
 }

@@ -9,16 +9,17 @@ import edu.wpi.grip.core.util.Icon;
 
 import com.google.common.collect.ImmutableList;
 
+import org.opencv.core.Mat;
+import org.opencv.core.Size;
+
 import java.util.List;
 
-import static org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_core.Size;
-import static org.bytedeco.javacpp.opencv_imgproc.INTER_AREA;
-import static org.bytedeco.javacpp.opencv_imgproc.INTER_CUBIC;
-import static org.bytedeco.javacpp.opencv_imgproc.INTER_LANCZOS4;
-import static org.bytedeco.javacpp.opencv_imgproc.INTER_LINEAR;
-import static org.bytedeco.javacpp.opencv_imgproc.INTER_NEAREST;
-import static org.bytedeco.javacpp.opencv_imgproc.resize;
+import static org.opencv.imgproc.Imgproc.INTER_AREA;
+import static org.opencv.imgproc.Imgproc.INTER_CUBIC;
+import static org.opencv.imgproc.Imgproc.INTER_LANCZOS4;
+import static org.opencv.imgproc.Imgproc.INTER_LINEAR;
+import static org.opencv.imgproc.Imgproc.INTER_NEAREST;
+import static org.opencv.imgproc.Imgproc.resize;
 
 /**
  * Scale an image to an exact width and height using one of several interpolation modes.  Scaling

@@ -4,6 +4,7 @@ import edu.wpi.grip.core.events.ExceptionClearedEvent;
 import edu.wpi.grip.core.events.ExceptionEvent;
 import edu.wpi.grip.core.http.GripServer;
 import edu.wpi.grip.core.http.HttpPipelineSwitcher;
+import edu.wpi.grip.core.natives.NativesLoader;
 import edu.wpi.grip.core.operations.CVOperations;
 import edu.wpi.grip.core.operations.Operations;
 import edu.wpi.grip.core.operations.network.GripNetworkModule;
@@ -47,6 +48,7 @@ public class Main {
 
   @SuppressWarnings("JavadocMethod")
   public static void main(String[] args) throws IOException, InterruptedException {
+    NativesLoader.load();
     final Injector injector = Guice.createInjector(Modules.override(new GripCoreModule(),
         new GripFileModule(), new GripSourcesHardwareModule()).with(new GripNetworkModule()));
     injector.getInstance(Main.class).start(args);

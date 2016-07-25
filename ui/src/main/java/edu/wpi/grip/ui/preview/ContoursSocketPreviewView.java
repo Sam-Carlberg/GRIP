@@ -8,6 +8,9 @@ import edu.wpi.grip.ui.util.ImageConverter;
 
 import com.google.common.eventbus.Subscribe;
 
+import org.opencv.core.Mat;
+import org.opencv.core.Scalar;
+
 import javafx.application.Platform;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -15,11 +18,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 
-import static org.bytedeco.javacpp.opencv_core.CV_8UC3;
-import static org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_core.Scalar;
-import static org.bytedeco.javacpp.opencv_core.bitwise_xor;
-import static org.bytedeco.javacpp.opencv_imgproc.drawContours;
+import static org.opencv.core.Core.bitwise_xor;
+import static org.opencv.core.CvType.CV_8UC3;
+import static org.opencv.imgproc.Imgproc.drawContours;
 
 /**
  * A preview view for displaying contours.  This view shows each contour as a different-colored
@@ -28,13 +29,13 @@ import static org.bytedeco.javacpp.opencv_imgproc.drawContours;
  */
 public final class ContoursSocketPreviewView extends SocketPreviewView<ContoursReport> {
 
-  private static final Scalar[] CONTOUR_COLORS = new Scalar[]{
-      Scalar.RED,
-      Scalar.YELLOW,
-      Scalar.GREEN,
-      Scalar.CYAN,
-      Scalar.BLUE,
-      Scalar.MAGENTA,
+  private static final Scalar[] CONTOUR_COLORS = new Scalar[] {
+      new Scalar(0, 0, 255, 255),   // RED
+      new Scalar(0, 255, 255, 255), // YELLOW
+      new Scalar(0, 255, 0, 255),   // GREEN
+      new Scalar(255, 150, 0, 255), // CYAN
+      new Scalar(255, 0, 0, 255),   // BLUE
+      new Scalar(255, 0, 255, 255), // MAGENTA
   };
   private final ImageConverter imageConverter = new ImageConverter();
   private final ImageView imageView = new ImageView();
@@ -71,7 +72,7 @@ public final class ContoursSocketPreviewView extends SocketPreviewView<ContoursR
       final ContoursReport contours = this.getSocket().getValue().get();
       long numContours = 0;
 
-      if (!contours.getContours().isNull() && contours.getRows() > 0 && contours.getCols() > 0) {
+      if (contours.getRows() > 0 && contours.getCols() > 0) {
         // Allocate a completely black OpenCV Mat to draw the contours onto.  We can easily
         // render contours
         // by using OpenCV's drawContours function and converting the Mat into a JavaFX Image.
@@ -86,7 +87,7 @@ public final class ContoursSocketPreviewView extends SocketPreviewView<ContoursR
                 .length]);
           }
         } else {
-          drawContours(this.tmp, contours.getContours(), -1, Scalar.WHITE);
+          drawContours(this.tmp, contours.getContours(), -1, Scalar.all(255));
         }
       }
 

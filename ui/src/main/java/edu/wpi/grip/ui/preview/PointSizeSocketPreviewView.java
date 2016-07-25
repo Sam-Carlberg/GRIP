@@ -6,31 +6,34 @@ import edu.wpi.grip.ui.util.GripPlatform;
 
 import com.google.common.eventbus.Subscribe;
 
-import org.bytedeco.javacpp.IntPointer;
+import org.opencv.core.Point;
+import org.opencv.core.Size;
 
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
-import static org.bytedeco.javacpp.opencv_core.Point;
-import static org.bytedeco.javacpp.opencv_core.Size;
-
 /**
  * A {@link SocketPreviewView} for OpenCV points and sizes.
  */
-public class PointSizeSocketPreviewView<T extends IntPointer> extends SocketPreviewView<T> {
+public class PointSizeSocketPreviewView extends SocketPreviewView {
 
   private final TextField x;
   private final TextField y;
   private final GripPlatform platform;
+  private final Class<?> type;
 
   /**
    * @param socket An output socket to preview.
    */
-  PointSizeSocketPreviewView(GripPlatform platform, OutputSocket<T> socket) {
+  PointSizeSocketPreviewView(GripPlatform platform, OutputSocket<?> socket) {
     super(socket);
     this.platform = platform;
+    this.type = socket.getSocketHint().getType();
+    if (type != Point.class && type != Size.class) {
+      throw new IllegalArgumentException("Cannot show a value of type: " + type.getName());
+    }
 
     x = new TextField();
     x.setEditable(false);
@@ -40,7 +43,6 @@ public class PointSizeSocketPreviewView<T extends IntPointer> extends SocketPrev
     final GridPane gridPane = new GridPane();
     gridPane.add(x, 1, 0);
     gridPane.add(y, 1, 1);
-
     // The only difference between point and size previews is the labels
     if (socket.getSocketHint().getType().equals(Point.class)) {
       gridPane.add(new Label("x: "), 0, 0);
@@ -63,8 +65,17 @@ public class PointSizeSocketPreviewView<T extends IntPointer> extends SocketPrev
 
   private void updateTextFields() {
     platform.runAsSoonAsPossible(() -> {
-      this.x.setText(Integer.toString(this.getSocket().getValue().get().get(0)));
-      this.y.setText(Integer.toString(this.getSocket().getValue().get().get(1)));
+      if (type.equals(Size.class)) {
+        Size value = (Size) this.getSocket().getValue().get();
+        this.x.setText(Double.toString(value.width));
+        this.y.setText(Double.toString(value.height));
+      } else if (type.equals(Point.class)) {
+        Point value = (Point) this.getSocket().getValue().get();
+        this.x.setText(Double.toString(value.x));
+        this.y.setText(Double.toString(value.y));
+      } else {
+        throw new UnsupportedOperationException("Unsupported value type: " + type.getName());
+      }
     });
   }
 }

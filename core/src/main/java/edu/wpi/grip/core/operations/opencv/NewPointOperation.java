@@ -10,7 +10,7 @@ import edu.wpi.grip.core.util.Icon;
 
 import com.google.common.collect.ImmutableList;
 
-import org.bytedeco.javacpp.opencv_core.Point;
+import org.opencv.core.Point;
 
 import java.util.List;
 

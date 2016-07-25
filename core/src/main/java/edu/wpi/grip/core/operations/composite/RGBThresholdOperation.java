@@ -10,19 +10,20 @@ import edu.wpi.grip.core.util.Icon;
 
 import com.google.common.collect.ImmutableList;
 
+import org.opencv.core.Mat;
+import org.opencv.core.Scalar;
+
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_core.Scalar;
-import static org.bytedeco.javacpp.opencv_core.inRange;
+import static org.opencv.core.Core.inRange;
 
 /**
  * An {@link Operation} that converts a color image into a binary image based on threshold ranges
  * for each channel.
  */
-public class RGBThresholdOperation extends ThresholdOperation {
+public class RGBThresholdOperation implements Operation {
 
   public static final OperationDescription DESCRIPTION =
       OperationDescription.builder()
@@ -102,11 +103,8 @@ public class RGBThresholdOperation extends ThresholdOperation {
         channel2.get(1).doubleValue(),
         channel1.get(1).doubleValue(), 0);
 
-    final Mat low = reallocateMatIfInputSizeOrWidthChanged(dataArray, 0, lowScalar, input);
-    final Mat high = reallocateMatIfInputSizeOrWidthChanged(dataArray, 1, highScalar, input);
-
     try {
-      inRange(input, low, high, output);
+      inRange(input, lowScalar, highScalar, output);
 
       outputSocket.setValue(output);
     } catch (RuntimeException e) {

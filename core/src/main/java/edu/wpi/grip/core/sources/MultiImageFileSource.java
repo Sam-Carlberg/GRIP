@@ -16,7 +16,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-import org.bytedeco.javacpp.opencv_core.Mat;
+import org.opencv.core.Mat;
 
 import java.io.File;
 import java.io.IOException;

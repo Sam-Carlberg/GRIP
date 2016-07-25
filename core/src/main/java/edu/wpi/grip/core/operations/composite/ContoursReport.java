@@ -4,19 +4,21 @@ import edu.wpi.grip.core.operations.network.PublishValue;
 import edu.wpi.grip.core.operations.network.Publishable;
 import edu.wpi.grip.core.sockets.NoSocketTypeLabel;
 import edu.wpi.grip.core.sockets.Socket;
+import edu.wpi.grip.core.util.OpenCvUtils;
 
 import com.google.auto.value.AutoValue;
+
+import org.opencv.core.MatOfInt;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Rect;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_core.MatVector;
-import static org.bytedeco.javacpp.opencv_core.Rect;
-import static org.bytedeco.javacpp.opencv_imgproc.boundingRect;
-import static org.bytedeco.javacpp.opencv_imgproc.contourArea;
-import static org.bytedeco.javacpp.opencv_imgproc.convexHull;
+import static org.opencv.imgproc.Imgproc.boundingRect;
+import static org.opencv.imgproc.Imgproc.contourArea;
+import static org.opencv.imgproc.Imgproc.convexHull;
 
 /**
  * The output of {@link FindContoursOperation}.  This stores a list of contours (which is basically
@@ -28,7 +30,7 @@ public final class ContoursReport implements Publishable {
 
   private final int rows;
   private final int cols;
-  private final MatVector contours;
+  private final List<MatOfPoint> contours;
   private Optional<Rect[]> boundingBoxes = Optional.empty();
 
   /**
@@ -36,10 +38,10 @@ public final class ContoursReport implements Publishable {
    * ContoursReports.
    */
   public ContoursReport() {
-    this(new MatVector(), 0, 0);
+    this(new ArrayList<>(), 0, 0);
   }
 
-  ContoursReport(MatVector contours, int rows, int cols) {
+  ContoursReport(List<MatOfPoint> contours, int rows, int cols) {
     this.contours = contours;
     this.rows = rows;
     this.cols = cols;
@@ -53,7 +55,7 @@ public final class ContoursReport implements Publishable {
     return this.cols;
   }
 
-  public MatVector getContours() {
+  public List<MatOfPoint> getContours() {
     return this.contours;
   }
 
@@ -61,7 +63,7 @@ public final class ContoursReport implements Publishable {
    * @return All of the contours held within this report.
    */
   public List<Contour> getProcessedContours() {
-    final List<Contour> processedContours = new ArrayList<>((int) contours.size());
+    final List<Contour> processedContours = new ArrayList<>(contours.size());
     double[] area = getArea();
     double[] centerX = getCenterX();
     double[] centerY = getCenterY();
@@ -82,7 +84,7 @@ public final class ContoursReport implements Publishable {
    */
   private synchronized Rect[] computeBoundingBoxes() {
     if (!boundingBoxes.isPresent()) {
-      Rect[] bb = new Rect[(int) contours.size()];
+      Rect[] bb = new Rect[contours.size()];
       for (int i = 0; i < contours.size(); i++) {
         bb[i] = boundingRect(contours.get(i));
       }
@@ -95,7 +97,7 @@ public final class ContoursReport implements Publishable {
 
   @PublishValue(key = "area", weight = 0)
   public double[] getArea() {
-    final double[] areas = new double[(int) contours.size()];
+    final double[] areas = new double[contours.size()];
     for (int i = 0; i < contours.size(); i++) {
       areas[i] = contourArea(contours.get(i));
     }
@@ -104,51 +106,52 @@ public final class ContoursReport implements Publishable {
 
   @PublishValue(key = "centerX", weight = 1)
   public double[] getCenterX() {
-    final double[] centers = new double[(int) contours.size()];
+    final double[] centers = new double[contours.size()];
     final Rect[] boundingBoxes = computeBoundingBoxes();
     for (int i = 0; i < contours.size(); i++) {
-      centers[i] = boundingBoxes[i].x() + boundingBoxes[i].width() / 2;
+      centers[i] = boundingBoxes[i].x + boundingBoxes[i].width / 2;
     }
     return centers;
   }
 
   @PublishValue(key = "centerY", weight = 2)
   public double[] getCenterY() {
-    final double[] centers = new double[(int) contours.size()];
+    final double[] centers = new double[contours.size()];
     final Rect[] boundingBoxes = computeBoundingBoxes();
     for (int i = 0; i < contours.size(); i++) {
-      centers[i] = boundingBoxes[i].y() + boundingBoxes[i].height() / 2;
+      centers[i] = boundingBoxes[i].y + boundingBoxes[i].height / 2;
     }
     return centers;
   }
 
   @PublishValue(key = "width", weight = 3)
   public synchronized double[] getWidth() {
-    final double[] widths = new double[(int) contours.size()];
+    final double[] widths = new double[contours.size()];
     final Rect[] boundingBoxes = computeBoundingBoxes();
     for (int i = 0; i < contours.size(); i++) {
-      widths[i] = boundingBoxes[i].width();
+      widths[i] = boundingBoxes[i].width;
     }
     return widths;
   }
 
   @PublishValue(key = "height", weight = 4)
   public synchronized double[] getHeights() {
-    final double[] heights = new double[(int) contours.size()];
+    final double[] heights = new double[contours.size()];
     final Rect[] boundingBoxes = computeBoundingBoxes();
     for (int i = 0; i < contours.size(); i++) {
-      heights[i] = boundingBoxes[i].height();
+      heights[i] = boundingBoxes[i].height;
     }
     return heights;
   }
 
   @PublishValue(key = "solidity", weight = 5)
   public synchronized double[] getSolidity() {
-    final double[] solidities = new double[(int) contours.size()];
-    Mat hull = new Mat();
+    final double[] solidities = new double[contours.size()];
+    MatOfInt hull = new MatOfInt();
     for (int i = 0; i < contours.size(); i++) {
       convexHull(contours.get(i), hull);
-      solidities[i] = contourArea(contours.get(i)) / contourArea(hull);
+      solidities[i] = contourArea(contours.get(i))
+          / contourArea(OpenCvUtils.hullToPoints(hull, contours.get(i)));
     }
     return solidities;
   }

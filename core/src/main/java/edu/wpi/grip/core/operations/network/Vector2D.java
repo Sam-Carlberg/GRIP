@@ -1,10 +1,9 @@
 package edu.wpi.grip.core.operations.network;
 
+import org.opencv.core.Point;
+import org.opencv.core.Size;
 
 import javax.annotation.concurrent.Immutable;
-
-import static org.bytedeco.javacpp.opencv_core.Point;
-import static org.bytedeco.javacpp.opencv_core.Size;
 
 /**
  * A type publishable to a NetworkPublisher that consists of two numbers.  JavaCV {@link Point}s and
@@ -17,13 +16,13 @@ public final class Vector2D implements Publishable {
   private final double y;
 
   public Vector2D(Point point) {
-    this.x = point.x();
-    this.y = point.y();
+    this.x = point.x;
+    this.y = point.y;
   }
 
   public Vector2D(Size size) {
-    this.x = size.width();
-    this.y = size.height();
+    this.x = size.width;
+    this.y = size.height;
   }
 
   @PublishValue(key = "x", weight = 0)

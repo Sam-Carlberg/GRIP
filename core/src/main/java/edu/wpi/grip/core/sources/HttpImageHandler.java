@@ -5,8 +5,9 @@ import edu.wpi.grip.core.http.GripServer;
 import edu.wpi.grip.core.http.PedanticHandler;
 
 import org.apache.commons.io.IOUtils;
-import org.bytedeco.javacpp.opencv_core.Mat;
 import org.eclipse.jetty.server.Request;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -88,7 +89,7 @@ public final class HttpImageHandler extends PedanticHandler {
       baseRequest.setHandled(true);
       return;
     }
-    image = new Mat(newBytes);
+    image = new MatOfByte(newBytes);
     lastBytes = newBytes;
     callbacks.forEach(c -> c.accept(image));
     response.setStatus(SC_CREATED);

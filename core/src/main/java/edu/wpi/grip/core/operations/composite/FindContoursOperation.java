@@ -10,14 +10,16 @@ import edu.wpi.grip.core.util.Icon;
 
 import com.google.common.collect.ImmutableList;
 
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+
+import java.util.ArrayList;
 import java.util.List;
 
-import static org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_core.MatVector;
-import static org.bytedeco.javacpp.opencv_imgproc.CV_CHAIN_APPROX_TC89_KCOS;
-import static org.bytedeco.javacpp.opencv_imgproc.CV_RETR_EXTERNAL;
-import static org.bytedeco.javacpp.opencv_imgproc.CV_RETR_LIST;
-import static org.bytedeco.javacpp.opencv_imgproc.findContours;
+import static org.opencv.imgproc.Imgproc.CHAIN_APPROX_TC89_KCOS;
+import static org.opencv.imgproc.Imgproc.RETR_EXTERNAL;
+import static org.opencv.imgproc.Imgproc.RETR_LIST;
+import static org.opencv.imgproc.Imgproc.findContours;
 
 /**
  * An {@link Operation} that, given a binary image, produces a list of contours of all of the shapes
@@ -91,9 +93,9 @@ public class FindContoursOperation implements Operation {
     // The other ones involve hierarchies of contours, which might be useful in some situations,
     // but probably only
     // when processing the contours manually in code (so, not in a graphical pipeline).
-    MatVector contours = new MatVector();
-    findContours(tmp, contours, externalOnly ? CV_RETR_EXTERNAL : CV_RETR_LIST,
-        CV_CHAIN_APPROX_TC89_KCOS);
+    List<MatOfPoint> contours = new ArrayList<>();
+    findContours(tmp, contours, new Mat(), externalOnly ? RETR_EXTERNAL : RETR_LIST,
+        CHAIN_APPROX_TC89_KCOS);
 
     contoursSocket.setValue(new ContoursReport(contours, input.rows(), input.cols()));
   }

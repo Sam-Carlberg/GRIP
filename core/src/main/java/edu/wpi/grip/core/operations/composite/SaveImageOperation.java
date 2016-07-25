@@ -12,17 +12,18 @@ import edu.wpi.grip.core.util.Icon;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableList;
 
-import org.bytedeco.javacpp.BytePointer;
-import org.bytedeco.javacpp.IntPointer;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.core.MatOfInt;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_imgcodecs.CV_IMWRITE_JPEG_QUALITY;
-import static org.bytedeco.javacpp.opencv_imgcodecs.imencode;
+import static org.opencv.imgcodecs.Imgcodecs.CV_IMWRITE_JPEG_QUALITY;
+import static org.opencv.imgcodecs.Imgcodecs.imencode;
+
 
 /**
  * Save JPEG files periodically to the local disk.
@@ -59,7 +60,7 @@ public class SaveImageOperation implements Operation {
   private final OutputSocket<Mat> outputSocket;
 
   private final FileManager fileManager;
-  private final BytePointer imagePointer = new BytePointer();
+  private final MatOfByte buf = new MatOfByte();
   private final Stopwatch stopwatch = Stopwatch.createStarted();
   private final DateTimeFormatter formatter
       = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss-SSS");
@@ -120,14 +121,11 @@ public class SaveImageOperation implements Operation {
     stopwatch.reset();
     stopwatch.start();
 
-    imencode("." + fileTypesSocket.getValue().get(), inputSocket.getValue().get(), imagePointer,
-        new IntPointer(CV_IMWRITE_JPEG_QUALITY, qualitySocket.getValue().get().intValue()));
-    byte[] buffer = new byte[128 * 1024];
-    int bufferSize = imagePointer.limit();
-    if (bufferSize > buffer.length) {
-      buffer = new byte[imagePointer.limit()];
-    }
-    imagePointer.get(buffer, 0, bufferSize);
+    imencode("." + fileTypesSocket.getValue().get(),
+        inputSocket.getValue().get(),
+        buf,
+        new MatOfInt(CV_IMWRITE_JPEG_QUALITY, qualitySocket.getValue().get().intValue()));
+    byte[] buffer = buf.toArray();
 
     fileManager.saveImage(buffer, LocalDateTime.now().format(formatter)
         + "." + fileTypesSocket.getValue().get());

@@ -12,9 +12,9 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;
 
-import org.bytedeco.javacpp.opencv_core.Mat;
 import org.junit.After;
 import org.junit.Test;
+import org.opencv.core.Mat;
 import org.testfx.framework.junit.ApplicationTest;
 import org.testfx.matcher.base.NodeMatchers;
 import org.testfx.util.WaitForAsyncUtils;

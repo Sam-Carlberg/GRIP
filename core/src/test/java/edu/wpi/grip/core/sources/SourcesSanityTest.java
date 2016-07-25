@@ -19,7 +19,7 @@ public class SourcesSanityTest extends AbstractPackageSanityTests {
     super();
     publicApiOnly();
     ignoreClasses(c -> c.getName().contains("Mock"));
-    ignoreClasses(c -> Arrays.asList(IPCameraFrameGrabber.class, HttpSource.class).contains(c));
+    ignoreClasses(c -> Arrays.asList(HttpSource.class).contains(c));
     setDefault(Service.Listener.class, new SingleActionListener(() -> {
     }));
     setDefault(ExceptionWitness.Factory.class, MockExceptionWitness.MOCK_FACTORY);

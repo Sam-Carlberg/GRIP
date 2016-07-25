@@ -10,22 +10,22 @@ import edu.wpi.grip.core.util.Icon;
 
 import com.google.common.collect.ImmutableList;
 
-import org.bytedeco.javacpp.opencv_core.Mat;
-import org.bytedeco.javacpp.opencv_core.Scalar;
+import org.opencv.core.Mat;
+import org.opencv.core.Scalar;
 
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.bytedeco.javacpp.opencv_core.inRange;
-import static org.bytedeco.javacpp.opencv_imgproc.COLOR_BGR2HSV;
-import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
+import static org.opencv.core.Core.inRange;
+import static org.opencv.imgproc.Imgproc.COLOR_BGR2HSV;
+import static org.opencv.imgproc.Imgproc.cvtColor;
 
 /**
  * An {@link Operation} that converts a color image into a binary image based on the HSV threshold
  * ranges for each channel.
  */
-public class HSVThresholdOperation extends ThresholdOperation {
+public class HSVThresholdOperation implements Operation {
 
   public static final OperationDescription DESCRIPTION =
       OperationDescription.builder()
@@ -104,16 +104,16 @@ public class HSVThresholdOperation extends ThresholdOperation {
         channel2.get(1).doubleValue(),
         channel3.get(1).doubleValue(), 0);
 
-    final Mat low = reallocateMatIfInputSizeOrWidthChanged(dataArray, 0, lowScalar, input);
-    final Mat high = reallocateMatIfInputSizeOrWidthChanged(dataArray, 1, highScalar, input);
-    final Mat hsv = dataArray[2];
+    final Mat hsv = new Mat();
 
     try {
       cvtColor(input, hsv, COLOR_BGR2HSV);
-      inRange(hsv, low, high, output);
+      inRange(hsv, lowScalar, highScalar, output);
       outputSocket.setValue(output);
     } catch (RuntimeException e) {
       logger.log(Level.WARNING, e.getMessage(), e);
+    } finally {
+      hsv.release();
     }
   }
 }

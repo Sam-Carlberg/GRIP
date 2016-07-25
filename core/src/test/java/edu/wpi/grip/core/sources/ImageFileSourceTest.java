@@ -1,5 +1,6 @@
 package edu.wpi.grip.core.sources;
 
+import edu.wpi.grip.core.natives.NativesLoader;
 import edu.wpi.grip.core.sockets.MockOutputSocketFactory;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.util.Files;
@@ -7,9 +8,10 @@ import edu.wpi.grip.util.ImageWithData;
 
 import com.google.common.eventbus.EventBus;
 
-import org.bytedeco.javacpp.opencv_core.Mat;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opencv.core.Mat;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +30,11 @@ public class ImageFileSourceTest {
   private final File textFile = Files.textFile;
   private EventBus eventBus;
   private OutputSocket.Factory osf;
+
+  @BeforeClass
+  public static void loadNatives() {
+    NativesLoader.load();
+  }
 
   @Before
   public void setUp() throws URISyntaxException {

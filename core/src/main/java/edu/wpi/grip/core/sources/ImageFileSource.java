@@ -14,8 +14,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-import org.bytedeco.javacpp.opencv_core.Mat;
-import org.bytedeco.javacpp.opencv_imgcodecs;
+import org.opencv.core.Mat;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +24,7 @@ import java.util.List;
 import java.util.Properties;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.opencv.imgcodecs.Imgcodecs.IMREAD_COLOR;
 
 
 /**
@@ -114,7 +114,7 @@ public final class ImageFileSource extends Source {
    * @param path The location on the file system where the image exists.
    */
   private void loadImage(String path) throws IOException {
-    this.loadImage(path, opencv_imgcodecs.IMREAD_COLOR);
+    this.loadImage(path, IMREAD_COLOR);
   }
 
   private void loadImage(String path, final int flags) throws IOException {

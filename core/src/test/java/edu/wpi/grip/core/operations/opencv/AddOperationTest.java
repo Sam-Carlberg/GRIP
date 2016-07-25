@@ -1,16 +1,19 @@
 package edu.wpi.grip.core.operations.opencv;
 
 import edu.wpi.grip.core.AddOperation;
+import edu.wpi.grip.core.natives.NativesLoader;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 
 import com.google.common.eventbus.EventBus;
 
-import org.bytedeco.javacpp.opencv_core;
-import org.bytedeco.javacpp.opencv_core.Mat;
-import org.bytedeco.javacpp.opencv_core.Scalar;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.Scalar;
 
 import java.util.List;
 
@@ -20,6 +23,11 @@ public class AddOperationTest {
 
   EventBus eventBus;
   AddOperation addition;
+
+  @BeforeClass
+  public static void loadNatives() {
+    NativesLoader.load();
+  }
 
   @Before
   public void setUp() throws Exception {
@@ -45,8 +53,8 @@ public class AddOperationTest {
       return false;
     }
     Mat diff = new Mat();
-    opencv_core.compare(mat1, mat2, diff, opencv_core.CMP_NE);
-    int nz = opencv_core.countNonZero(diff);
+    Core.compare(mat1, mat2, diff, Core.CMP_NE);
+    int nz = Core.countNonZero(diff);
     return nz == 0;
   }
 
@@ -59,16 +67,14 @@ public class AddOperationTest {
     InputSocket b = inputs.get(1);
     OutputSocket c = outputs.get(0);
 
-    int[] sz = {256, 256};
-
-    a.setValue(new Mat(2, sz, opencv_core.CV_8U, Scalar.all(1)));
-    b.setValue(new Mat(2, sz, opencv_core.CV_8U, Scalar.all(2)));
+    a.setValue(new Mat(2, 2, CvType.CV_8U, Scalar.all(1)));
+    b.setValue(new Mat(2, 2, CvType.CV_8U, Scalar.all(2)));
 
     for (int i = 0; i < 1000; i++) {
       addition.perform();
     }
 
-    Mat expectedResult = new Mat(2, sz, opencv_core.CV_8U, Scalar.all(3));
+    Mat expectedResult = new Mat(2, 2, CvType.CV_8U, Scalar.all(3));
     assertTrue(isMatEqual((Mat) c.getValue().get(), expectedResult));
   }
 }

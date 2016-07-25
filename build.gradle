@@ -177,8 +177,11 @@ allprojects {
     }
 }
 
-def os = osdetector.classifier.replace("osx", "macosx").replace("x86_32", "x86")
-def arch = osdetector.arch.replace("x86_64", "x64")
+def arch = osdetector.arch
+def os = osdetector.classifier.replace("-$arch", "")
+
+println "OS = $os"
+println "Arch = $arch"
 
 project(":core") {
     apply plugin: 'java'
@@ -188,6 +191,7 @@ project(":core") {
 
     configurations {
         shadow
+        openCvNatives
     }
 
     repositories {
@@ -200,15 +204,15 @@ project(":core") {
         maven {
             url = "https://github.com/WPIRoboticsProjects/rosjava_mvn_repo/raw/master"
         }
+        maven {
+            url = "http://github.com/SamCarlberg/test-maven-repo/raw/master"
+        }
     }
 
     dependencies {
         compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
-        compile group: 'org.bytedeco', name: 'javacv', version: '1.1'
-        compile group: 'org.bytedeco.javacpp-presets', name: 'opencv', version: '3.0.0-1.1'
-        compile group: 'org.bytedeco.javacpp-presets', name: 'opencv', version: '3.0.0-1.1', classifier: os
-        compile group: 'org.bytedeco.javacpp-presets', name: 'opencv-3.0.0-1.1', classifier: 'linux-frc'
-        compile group: 'org.bytedeco.javacpp-presets', name: 'videoinput', version: '0.200-1.1', classifier: os
+        compile group: 'org.opencv', name: 'OpenCV', version: '3.1.0'
+        openCvNatives group: 'org.opencv', name: "$os-jni", version: '3.1.0'
         compile group: 'org.python', name: 'jython', version: '2.7.0'
         compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.9'
         compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
@@ -234,10 +238,37 @@ project(":core") {
 
     mainClassName = 'edu.wpi.grip.core.Main'
 
+    def nativeLibDir = "libs/opencv-jni"
+
     jar {
+        description = "Generates core jar with embedded native libs"
         manifest {
             attributes 'Implementation-Version': version, 'Main-Class': mainClassName
         }
+        dependsOn {
+            classes
+        }
+        from {
+            configurations.openCvNatives.collect { it.isDirectory() ? it : zipTree(it) }
+        }
+    }
+
+    // Extract native artifacts from zip file into build/opencv-jni/
+    task extractOpenCvNatives(type: Copy) {
+        println "Extracting OpenCV JNI to $nativeLibDir"
+        from {
+            configurations.openCvNatives.collect { zipTree(it) }
+        }
+        into nativeLibDir
+    }
+
+    compileJava.dependsOn extractOpenCvNatives
+
+    tasks.withType(JavaExec) {
+        systemProperty "java.library.path", "$nativeLibDir/jni/"
+    }
+    tasks.withType(Test) {
+        systemProperty "java.library.path", "$nativeLibDir/jni/"
     }
 
     shadowJar {
@@ -246,23 +277,12 @@ project(":core") {
                 builtBy shadowJar
             }
         }
+        from {
+            project(':core').configurations.openCvNatives.collect { it.isDirectory() ? it : zipTree(it) }
+        }
 
         /* The icudt54b directory in Jython takes up 9 megabytes and doesn't seem to do anything useful. */
         exclude 'org/python/icu/impl/data/icudt54b/'
-
-        /* We don't use all of the OpenCV libraries, and they seem to take up a lot of space.  If we ever decide to
-        use any more of these (or perhaps just include them for people to use from Python scripts), the following lines
-        should be changed, but for now this saves us a lot of space. */
-        exclude 'org/bytedeco/javacpp/*/*calib3d*'
-        exclude 'org/bytedeco/javacpp/*/*face*'
-        exclude 'org/bytedeco/javacpp/*/*objdetect*'
-        exclude 'org/bytedeco/javacpp/*/*optflow*'
-        exclude 'org/bytedeco/javacpp/*/*photo*'
-        exclude 'org/bytedeco/javacpp/*/*shape*'
-        exclude 'org/bytedeco/javacpp/*/*stitching*'
-        exclude 'org/bytedeco/javacpp/*/*superres*'
-        exclude 'org/bytedeco/javacpp/*/*videostab*'
-        exclude 'org/bytedeco/javacpp/*/*xfeatures2d*'
     }
 
     sourceSets {
@@ -273,15 +293,6 @@ project(":core") {
             }
         }
     }
-
-    task generateCodeFromSource(type: CodeGenerator) {
-        description 'Generates the Operation Wrappers for the OpenCV methods.\n To skip run with parm `-PskipGenerate`'
-        dest sourceSets.generated.java.srcDirs
-        removeExisting true
-    }
-    generateCodeFromSource.onlyIf { !project.hasProperty('skipGenerate') }
-    compileJava.source sourceSets.generated.java, sourceSets.main.java
-    compileJava.dependsOn generateCodeFromSource
 
     // IDE setup
     eclipse.classpath {

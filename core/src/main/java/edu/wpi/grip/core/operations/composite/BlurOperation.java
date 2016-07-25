@@ -10,14 +10,15 @@ import edu.wpi.grip.core.util.Icon;
 
 import com.google.common.collect.ImmutableList;
 
+import org.opencv.core.Mat;
+import org.opencv.core.Size;
+
 import java.util.List;
 
-import static org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_core.Size;
-import static org.bytedeco.javacpp.opencv_imgproc.GaussianBlur;
-import static org.bytedeco.javacpp.opencv_imgproc.bilateralFilter;
-import static org.bytedeco.javacpp.opencv_imgproc.blur;
-import static org.bytedeco.javacpp.opencv_imgproc.medianBlur;
+import static org.opencv.imgproc.Imgproc.GaussianBlur;
+import static org.opencv.imgproc.Imgproc.bilateralFilter;
+import static org.opencv.imgproc.Imgproc.blur;
+import static org.opencv.imgproc.Imgproc.medianBlur;
 
 /**
  * An {@link Operation} that softens an image using one of several different filters.

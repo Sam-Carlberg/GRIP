@@ -8,6 +8,7 @@ public class UtilitySanityTest extends AbstractPackageSanityTests {
     super();
     publicApiOnly();
     ignoreClasses(c -> c.getName().contains("Mock"));
+    ignoreClasses(OpenCvUtils.class::equals);
   }
 
   @Override

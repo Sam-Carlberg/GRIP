@@ -1,6 +1,6 @@
 package edu.wpi.grip.core.sources;
 
-import org.bytedeco.javacv.FrameGrabber;
+import org.opencv.videoio.VideoCapture;
 
 import java.net.MalformedURLException;
 
@@ -10,12 +10,12 @@ import java.net.MalformedURLException;
 public class MockFrameGrabberFactory implements CameraSource.FrameGrabberFactory {
 
   @Override
-  public FrameGrabber create(int deviceNumber) {
+  public VideoCapture create(int deviceNumber) {
     return new SimpleMockFrameGrabber();
   }
 
   @Override
-  public FrameGrabber create(String addressProperty) throws MalformedURLException {
+  public VideoCapture create(String addressProperty) throws MalformedURLException {
     return new SimpleMockFrameGrabber();
   }
 }

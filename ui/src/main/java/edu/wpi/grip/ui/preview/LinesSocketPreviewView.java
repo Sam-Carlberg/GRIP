@@ -8,7 +8,12 @@ import edu.wpi.grip.ui.util.ImageConverter;
 
 import com.google.common.eventbus.Subscribe;
 
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+
 import java.util.List;
+
 import javafx.application.Platform;
 import javafx.geometry.Orientation;
 import javafx.scene.control.CheckBox;
@@ -18,15 +23,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 
-import static org.bytedeco.javacpp.opencv_core.LINE_8;
-import static org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_core.Point;
-import static org.bytedeco.javacpp.opencv_core.Scalar;
-import static org.bytedeco.javacpp.opencv_core.bitwise_xor;
-import static org.bytedeco.javacpp.opencv_imgproc.CV_GRAY2BGR;
-import static org.bytedeco.javacpp.opencv_imgproc.circle;
-import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
-import static org.bytedeco.javacpp.opencv_imgproc.line;
+import static org.opencv.core.Core.bitwise_xor;
+import static org.opencv.imgproc.Imgproc.COLOR_GRAY2BGR;
+import static org.opencv.imgproc.Imgproc.LINE_8;
+import static org.opencv.imgproc.Imgproc.circle;
+import static org.opencv.imgproc.Imgproc.cvtColor;
+import static org.opencv.imgproc.Imgproc.line;
 
 /**
  * A <code>SocketPreviewView</code> that previews sockets containing containing the result of a line
@@ -83,7 +85,7 @@ public class LinesSocketPreviewView extends SocketPreviewView<LinesReport> {
         if (input.channels() == 3) {
           input.copyTo(tmp);
         } else {
-          cvtColor(input, tmp, CV_GRAY2BGR);
+          cvtColor(input, tmp, COLOR_GRAY2BGR);
         }
 
         input = tmp;
@@ -97,9 +99,9 @@ public class LinesSocketPreviewView extends SocketPreviewView<LinesReport> {
         for (LinesReport.Line line : lines) {
           final Point startPoint = new Point((int) line.x1, (int) line.y1);
           final Point endPoint = new Point((int) line.x2, (int) line.y2);
-          line(input, startPoint, endPoint, Scalar.WHITE, 2, LINE_8, 0);
-          circle(input, startPoint, 2, Scalar.WHITE, 2, LINE_8, 0);
-          circle(input, endPoint, 2, Scalar.WHITE, 2, LINE_8, 0);
+          line(input, startPoint, endPoint, Scalar.all(255), 2, LINE_8, 0);
+          circle(input, startPoint, 2, Scalar.all(255), 2, LINE_8, 0);
+          circle(input, endPoint, 2, Scalar.all(255), 2, LINE_8, 0);
         }
       }
       final Mat convertInput = input;

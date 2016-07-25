@@ -7,18 +7,22 @@ import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.sockets.SocketHints;
 import edu.wpi.grip.core.util.Icon;
+import edu.wpi.grip.core.util.OpenCvUtils;
 
 import com.google.common.collect.ImmutableList;
 
+import org.opencv.core.MatOfInt;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Rect;
+
+import java.util.ArrayList;
 import java.util.List;
 
-import static org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_core.MatVector;
-import static org.bytedeco.javacpp.opencv_core.Rect;
-import static org.bytedeco.javacpp.opencv_imgproc.arcLength;
-import static org.bytedeco.javacpp.opencv_imgproc.boundingRect;
-import static org.bytedeco.javacpp.opencv_imgproc.contourArea;
-import static org.bytedeco.javacpp.opencv_imgproc.convexHull;
+import static org.opencv.imgproc.Imgproc.arcLength;
+import static org.opencv.imgproc.Imgproc.boundingRect;
+import static org.opencv.imgproc.Imgproc.contourArea;
+import static org.opencv.imgproc.Imgproc.convexHull;
 
 /**
  * An {@link Operation} that takes in a list of contours and outputs a list of any contours in the
@@ -154,22 +158,17 @@ public class FilterContoursOperation implements Operation {
     final double maxRatio = maxRatioSocket.getValue().get().doubleValue();
 
 
-    final MatVector inputContours = inputSocket.getValue().get().getContours();
-    final MatVector outputContours = new MatVector(inputContours.size());
-    final Mat hull = new Mat();
+    final List<MatOfPoint> inputContours = inputSocket.getValue().get().getContours();
+    final List<MatOfPoint> outputContours = new ArrayList<>(inputContours.size());
 
     // Add contours from the input vector to the output vector only if they pass all of the
-    // criteria (minimum
-    // area, minimum perimeter, width, and height, etc...)
-    int filteredContourCount = 0;
-    for (int i = 0; i < inputContours.size(); i++) {
-      final Mat contour = inputContours.get(i);
-
+    // criteria (minimum area, minimum perimeter, width, and height, etc...)
+    for (MatOfPoint contour : inputContours) {
       final Rect bb = boundingRect(contour);
-      if (bb.width() < minWidth || bb.width() > maxWidth) {
+      if (bb.width < minWidth || bb.width > maxWidth) {
         continue;
       }
-      if (bb.height() < minHeight || bb.height() > maxHeight) {
+      if (bb.height < minHeight || bb.height > maxHeight) {
         continue;
       }
 
@@ -177,12 +176,16 @@ public class FilterContoursOperation implements Operation {
       if (area < minArea) {
         continue;
       }
-      if (arcLength(contour, true) < minPerimeter) {
+      MatOfPoint2f c2f = new MatOfPoint2f(contour.toArray());
+      if (arcLength(c2f, true) < minPerimeter) {
+        c2f.release();
         continue;
       }
 
-      convexHull(contour, hull);
-      final double solidity = 100 * area / contourArea(hull);
+      final MatOfInt indicesHull = new MatOfInt();
+      convexHull(contour, indicesHull);
+      MatOfPoint pointHull = OpenCvUtils.hullToPoints(indicesHull, contour);
+      final double solidity = 100 * area / contourArea(pointHull);
       if (solidity < minSolidity || solidity > maxSolidity) {
         continue;
       }
@@ -191,15 +194,13 @@ public class FilterContoursOperation implements Operation {
         continue;
       }
 
-      final double ratio = bb.width() / bb.height();
+      final double ratio = (double) bb.width / bb.height;
       if (ratio < minRatio || ratio > maxRatio) {
         continue;
       }
 
-      outputContours.put(filteredContourCount++, contour);
+      outputContours.add(contour);
     }
-
-    outputContours.resize(filteredContourCount);
 
     outputSocket.setValue(new ContoursReport(outputContours,
         inputSocket.getValue().get().getRows(), inputSocket.getValue().get().getCols()));

@@ -10,18 +10,18 @@ import edu.wpi.grip.core.util.Icon;
 
 import com.google.common.collect.ImmutableList;
 
-import org.bytedeco.javacpp.opencv_core.Mat;
+import org.opencv.core.Mat;
 
 import java.util.List;
 
-import static org.bytedeco.javacpp.opencv_core.CV_8U;
-import static org.bytedeco.javacpp.opencv_imgproc.CV_DIST_C;
-import static org.bytedeco.javacpp.opencv_imgproc.CV_DIST_L1;
-import static org.bytedeco.javacpp.opencv_imgproc.CV_DIST_L2;
-import static org.bytedeco.javacpp.opencv_imgproc.distanceTransform;
+import static org.opencv.core.CvType.CV_8U;
+import static org.opencv.imgproc.Imgproc.CV_DIST_C;
+import static org.opencv.imgproc.Imgproc.CV_DIST_L1;
+import static org.opencv.imgproc.Imgproc.CV_DIST_L2;
+import static org.opencv.imgproc.Imgproc.distanceTransform;
 
 /**
- * GRIP {@link Operation} for {@link org.bytedeco.javacpp.opencv_imgproc#distanceTransform}.
+ * GRIP {@link Operation} for {@link org.opencv.imgproc.Imgproc#distanceTransform}.
  */
 public class DistanceTransformOperation implements Operation {
 

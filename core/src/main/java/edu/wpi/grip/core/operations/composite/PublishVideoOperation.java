@@ -9,8 +9,9 @@ import edu.wpi.grip.core.util.Icon;
 
 import com.google.common.collect.ImmutableList;
 
-import org.bytedeco.javacpp.BytePointer;
-import org.bytedeco.javacpp.IntPointer;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.core.MatOfInt;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -21,9 +22,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_imgcodecs.CV_IMWRITE_JPEG_QUALITY;
-import static org.bytedeco.javacpp.opencv_imgcodecs.imencode;
+import static org.opencv.imgcodecs.Imgcodecs.IMWRITE_JPEG_QUALITY;
+import static org.opencv.imgcodecs.Imgcodecs.imencode;
 
 /**
  * Publish an M-JPEG stream with the protocol used by SmartDashboard and the FRC Dashboard.  This
@@ -49,7 +49,7 @@ public class PublishVideoOperation implements Operation {
   @SuppressWarnings("PMD.AssignmentToNonFinalStatic")
   private static int numSteps;
   private final Object imageLock = new Object();
-  private final BytePointer imagePointer = new BytePointer();
+  private final MatOfByte imagePointer = new MatOfByte();
   private final Thread serverThread;
   private final InputSocket<Mat> inputSocket;
   private final InputSocket<Number> qualitySocket;
@@ -94,18 +94,12 @@ public class PublishVideoOperation implements Operation {
             // a new input.
             synchronized (imageLock) {
               imageLock.wait();
-
-              // Copy the image data into a pre-allocated buffer, growing it if necessary
-              bufferSize = imagePointer.limit();
-              if (bufferSize > buffer.length) {
-                buffer = new byte[imagePointer.limit()];
-              }
-              imagePointer.get(buffer, 0, bufferSize);
+              buffer = imagePointer.toArray();
+              bufferSize = buffer.length;
             }
 
             // The FRC dashboard image protocol consists of a magic number, the size of the image
-            // data,
-            // and the image data itself.
+            // data, and the image data itself.
             socketOutputStream.write(MAGIC_NUMBER);
             socketOutputStream.writeInt(bufferSize);
             socketOutputStream.write(buffer, 0, bufferSize);
@@ -173,7 +167,7 @@ public class PublishVideoOperation implements Operation {
 
     synchronized (imageLock) {
       imencode(".jpeg", inputSocket.getValue().get(), imagePointer,
-          new IntPointer(CV_IMWRITE_JPEG_QUALITY, qualitySocket.getValue().get().intValue()));
+          new MatOfInt(IMWRITE_JPEG_QUALITY, qualitySocket.getValue().get().intValue()));
       imageLock.notifyAll();
     }
   }

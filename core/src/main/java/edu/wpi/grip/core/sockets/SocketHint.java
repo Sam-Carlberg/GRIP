@@ -2,6 +2,8 @@ package edu.wpi.grip.core.sockets;
 
 import com.google.common.base.MoreObjects;
 
+import org.opencv.core.Mat;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -11,7 +13,6 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.bytedeco.javacpp.opencv_core.Mat;
 
 /**
  * A <code>SocketHint</code> is a descriptor that gives some information about one of the inputs or

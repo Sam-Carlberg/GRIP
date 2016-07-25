@@ -10,13 +10,9 @@ import edu.wpi.grip.core.util.Icon;
 
 import com.google.common.collect.ImmutableList;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.opencv.core.Mat;
 
-import static org.bytedeco.javacpp.opencv_core.KeyPoint;
-import static org.bytedeco.javacpp.opencv_core.KeyPointVector;
-import static org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_features2d.SimpleBlobDetector;
+import java.util.List;
 
 /**
  * Find groups of similar pixels in a color or grayscale image.
@@ -82,11 +78,13 @@ public class FindBlobsOperation implements Operation {
   @Override
   @SuppressWarnings("unchecked")
   public void perform() {
+    // TODO REIMPLEMENT THIS
+    throw new UnsupportedOperationException("Needs to be reimplemented with official OpenCV");
+    /*
     final Mat input = inputSocket.getValue().get();
     final Number minArea = minAreaSocket.getValue().get();
     final List<Number> circularity = circularitySocket.getValue().get();
     final Boolean darkBlobs = colorSocket.getValue().get();
-
 
     final SimpleBlobDetector blobDetector = SimpleBlobDetector.create(new SimpleBlobDetector
         .Params()
@@ -112,5 +110,6 @@ public class FindBlobsOperation implements Operation {
     }
 
     outputSocket.setValue(new BlobsReport(input, blobs));
+    */
   }
 }

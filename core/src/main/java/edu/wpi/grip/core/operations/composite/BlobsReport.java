@@ -6,10 +6,10 @@ import edu.wpi.grip.core.sockets.NoSocketTypeLabel;
 
 import com.google.common.base.MoreObjects;
 
+import org.opencv.core.Mat;
+
 import java.util.Collections;
 import java.util.List;
-
-import static org.bytedeco.javacpp.opencv_core.Mat;
 
 /**
  * This class is used as the output of operations that detect blobs in an image.

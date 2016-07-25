@@ -5,12 +5,13 @@ import edu.wpi.grip.core.operations.network.Publishable;
 import edu.wpi.grip.core.sockets.NoSocketTypeLabel;
 import edu.wpi.grip.core.sockets.Socket;
 
+import org.opencv.core.Mat;
+import org.opencv.imgproc.LineSegmentDetector;
+
 import java.util.Collections;
 import java.util.List;
 
-import static org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_imgproc.LineSegmentDetector;
-import static org.bytedeco.javacpp.opencv_imgproc.createLineSegmentDetector;
+import static org.opencv.imgproc.Imgproc.createLineSegmentDetector;
 
 /**
  * This class contains the results of a line detection algorithm.  It has an input matrix (the image

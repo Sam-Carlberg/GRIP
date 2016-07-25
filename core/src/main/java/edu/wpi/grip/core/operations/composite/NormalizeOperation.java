@@ -10,17 +10,18 @@ import edu.wpi.grip.core.util.Icon;
 
 import com.google.common.collect.ImmutableList;
 
+import org.opencv.core.Mat;
+
 import java.util.List;
 
-import static org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_core.NORM_INF;
-import static org.bytedeco.javacpp.opencv_core.NORM_L1;
-import static org.bytedeco.javacpp.opencv_core.NORM_L2;
-import static org.bytedeco.javacpp.opencv_core.NORM_MINMAX;
-import static org.bytedeco.javacpp.opencv_core.normalize;
+import static org.opencv.core.Core.NORM_INF;
+import static org.opencv.core.Core.NORM_L1;
+import static org.opencv.core.Core.NORM_L2;
+import static org.opencv.core.Core.NORM_MINMAX;
+import static org.opencv.core.Core.normalize;
 
 /**
- * GRIP {@link Operation} for {@link org.bytedeco.javacpp.opencv_core#normalize}.
+ * GRIP {@link Operation} for {@link org.opencv.core.Core#normalize}.
  */
 public class NormalizeOperation implements Operation {
 

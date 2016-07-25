@@ -12,7 +12,6 @@ import edu.wpi.grip.core.util.service.AutoRestartingService;
 import edu.wpi.grip.core.util.service.LoggingListener;
 import edu.wpi.grip.core.util.service.RestartableService;
 
-import com.google.common.base.StandardSystemProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -21,10 +20,8 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-import org.bytedeco.javacpp.opencv_core.Mat;
-import org.bytedeco.javacv.FrameGrabber;
-import org.bytedeco.javacv.OpenCVFrameGrabber;
-import org.bytedeco.javacv.VideoInputFrameGrabber;
+import org.opencv.core.Mat;
+import org.opencv.videoio.VideoCapture;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -83,7 +80,7 @@ public class CameraSource extends Source implements RestartableService {
       SocketHints.createNumberSocketHint("Frame Rate", 0);
   private final OutputSocket<Mat> frameOutputSocket;
   private final OutputSocket<Number> frameRateOutputSocket;
-  private final Supplier<FrameGrabber> grabberSupplier;
+  private final Supplier<VideoCapture> grabberSupplier;
   private final AtomicBoolean isNewFrame = new AtomicBoolean(false);
   private final Mat currentFrameTransferMat = new Mat();
   private final AutoRestartingService cameraService;
@@ -352,39 +349,28 @@ public class CameraSource extends Source implements RestartableService {
    * Allows for the creation of a frame grabber using either a device number or URL string address.
    */
   public interface FrameGrabberFactory {
-    FrameGrabber create(int deviceNumber);
+    VideoCapture create(int deviceNumber);
 
-    FrameGrabber create(String addressProperty) throws MalformedURLException;
+    VideoCapture create(String addressProperty) throws MalformedURLException;
   }
 
   public static class FrameGrabberFactoryImpl implements FrameGrabberFactory {
     FrameGrabberFactoryImpl() { /* no-op */ }
 
     @Override
-    public FrameGrabber create(int deviceNumber) {
-      // On Windows, videoInput is much more reliable for webcam capture.  On other platforms,
-      // OpenCV's frame
-      // grabber class works fine.
-      if (StandardSystemProperty.OS_NAME.value().contains("Windows")) {
-        return new VideoInputFrameGrabber(deviceNumber);
-      } else {
-        return new OpenCVFrameGrabber(deviceNumber);
-      }
+    public VideoCapture create(int deviceNumber) {
+      return new VideoCapture(deviceNumber);
     }
 
     @Override
     @SuppressWarnings("PMD.AvoidReassigningParameters")
-    public FrameGrabber create(String addressProperty) throws MalformedURLException {
+    public VideoCapture create(String addressProperty) throws MalformedURLException {
       // If no path was specified in the URL (ie: it was something like http://10.1.90.11/), use
       // the default path for Axis M1011 cameras.
       if (new URL(addressProperty).getPath().length() <= 1) {
         addressProperty += DEFAULT_IP_CAMERA_PATH;
       }
-      return new IPCameraFrameGrabber(
-          addressProperty,
-          IP_CAMERA_CONNECTION_TIMEOUT,
-          IP_CAMERA_READ_TIMEOUT,
-          IP_CAMERA_TIMEOUT_UNIT);
+      return new VideoCapture(addressProperty);
     }
   }
 }

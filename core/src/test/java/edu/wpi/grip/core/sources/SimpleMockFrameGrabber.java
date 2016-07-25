@@ -1,33 +1,58 @@
 package edu.wpi.grip.core.sources;
 
-import org.bytedeco.javacv.Frame;
-import org.bytedeco.javacv.FrameGrabber;
+import org.opencv.core.Mat;
+import org.opencv.videoio.VideoCapture;
 
 @SuppressWarnings({"PMD.AvoidThrowingRawExceptionTypes", "PMD.SignatureDeclareThrowsException"})
-class SimpleMockFrameGrabber extends FrameGrabber {
+class SimpleMockFrameGrabber extends VideoCapture {
 
   @Override
-  public void start() throws Exception {
-        /* no-op */
+  public boolean grab() {
+    return false;
   }
 
   @Override
-  public void stop() throws Exception {
-        /* no-op */
+  public boolean isOpened() {
+    return false;
   }
 
   @Override
-  public void trigger() throws Exception {
-        /* no-op */
+  public boolean open(String filename, int apiPreference) {
+    return false;
   }
 
   @Override
-  public Frame grab() throws Exception {
-    return null;
+  public boolean open(String filename) {
+    return false;
   }
 
   @Override
-  public void release() throws Exception {
-        /* no-op */
+  public boolean open(int index) {
+    return false;
+  }
+
+  @Override
+  public boolean read(Mat image) {
+    return false;
+  }
+
+  @Override
+  public boolean retrieve(Mat image, int flag) {
+    return false;
+  }
+
+  @Override
+  public boolean retrieve(Mat image) {
+    return false;
+  }
+
+  @Override
+  public boolean set(int propId, double value) {
+    return false;
+  }
+
+  @Override
+  public double get(int propId) {
+    return 0;
   }
 }

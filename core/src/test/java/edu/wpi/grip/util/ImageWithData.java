@@ -3,7 +3,7 @@ package edu.wpi.grip.util;
 
 import edu.wpi.grip.core.util.ImageLoadingUtility;
 
-import org.bytedeco.javacpp.opencv_core.Mat;
+import org.opencv.core.Mat;
 
 import java.io.File;
 import java.io.IOException;

@@ -10,24 +10,24 @@ import edu.wpi.grip.core.util.Icon;
 
 import com.google.common.collect.ImmutableList;
 
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+
 import java.util.List;
 
-import static org.bytedeco.javacpp.opencv_core.CV_32SC1;
-import static org.bytedeco.javacpp.opencv_core.CV_8UC1;
-import static org.bytedeco.javacpp.opencv_core.CV_8UC3;
-import static org.bytedeco.javacpp.opencv_core.LINE_8;
-import static org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_core.MatVector;
-import static org.bytedeco.javacpp.opencv_core.Point;
-import static org.bytedeco.javacpp.opencv_core.Scalar;
-import static org.bytedeco.javacpp.opencv_core.bitwise_not;
-import static org.bytedeco.javacpp.opencv_imgproc.CV_FILLED;
-import static org.bytedeco.javacpp.opencv_imgproc.circle;
-import static org.bytedeco.javacpp.opencv_imgproc.drawContours;
-import static org.bytedeco.javacpp.opencv_imgproc.watershed;
+import static org.opencv.core.Core.LINE_8;
+import static org.opencv.core.Core.bitwise_not;
+import static org.opencv.core.CvType.CV_32SC1;
+import static org.opencv.core.CvType.CV_8UC1;
+import static org.opencv.core.CvType.CV_8UC3;
+import static org.opencv.imgproc.Imgproc.circle;
+import static org.opencv.imgproc.Imgproc.drawContours;
+import static org.opencv.imgproc.Imgproc.watershed;
 
 /**
- * GRIP {@link Operation} for {@link org.bytedeco.javacpp.opencv_imgproc#watershed}.
+ * GRIP {@link Operation} for {@link org.opencv.imgproc.Imgproc#watershed}.
  */
 public class WatershedOperation implements Operation {
 
@@ -83,7 +83,7 @@ public class WatershedOperation implements Operation {
     }
 
     final ContoursReport contourReport = contoursSocket.getValue().get();
-    final MatVector contours = contourReport.getContours();
+    final List<MatOfPoint> contours = contourReport.getContours();
 
     final Mat markers = new Mat(input.size(), CV_32SC1, new Scalar(0.0));
     final Mat output = new Mat(markers.size(), CV_8UC1, new Scalar(0.0));
@@ -92,12 +92,12 @@ public class WatershedOperation implements Operation {
       // draw foreground markers (these have to be different colors)
       for (int i = 0; i < contours.size(); i++) {
         drawContours(markers, contours, i, Scalar.all((i + 1) * (255 / contours.size())),
-            CV_FILLED, LINE_8, null, 2, null);
+            -1, LINE_8, null, 2, null);
       }
 
       // draw background marker a different color from the foreground markers
       // TODO maybe make this configurable? There may be something in the corner
-      circle(markers, new Point(5, 5), 3, Scalar.WHITE, -1, LINE_8, 0);
+      circle(markers, new Point(5, 5), 3, Scalar.all(255), -1, LINE_8, 0);
 
       watershed(input, markers);
       markers.convertTo(output, CV_8UC1);

@@ -50,8 +50,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
-import org.bytedeco.javacpp.opencv_core.Point;
-import org.bytedeco.javacpp.opencv_core.Size;
+import org.opencv.core.Point;
+import org.opencv.core.Size;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

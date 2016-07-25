@@ -10,25 +10,25 @@ import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.sockets.SocketHints;
-import edu.wpi.grip.generated.opencv_core.enumeration.BorderTypesEnum;
-import edu.wpi.grip.generated.opencv_core.enumeration.CmpTypesEnum;
-import edu.wpi.grip.generated.opencv_core.enumeration.LineTypesEnum;
-import edu.wpi.grip.generated.opencv_imgproc.enumeration.AdaptiveThresholdTypesEnum;
-import edu.wpi.grip.generated.opencv_imgproc.enumeration.ColorConversionCodesEnum;
-import edu.wpi.grip.generated.opencv_imgproc.enumeration.ColormapTypesEnum;
-import edu.wpi.grip.generated.opencv_imgproc.enumeration.InterpolationFlagsEnum;
-import edu.wpi.grip.generated.opencv_imgproc.enumeration.ThresholdTypesEnum;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 
-import org.bytedeco.javacpp.opencv_core;
-import org.bytedeco.javacpp.opencv_core.Point;
-import org.bytedeco.javacpp.opencv_core.Scalar;
-import org.bytedeco.javacpp.opencv_core.Size;
-import org.bytedeco.javacpp.opencv_imgproc;
+import org.opencv.core.Core;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.core.enumeration.BorderTypesEnum;
+import org.opencv.core.enumeration.CmpTypesEnum;
+import org.opencv.core.enumeration.LineTypesEnum;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.enumeration.AdaptiveThresholdTypesEnum;
+import org.opencv.imgproc.enumeration.ColorConversionCodesEnum;
+import org.opencv.imgproc.enumeration.ColormapTypesEnum;
+import org.opencv.imgproc.enumeration.InterpolationFlagsEnum;
+import org.opencv.imgproc.enumeration.ThresholdTypesEnum;
 
 /**
  * A list of all of the raw opencv operations.
@@ -47,11 +47,11 @@ public class CVOperations {
     this.coreOperations = ImmutableList.of(
         new OperationMetaData(CVOperation.defaults("CV absdiff",
             "Calculate the per-element absolute difference of two images."),
-            templateFactory.createAllMatTwoSource(opencv_core::absdiff)),
+            templateFactory.createAllMatTwoSource(Core::absdiff)),
 
         new OperationMetaData(CVOperation.defaults("CV add",
             "Calculate the per-pixel sum of two images."),
-            templateFactory.createAllMatTwoSource(opencv_core::add)),
+            templateFactory.createAllMatTwoSource(Core::add)),
 
         new OperationMetaData(CVOperation.defaults("CV addWeighted",
             "Calculate the weighted sum of two images."),
@@ -63,26 +63,26 @@ public class CVOperations {
                 SocketHints.Inputs.createNumberSpinnerSocketHint("gamma", 0),
                 SocketHints.Outputs.createMatSocketHint("dst"),
                 (src1, alpha, src2, beta, gamma, dst) -> {
-                  opencv_core.addWeighted(src1, alpha.doubleValue(), src2, beta.doubleValue(),
+                  Core.addWeighted(src1, alpha.doubleValue(), src2, beta.doubleValue(),
                       gamma.doubleValue(), dst);
                 }
             )),
 
         new OperationMetaData(CVOperation.defaults("CV bitwise_and",
             "Calculate the per-element bitwise conjunction of two images."),
-            templateFactory.createAllMatTwoSource(opencv_core::bitwise_and)),
+            templateFactory.createAllMatTwoSource(Core::bitwise_and)),
 
         new OperationMetaData(CVOperation.defaults("CV bitwise_not",
             "Calculate per-element bit-wise inversion of an image."),
-            templateFactory.createAllMatOneSource(opencv_core::bitwise_not)),
+            templateFactory.createAllMatOneSource(Core::bitwise_not)),
 
         new OperationMetaData(CVOperation.defaults("CV bitwise_or",
             "Calculate the per-element bit-wise disjunction of two images."),
-            templateFactory.createAllMatTwoSource(opencv_core::bitwise_or)),
+            templateFactory.createAllMatTwoSource(Core::bitwise_or)),
 
         new OperationMetaData(CVOperation.defaults("CV bitwise_xor",
             "Calculate the per-element bit-wise \"exclusive or\" on two images."),
-            templateFactory.createAllMatTwoSource(opencv_core::bitwise_xor)),
+            templateFactory.createAllMatTwoSource(Core::bitwise_xor)),
 
         new OperationMetaData(CVOperation.defaults("CV compare",
             "Compare each pixel in two images using a given rule."),
@@ -92,7 +92,7 @@ public class CVOperations {
                 SocketHints.createEnumSocketHint("cmpop", CmpTypesEnum.CMP_EQ),
                 SocketHints.Outputs.createMatSocketHint("dst"),
                 (src1, src2, cmp, dst) -> {
-                  opencv_core.compare(src1, src2, dst, cmp.value);
+                  Core.compare(src1, src2, dst, cmp.value);
                 }
             )),
 
@@ -105,7 +105,7 @@ public class CVOperations {
                     Double.MAX_VALUE),
                 SocketHints.Outputs.createMatSocketHint("dst"),
                 (src1, src2, scale, dst) -> {
-                  opencv_core.divide(src1, src2, dst, scale.doubleValue(), -1);
+                  Core.divide(src1, src2, dst, scale.doubleValue(), -1);
                 }
             )),
 
@@ -117,7 +117,7 @@ public class CVOperations {
                     .MAX_VALUE),
                 SocketHints.Outputs.createMatSocketHint("dst"),
                 (src1, coi, dst) -> {
-                  opencv_core.extractChannel(src1, dst, coi.intValue());
+                  Core.extractChannel(src1, dst, coi.intValue());
                 }
             )),
 
@@ -128,17 +128,17 @@ public class CVOperations {
                 SocketHints.createEnumSocketHint("flipCode", FlipCode.Y_AXIS),
                 SocketHints.Outputs.createMatSocketHint("dst"),
                 (src, flipCode, dst) -> {
-                  opencv_core.flip(src, dst, flipCode.value);
+                  Core.flip(src, dst, flipCode.value);
                 }
             )),
 
         new OperationMetaData(CVOperation.defaults("CV max",
             "Calculate per-element maximum of two images."),
-            templateFactory.createAllMatTwoSource(opencv_core::max)),
+            templateFactory.createAllMatTwoSource(Core::max)),
 
         new OperationMetaData(CVOperation.defaults("CV min",
             "Calculate the per-element minimum of two images."),
-            templateFactory.createAllMatTwoSource(opencv_core::min)),
+            templateFactory.createAllMatTwoSource(Core::min)),
 
         new OperationMetaData(CVOperation.defaults("CV multiply",
             "Calculate the per-pixel scaled product of two images."),
@@ -149,7 +149,7 @@ public class CVOperations {
                     Integer.MAX_VALUE),
                 SocketHints.Outputs.createMatSocketHint("dst"),
                 (src1, src2, scale, dst) -> {
-                  opencv_core.multiply(src1, src2, dst, scale.doubleValue(), -1);
+                  Core.multiply(src1, src2, dst, scale.doubleValue(), -1);
                 }
             )),
 
@@ -161,17 +161,17 @@ public class CVOperations {
                 SocketHints.Inputs.createMatSocketHint("src2", false),
                 SocketHints.Outputs.createMatSocketHint("dst"),
                 (src1, alpha, src2, dst) -> {
-                  opencv_core.scaleAdd(src1, alpha.doubleValue(), src2, dst);
+                  Core.scaleAdd(src1, alpha.doubleValue(), src2, dst);
                 }
             )),
 
         new OperationMetaData(CVOperation.defaults("CV subtract",
             "Calculate the per-pixel difference between two images."),
-            templateFactory.createAllMatTwoSource(opencv_core::subtract)),
+            templateFactory.createAllMatTwoSource(Core::subtract)),
 
         new OperationMetaData(CVOperation.defaults("CV transpose",
             "Calculate the transpose of an image."),
-            templateFactory.createAllMatOneSource(opencv_core::transpose))
+            templateFactory.createAllMatOneSource(Core::transpose))
     );
 
     this.imgprocOperation = ImmutableList.of(
@@ -188,7 +188,7 @@ public class CVOperations {
                 SocketHints.Inputs.createNumberSpinnerSocketHint("C", 0.0),
                 SocketHints.Outputs.createMatSocketHint("dst"),
                 (src, maxValue, adaptiveMethod, thresholdType, blockSize, c, dst) -> {
-                  opencv_imgproc.adaptiveThreshold(src, dst, maxValue.doubleValue(),
+                  Imgproc.adaptiveThreshold(src, dst, maxValue.doubleValue(),
                       adaptiveMethod.value, thresholdType.value, blockSize.intValue(), c
                           .doubleValue());
                 }
@@ -201,7 +201,7 @@ public class CVOperations {
                 SocketHints.createEnumSocketHint("colormap", ColormapTypesEnum.COLORMAP_AUTUMN),
                 SocketHints.Outputs.createMatSocketHint("dst"),
                 (src, colormap, dst) -> {
-                  opencv_imgproc.applyColorMap(src, dst, colormap.value);
+                  Imgproc.applyColorMap(src, dst, colormap.value);
                 }
             )),
 
@@ -215,7 +215,7 @@ public class CVOperations {
                 SocketHints.Inputs.createCheckboxSocketHint("L2gradient", false),
                 SocketHints.Outputs.createMatSocketHint("edges"),
                 (image, threshold1, threshold2, apertureSize, l2gradient, edges) -> {
-                  opencv_imgproc.Canny(image, edges, threshold1.doubleValue(), threshold2
+                  Imgproc.Canny(image, edges, threshold1.doubleValue(), threshold2
                       .doubleValue(), apertureSize.intValue(), l2gradient);
                 }
             )),
@@ -227,7 +227,7 @@ public class CVOperations {
                 SocketHints.createEnumSocketHint("code", ColorConversionCodesEnum.COLOR_BGR2BGRA),
                 SocketHints.Outputs.createMatSocketHint("dst"),
                 (src, code, dst) -> {
-                  opencv_imgproc.cvtColor(src, dst, code.value);
+                  Imgproc.cvtColor(src, dst, code.value);
                 }
             )),
 
@@ -241,10 +241,10 @@ public class CVOperations {
                 SocketHints.Inputs.createNumberSpinnerSocketHint("iterations", 1),
                 SocketHints.createEnumSocketHint("borderType", BorderTypesEnum.BORDER_CONSTANT),
                 new SocketHint.Builder<>(Scalar.class).identifier("borderValue")
-                    .initialValueSupplier(opencv_imgproc::morphologyDefaultBorderValue).build(),
+                    .initialValueSupplier(() -> Scalar.all(-Double.MAX_VALUE)).build(),
                 SocketHints.Outputs.createMatSocketHint("dst"),
                 (src, kernel, anchor, iterations, borderType, borderValue, dst) -> {
-                  opencv_imgproc.dilate(src, dst, kernel, anchor, iterations.intValue(),
+                  Imgproc.dilate(src, dst, kernel, anchor, iterations.intValue(),
                       borderType.value, borderValue);
                 }
             )),
@@ -259,10 +259,10 @@ public class CVOperations {
                 SocketHints.Inputs.createNumberSpinnerSocketHint("iterations", 1),
                 SocketHints.createEnumSocketHint("borderType", BorderTypesEnum.BORDER_CONSTANT),
                 new SocketHint.Builder<>(Scalar.class).identifier("borderValue")
-                    .initialValueSupplier(opencv_imgproc::morphologyDefaultBorderValue).build(),
+                    .initialValueSupplier(() -> Scalar.all(-Double.MAX_VALUE)).build(),
                 SocketHints.Outputs.createMatSocketHint("dst"),
                 (src, kernel, anchor, iterations, borderType, borderValue, dst) -> {
-                  opencv_imgproc.erode(src, dst, kernel, anchor, iterations.intValue(),
+                  Imgproc.erode(src, dst, kernel, anchor, iterations.intValue(),
                       borderType.value, borderValue);
                 }
             )),
@@ -278,7 +278,7 @@ public class CVOperations {
                     .createEnumSocketHint("borderType", CVBorderTypesEnum.BORDER_DEFAULT),
                 SocketHints.Outputs.createMatSocketHint("dst"),
                 (src, ksize, sigmaX, sigmaY, borderType, dst) -> {
-                  opencv_imgproc.GaussianBlur(src, dst, ksize, sigmaX.doubleValue(), sigmaY
+                  Imgproc.GaussianBlur(src, dst, ksize, sigmaX.doubleValue(), sigmaY
                       .doubleValue(), borderType.value);
                 }
             )),
@@ -293,7 +293,7 @@ public class CVOperations {
                 SocketHints.createEnumSocketHint("borderType", BorderTypesEnum.BORDER_DEFAULT),
                 SocketHints.Outputs.createMatSocketHint("dst"),
                 (src, ksize, scale, delta, borderType, dst) -> {
-                  opencv_imgproc.Laplacian(src, dst, 0, ksize.intValue(), scale.doubleValue(),
+                  Imgproc.Laplacian(src, dst, 0, ksize.intValue(), scale.doubleValue(),
                       delta.doubleValue(), borderType.value);
                 }
             )),
@@ -305,7 +305,7 @@ public class CVOperations {
                 SocketHints.Inputs.createNumberSpinnerSocketHint("ksize", 1, 1, Integer.MAX_VALUE),
                 SocketHints.Outputs.createMatSocketHint("dst"),
                 (src, ksize, dst) -> {
-                  opencv_imgproc.medianBlur(src, dst, ksize.intValue());
+                  Imgproc.medianBlur(src, dst, ksize.intValue());
                 }
             )),
 
@@ -316,7 +316,7 @@ public class CVOperations {
                 SocketHints.Inputs.createPointSocketHint("pt1", 0, 0),
                 SocketHints.Inputs.createPointSocketHint("pt2", 0, 0),
                 new SocketHint.Builder<>(Scalar.class).identifier("color").initialValueSupplier(
-                    () -> Scalar.BLACK).build(),
+                    () -> Scalar.all(0)).build(),
                 SocketHints.Inputs.createNumberSpinnerSocketHint("thickness", 0, Integer
                     .MIN_VALUE, Integer.MAX_VALUE),
                 SocketHints.createEnumSocketHint("lineType", LineTypesEnum.LINE_8),
@@ -326,7 +326,7 @@ public class CVOperations {
                   // Rectangle only has one input and it modifies it so we have to copy the input
                   // image to the dst
                   src.copyTo(dst);
-                  opencv_imgproc.rectangle(dst, pt1, pt2, color, thickness.intValue(), lineType
+                  Imgproc.rectangle(dst, pt1, pt2, color, thickness.intValue(), lineType
                       .value, shift.intValue());
                 }
             )),
@@ -343,7 +343,7 @@ public class CVOperations {
                     .INTER_LINEAR),
                 SocketHints.Outputs.createMatSocketHint("dst"),
                 (src, dsize, fx, fy, interpolation, dst) -> {
-                  opencv_imgproc.resize(src, dst, dsize, fx.doubleValue(), fy.doubleValue(),
+                  Imgproc.resize(src, dst, dsize, fx.doubleValue(), fy.doubleValue(),
                       interpolation.value);
                 }
             )),
@@ -360,7 +360,7 @@ public class CVOperations {
                 SocketHints.createEnumSocketHint("borderType", BorderTypesEnum.BORDER_DEFAULT),
                 SocketHints.Outputs.createMatSocketHint("dst"),
                 (src, dx, dy, ksize, scale, delta, borderType, dst) -> {
-                  opencv_imgproc.Sobel(src, dst, 0, dx.intValue(), dy.intValue(),
+                  Imgproc.Sobel(src, dst, 0, dx.intValue(), dy.intValue(),
                       ksize.intValue(), scale.doubleValue(), delta.doubleValue(), borderType.value);
                 }
             )),
@@ -374,7 +374,7 @@ public class CVOperations {
                 SocketHints.createEnumSocketHint("type", CVThresholdTypesEnum.THRESH_BINARY),
                 SocketHints.Outputs.createMatSocketHint("dst"),
                 (src, thresh, maxval, type, dst) -> {
-                  opencv_imgproc.threshold(src, dst, thresh.doubleValue(), maxval.doubleValue(),
+                  Imgproc.threshold(src, dst, thresh.doubleValue(), maxval.doubleValue(),
                       type.value);
                 }
             ))

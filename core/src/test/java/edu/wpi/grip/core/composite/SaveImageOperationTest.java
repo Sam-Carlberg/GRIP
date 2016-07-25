@@ -1,6 +1,7 @@
 package edu.wpi.grip.core.composite;
 
 
+import edu.wpi.grip.core.natives.NativesLoader;
 import edu.wpi.grip.core.operations.composite.SaveImageOperation;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.MockInputSocketFactory;
@@ -10,6 +11,7 @@ import edu.wpi.grip.core.util.MockFileManager;
 import com.google.common.eventbus.EventBus;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -17,6 +19,11 @@ import static org.junit.Assert.assertFalse;
 public class SaveImageOperationTest {
 
   private InputSocket<Boolean> activeSocket;
+
+  @BeforeClass
+  public static void loadNatives() {
+    NativesLoader.load();
+  }
 
   @Before
   public void setUp() throws Exception {

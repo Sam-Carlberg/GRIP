@@ -9,7 +9,7 @@ import edu.wpi.grip.core.sockets.SocketHints;
 
 import com.google.inject.Singleton;
 
-import org.bytedeco.javacpp.opencv_core.Mat;
+import org.opencv.core.Mat;
 
 import java.util.function.Supplier;
 

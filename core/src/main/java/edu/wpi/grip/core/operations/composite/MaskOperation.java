@@ -10,10 +10,11 @@ import edu.wpi.grip.core.util.Icon;
 
 import com.google.common.collect.ImmutableList;
 
+import org.opencv.core.Mat;
+
 import java.util.List;
 
-import static org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_core.bitwise_xor;
+import static org.opencv.core.Core.bitwise_xor;
 
 /**
  * An {@link Operation} that masks out an area of interest from an image.

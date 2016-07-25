@@ -8,7 +8,7 @@ import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.sockets.SocketHints;
 import edu.wpi.grip.core.util.Icon;
 
-import org.bytedeco.javacpp.opencv_core.Size;
+import org.opencv.core.Size;
 import org.python.google.common.collect.ImmutableList;
 
 import java.util.List;

@@ -11,12 +11,12 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;
 
-import org.bytedeco.javacpp.opencv_core.Point;
-import org.bytedeco.javacpp.opencv_core.Size;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
+import org.opencv.core.Point;
+import org.opencv.core.Size;
 import org.testfx.framework.junit.ApplicationTest;
 import org.testfx.matcher.base.NodeMatchers;
 import org.testfx.util.WaitForAsyncUtils;
@@ -47,8 +47,8 @@ public class PointSizeSocketPreviewViewTest {
                   .identifier(identifier)
                   .initialValueSupplier(() -> new Point(value1, value2))
                   .build());
-      final PointSizeSocketPreviewView<Point> point =
-          new PointSizeSocketPreviewView<>(new MockGripPlatform(new EventBus()), pointOutputSocket);
+      final PointSizeSocketPreviewView point =
+          new PointSizeSocketPreviewView(new MockGripPlatform(new EventBus()), pointOutputSocket);
       final Scene scene = new Scene(point);
       stage.setScene(scene);
       stage.show();
@@ -89,8 +89,8 @@ public class PointSizeSocketPreviewViewTest {
                   .initialValueSupplier(() -> new Size(value1, value2))
                   .build());
 
-      final PointSizeSocketPreviewView<Size> size =
-          new PointSizeSocketPreviewView<>(new MockGripPlatform(new EventBus()), sizeOutputSocket);
+      final PointSizeSocketPreviewView size =
+          new PointSizeSocketPreviewView(new MockGripPlatform(new EventBus()), sizeOutputSocket);
       final Scene scene = new Scene(size);
       stage.setScene(scene);
       stage.show();

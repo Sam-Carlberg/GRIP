@@ -10,15 +10,9 @@ import edu.wpi.grip.core.util.Icon;
 
 import com.google.common.collect.ImmutableList;
 
-import org.bytedeco.javacpp.indexer.FloatIndexer;
+import org.opencv.core.Mat;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_imgproc.COLOR_BGR2GRAY;
-import static org.bytedeco.javacpp.opencv_imgproc.LineSegmentDetector;
-import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
 
 /**
  * Find line segments in a color or grayscale image.
@@ -65,6 +59,9 @@ public class FindLinesOperation implements Operation {
   @Override
   @SuppressWarnings("unchecked")
   public void perform() {
+    //TODO REIMPLEMENT THIS
+    throw new UnsupportedOperationException("Needs to be reimplemented with official OpenCV");
+    /*
     final Mat input = inputSocket.getValue().get();
     final LineSegmentDetector lsd = linesReportSocket.getValue().get().getLineSegmentDetector();
 
@@ -92,5 +89,6 @@ public class FindLinesOperation implements Operation {
     }
 
     linesReportSocket.setValue(new LinesReport(lsd, input, lineList));
+    */
   }
 }
