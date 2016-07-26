@@ -66,7 +66,7 @@ public final class NativesLoader {
       String osName = System.getProperty("os.name");
       final boolean onWindows = osName.startsWith("Windows");
       final boolean onMac = osName.startsWith("Mac");
-      String resName = "/jni/";
+      String resName = "/opencv-jni/";
       if (onWindows) {
         resName += "opencv_java" + version + ".dll";
       } else if (onMac) {

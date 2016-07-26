@@ -1,6 +1,7 @@
 package edu.wpi.grip.core;
 
 import edu.wpi.grip.core.events.UnexpectedThrowableEvent;
+import edu.wpi.grip.core.natives.NativesLoader;
 import edu.wpi.grip.core.serialization.Project;
 import edu.wpi.grip.core.settings.SettingsProvider;
 import edu.wpi.grip.core.sockets.InputSocket;
@@ -94,6 +95,7 @@ public class GripCoreModule extends AbstractModule {
     } catch (IOException exception) { //Something happened setting up file IO
       throw new IllegalStateException("Failed to configure the Logger", exception);
     }
+    NativesLoader.load();
   }
 
   /*
