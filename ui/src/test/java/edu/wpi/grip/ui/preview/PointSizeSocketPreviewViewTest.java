@@ -59,8 +59,8 @@ public class PointSizeSocketPreviewViewTest {
     public void testForExpectedValues() {
       WaitForAsyncUtils.waitForFxEvents();
       verifyThat(identifier, NodeMatchers.isVisible());
-      verifyThat(Integer.toString(value1), NodeMatchers.isVisible());
-      verifyThat(Integer.toString(value2), NodeMatchers.isVisible());
+      verifyThat(Double.toString(value1), NodeMatchers.isVisible());
+      verifyThat(Double.toString(value2), NodeMatchers.isVisible());
     }
 
 
@@ -101,8 +101,8 @@ public class PointSizeSocketPreviewViewTest {
     public void testForExpectedValues() {
       WaitForAsyncUtils.waitForFxEvents();
       verifyThat(identifier, NodeMatchers.isVisible());
-      verifyThat(Integer.toString(value1), NodeMatchers.isVisible());
-      verifyThat(Integer.toString(value2), NodeMatchers.isVisible());
+      verifyThat(Double.toString(value1), NodeMatchers.isVisible());
+      verifyThat(Double.toString(value2), NodeMatchers.isVisible());
     }
 
     @After

@@ -42,6 +42,8 @@ public class NewPointOperation implements CVOperation {
     this.ySocket = inputSocketFactory.create(yHint);
 
     this.outputSocket = outputSocketFactory.create(outputHint);
+    
+    this.perform();//So initial value is correct.
   }
 
   @Override

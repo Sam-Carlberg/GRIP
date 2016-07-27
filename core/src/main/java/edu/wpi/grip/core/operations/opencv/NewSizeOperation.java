@@ -41,6 +41,8 @@ public class NewSizeOperation implements CVOperation {
     this.heightSocket = inputSocketFactory.create(heightHint);
 
     this.outputSocket = outputSocketFactory.create(outputHint);
+    
+    this.perform();//So initial value is correct.
   }
 
   @Override
