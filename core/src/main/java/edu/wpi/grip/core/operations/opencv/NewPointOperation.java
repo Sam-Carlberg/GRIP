@@ -5,6 +5,7 @@ import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
+import edu.wpi.grip.core.sockets.SocketHint.View;
 import edu.wpi.grip.core.sockets.SocketHints;
 import edu.wpi.grip.core.util.Icon;
 
@@ -22,13 +23,18 @@ public class NewPointOperation implements CVOperation {
           .summary("Create a point by (x,y) value.")
           .icon(Icon.iconStream("point"))
           .build();
-
-  private final SocketHint<Number> xHint = SocketHints.Inputs.createNumberSpinnerSocketHint("x", -1,
+  private final int initX = -1;
+  private final int initY = -1;
+  private final SocketHint<Number> xHint = SocketHints.Inputs
+      .createNumberSpinnerSocketHint("x", initX,
       Integer.MIN_VALUE, Integer.MAX_VALUE);
-  private final SocketHint<Number> yHint = SocketHints.Inputs.createNumberSpinnerSocketHint("y", -1,
+  private final SocketHint<Number> yHint = SocketHints.Inputs
+      .createNumberSpinnerSocketHint("y", initY,
       Integer.MIN_VALUE, Integer.MAX_VALUE);
-  private final SocketHint<Point> outputHint = SocketHints.Outputs.createPointSocketHint("point");
-
+  private final SocketHint<Point> outputHint = new SocketHint.Builder<Point>(Point.class)
+      .identifier("point")
+      .initialValueSupplier(() -> new Point(initX, initY))
+      .view(View.NONE).build();
 
   private final InputSocket<Number> xSocket;
   private final InputSocket<Number> ySocket;
@@ -42,8 +48,6 @@ public class NewPointOperation implements CVOperation {
     this.ySocket = inputSocketFactory.create(yHint);
 
     this.outputSocket = outputSocketFactory.create(outputHint);
-    
-    this.perform();//So initial value is correct.
   }
 
   @Override
