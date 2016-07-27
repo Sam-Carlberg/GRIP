@@ -265,10 +265,10 @@ project(":core") {
     compileJava.dependsOn extractOpenCvNatives
 
     tasks.withType(JavaExec) {
-        systemProperty "java.library.path", "$nativeLibDir/jni/"
+        systemProperty "java.library.path", "$nativeLibDir/opencv-jni/"
     }
     tasks.withType(Test) {
-        systemProperty "java.library.path", "$nativeLibDir/jni/"
+        systemProperty "java.library.path", "$nativeLibDir/opencv-jni/"
     }
 
     shadowJar {
@@ -327,6 +327,7 @@ project(":ui") {
         ideProvider project(path: ':core', configuration: 'compile')
         compile group: 'org.controlsfx', name: 'controlsfx', version: '8.40.10'
         compile group: 'com.hierynomus', name: 'sshj', version: '0.16.0'
+        testCompile project(path: ':core', configuration: 'shadow')
         testCompile files(project(':core').sourceSets.test.output.classesDir)
         testCompile files(project(':core').sourceSets.test.output.resourcesDir)
         testCompile group: 'org.testfx', name: 'testfx-core', version: '4.0.+'

@@ -5,6 +5,7 @@ import edu.wpi.grip.core.OperationDescription;
 import edu.wpi.grip.core.sockets.InputSocket;
 import edu.wpi.grip.core.sockets.OutputSocket;
 import edu.wpi.grip.core.sockets.SocketHint;
+import edu.wpi.grip.core.sockets.SocketHint.View;
 import edu.wpi.grip.core.sockets.SocketHints;
 import edu.wpi.grip.core.util.Icon;
 
@@ -22,11 +23,16 @@ public class NewSizeOperation implements CVOperation {
           .icon(Icon.iconStream("size"))
           .build();
 
+  private final int initWidth = -1;
+  private final int initHeight = -1;
   private final SocketHint<Number> widthHint = SocketHints.Inputs
-      .createNumberSpinnerSocketHint("width", -1, -1, Integer.MAX_VALUE);
+      .createNumberSpinnerSocketHint("width", initWidth, -1, Integer.MAX_VALUE);
   private final SocketHint<Number> heightHint = SocketHints.Inputs
-      .createNumberSpinnerSocketHint("height", -1, -1, Integer.MAX_VALUE);
-  private final SocketHint<Size> outputHint = SocketHints.Outputs.createSizeSocketHint("size");
+      .createNumberSpinnerSocketHint("height", initHeight, -1, Integer.MAX_VALUE);
+  private final SocketHint<Size> outputHint = new SocketHint.Builder<Size>(Size.class)
+      .identifier("size")
+      .initialValueSupplier(() -> new Size(initWidth, initHeight))
+      .view(View.NONE).build();
 
 
   private final InputSocket<Number> widthSocket;
