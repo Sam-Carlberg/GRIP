@@ -88,4 +88,3 @@ bower_components
 **/generated
 */generated_tests
 /bin/
-core/libs/opencv-jni
