@@ -37,7 +37,6 @@ public final class NativesLoader {
     if (didLoad) {
       return;
     }
-    log.info("java.library.path: " + System.getProperty("java.library.path"));
     try {
       // Check if the native libraries have already been loaded
       Field loaded = ClassLoader.class.getDeclaredField("loadedLibraryNames");
@@ -63,10 +62,11 @@ public final class NativesLoader {
           String.valueOf(Core.VERSION_MAJOR)
               + Core.VERSION_MINOR
               + Core.VERSION_REVISION;
+      log.info("Simplified OpenCV version: " + version);
       String osName = System.getProperty("os.name");
       final boolean onWindows = osName.startsWith("Windows");
       final boolean onMac = osName.startsWith("Mac");
-      String resName = "/jni/";
+      String resName = "/org/opencv/";
       if (onWindows) {
         resName += "opencv_java" + version + ".dll";
       } else if (onMac) {

@@ -180,9 +180,6 @@ allprojects {
 def arch = osdetector.arch
 def os = osdetector.classifier.replace("-$arch", "")
 
-println "OS = $os"
-println "Arch = $arch"
-
 project(":core") {
     apply plugin: 'java'
     apply plugin: 'idea'
@@ -191,7 +188,6 @@ project(":core") {
 
     configurations {
         shadow
-        openCvNatives
     }
 
     repositories {
@@ -205,14 +201,13 @@ project(":core") {
             url = "https://github.com/WPIRoboticsProjects/rosjava_mvn_repo/raw/master"
         }
         maven {
-            url = "http://github.com/SamCarlberg/test-maven-repo/raw/master"
+            url = "http://dl.bintray.com/ihmcrobotics/maven-vendor" // OpenCV Java bindings curated by IHMC Robotics (https://github.com/ihmcrobotics/)
         }
     }
 
     dependencies {
         compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
-        compile group: 'org.opencv', name: 'OpenCV', version: '3.1.0'
-        openCvNatives group: 'org.opencv', name: "$os-jni", version: '3.1.0'
+        compile group: 'us.ihmc.thirdparty.org.opencv', name: 'opencv', version: '3.1.0'
         compile group: 'org.python', name: 'jython', version: '2.7.0'
         compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.9'
         compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
@@ -238,37 +233,14 @@ project(":core") {
 
     mainClassName = 'edu.wpi.grip.core.Main'
 
-    def nativeLibDir = "libs/opencv-jni"
 
     jar {
-        description = "Generates core jar with embedded native libs"
         manifest {
             attributes 'Implementation-Version': version, 'Main-Class': mainClassName
         }
         dependsOn {
             classes
         }
-        from {
-            configurations.openCvNatives.collect { it.isDirectory() ? it : zipTree(it) }
-        }
-    }
-
-    // Extract native artifacts from zip file into build/opencv-jni/
-    task extractOpenCvNatives(type: Copy) {
-        println "Extracting OpenCV JNI to $nativeLibDir"
-        from {
-            configurations.openCvNatives.collect { zipTree(it) }
-        }
-        into nativeLibDir
-    }
-
-    compileJava.dependsOn extractOpenCvNatives
-
-    tasks.withType(JavaExec) {
-        systemProperty "java.library.path", "$nativeLibDir/jni/"
-    }
-    tasks.withType(Test) {
-        systemProperty "java.library.path", "$nativeLibDir/jni/"
     }
 
     shadowJar {
@@ -276,9 +248,6 @@ project(":core") {
             shadow(tasks.shadowJar.archivePath) {
                 builtBy shadowJar
             }
-        }
-        from {
-            project(':core').configurations.openCvNatives.collect { it.isDirectory() ? it : zipTree(it) }
         }
 
         /* The icudt54b directory in Jython takes up 9 megabytes and doesn't seem to do anything useful. */
