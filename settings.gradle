@@ -1,4 +1,5 @@
-include 'core', 'ui', 'ui:preloader', 'ui:linuxLauncher'
+include 'core', 'codeGeneration', 'ui', 'ui:preloader', 'ui:linuxLauncher'
 rootProject.name = 'GRIP'
 include 'linuxLauncher'
+include 'codeGeneration'
 

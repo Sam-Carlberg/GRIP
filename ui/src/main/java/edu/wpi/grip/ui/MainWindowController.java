@@ -3,6 +3,7 @@ package edu.wpi.grip.ui;
 import edu.wpi.grip.core.Palette;
 import edu.wpi.grip.core.Pipeline;
 import edu.wpi.grip.core.PipelineRunner;
+import edu.wpi.grip.core.codegeneration.Exporter;
 import edu.wpi.grip.core.events.AppSettingsChangedEvent;
 import edu.wpi.grip.core.events.BenchmarkEvent;
 import edu.wpi.grip.core.events.CodeGenerationSettingsChangedEvent;
@@ -19,7 +20,6 @@ import edu.wpi.grip.core.sockets.SocketHint;
 import edu.wpi.grip.core.util.SafeShutdown;
 import edu.wpi.grip.core.util.service.SingleActionListener;
 import edu.wpi.grip.ui.codegeneration.CodeGenerationSettingsDialog;
-import edu.wpi.grip.ui.codegeneration.Exporter;
 import edu.wpi.grip.ui.components.StartStoppableButton;
 import edu.wpi.grip.ui.util.DPIUtility;
 
