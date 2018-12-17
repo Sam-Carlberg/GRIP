@@ -3,6 +3,7 @@ package edu.wpi.grip.core.operations;
 
 import edu.wpi.grip.core.OperationMetaData;
 import edu.wpi.grip.core.events.OperationAddedEvent;
+import edu.wpi.grip.core.events.UnexpectedThrowableEvent;
 import edu.wpi.grip.core.operations.opencv.CVOperation;
 import edu.wpi.grip.core.operations.opencv.enumeration.FlipCode;
 import edu.wpi.grip.core.operations.templated.TemplateFactory;
@@ -266,6 +267,55 @@ public class CVOperations {
                       borderType.value, borderValue);
                 }
             )),
+
+        new OperationMetaData(CVOperation.defaults("CV Open",
+            "Removes small bridges between large blobs"),
+            templateFactory.create(
+                SocketHints.Inputs.createMatSocketHint("src", false),
+                SocketHints.Inputs.createMatSocketHint("kernel", true),
+                new SocketHint.Builder<>(Point.class).identifier("anchor").initialValueSupplier(
+                    () -> new Point(-1, -1)).build(),
+                SocketHints.Inputs.createNumberSpinnerSocketHint("iterations", 1, 0, 100),
+                SocketHints.createEnumSocketHint("borderType", BorderTypesEnum.BORDER_CONSTANT),
+                new SocketHint.Builder<>(Scalar.class).identifier("borderValue")
+                    .initialValueSupplier(opencv_imgproc::morphologyDefaultBorderValue).build(),
+                SocketHints.Outputs.createMatSocketHint("dst"),
+                (src, kernel, anchor, iterations, borderType, borderValue, dst) -> {
+                  try (opencv_core.Mat tmp = new opencv_core.Mat()) {
+                    int it = iterations.intValue();
+                    opencv_imgproc.erode(src, tmp, kernel, anchor, it,
+                        borderType.value, borderValue);
+                    opencv_imgproc.dilate(tmp, dst, kernel, anchor, it,
+                        borderType.value, borderValue);
+                  } catch (Exception e) {
+                    eventBus.post(new UnexpectedThrowableEvent(e,
+                        "Exception while performing OpenCV Open"));
+                  }
+                })),
+
+        new OperationMetaData(CVOperation.defaults("CV Close", "Removes small gaps between blobs"),
+            templateFactory.create(
+                SocketHints.Inputs.createMatSocketHint("src", false),
+                SocketHints.Inputs.createMatSocketHint("kernel", true),
+                new SocketHint.Builder<>(Point.class).identifier("anchor").initialValueSupplier(
+                    () -> new Point(-1, -1)).build(),
+                SocketHints.Inputs.createNumberSpinnerSocketHint("iterations", 1, 0, 100),
+                SocketHints.createEnumSocketHint("borderType", BorderTypesEnum.BORDER_CONSTANT),
+                new SocketHint.Builder<>(Scalar.class).identifier("borderValue")
+                    .initialValueSupplier(opencv_imgproc::morphologyDefaultBorderValue).build(),
+                SocketHints.Outputs.createMatSocketHint("dst"),
+                (src, kernel, anchor, iterations, borderType, borderValue, dst) -> {
+                  try (opencv_core.Mat tmp = new opencv_core.Mat()) {
+                    int it = iterations.intValue();
+                    opencv_imgproc.dilate(src, tmp, kernel, anchor, it,
+                        borderType.value, borderValue);
+                    opencv_imgproc.erode(tmp, dst, kernel, anchor, it,
+                        borderType.value, borderValue);
+                  } catch (Exception e) {
+                    eventBus.post(new UnexpectedThrowableEvent(e,
+                        "Exception while performing OpenCV Close"));
+                  }
+                })),
 
         new OperationMetaData(CVOperation.defaults("CV GaussianBlur",
             "Apply a Gaussian blur to an image."),
