@@ -309,15 +309,12 @@ public class ProjectTest {
   public void testSerializedProjectSettings() {
     ProjectSettings projectSettings = new ProjectSettings();
     projectSettings.setTeamNumber(190);
-    projectSettings.setDeployAddress("roborio-191-frc.local");
     eventBus.post(new ProjectSettingsChangedEvent(projectSettings));
 
     serializeAndDeserialize();
 
     assertEquals("Team number was not serialized/deserialized",
         190, pipeline.getProjectSettings().getTeamNumber());
-    assertEquals("Deploy address was not serialized/deserialized",
-        "roborio-191-frc.local", pipeline.getProjectSettings().getDeployAddress());
   }
 
   @Test
@@ -331,6 +328,6 @@ public class ProjectTest {
 
     project.open(reader);
 
-    assertNotNull("Project setting was null", pipeline.getProjectSettings().getDeployJvmOptions());
+    assertNotNull("Project setting was null", pipeline.getProjectSettings().getPublishAddress());
   }
 }

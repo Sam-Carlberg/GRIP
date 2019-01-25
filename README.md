@@ -22,7 +22,7 @@ As a result, many teams with minimal computer vision knowledge successfully used
  - Active development community.
  - Generates Java, C++, and Python code directly from the pipeline ([Example usage here](https://github.com/WPIRoboticsProjects/GRIP-code-generation))!
  - Extensible!
- - Deploys and runs headless.
+ - Runs headless.
  - Supports various network protocols
    - [Network Tables](https://github.com/PeterJohnson/ntcore)
    - [Robot Operating System (ROS)](http://www.ros.org/)

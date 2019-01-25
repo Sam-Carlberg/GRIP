@@ -101,24 +101,6 @@
                 <MenuItem text="Exit" onAction="#quit" />
             </Menu>
             <Menu text="Tools">
-                <MenuItem text="Deploy" onAction="#deploy">
-                    <accelerator>
-                        <KeyCodeCombination alt="UP" code="R" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
-                    </accelerator>
-                    <graphic>
-                        <ImageView styleClass="menu-graphic">
-                            <fitWidth>
-                                <DPIUtility fx:constant="SMALL_ICON_SIZE" />
-                            </fitWidth>
-                            <fitHeight>
-                                <DPIUtility fx:constant="SMALL_ICON_SIZE" />
-                            </fitHeight>
-                            <image>
-                                <Image url="@icons/deploy.png" />
-                            </image>
-                        </ImageView>
-                    </graphic>
-                </MenuItem>
                 <MenuItem text="Settings" onAction="#showProjectSettingsEditor">
                     <graphic>
                         <ImageView styleClass="menu-graphic">
@@ -210,7 +192,6 @@
         </HBox>
     </children>
     <fx:define>
-        <fx:include source="Deploy.fxml" fx:id="deployPane" />
         <fx:include source="AboutDialog.fxml" fx:id="aboutPane" />
         <fx:include source="analysis/Analysis.fxml" fx:id="analysisPane" />
         <fx:include source="codegeneration/CodegenDialog.fxml" fx:id="codegenPane"/>

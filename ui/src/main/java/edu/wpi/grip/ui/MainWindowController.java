@@ -22,7 +22,6 @@ import edu.wpi.grip.core.util.service.SingleActionListener;
 import edu.wpi.grip.ui.codegeneration.CodeGenerationSettingsDialog;
 import edu.wpi.grip.ui.codegeneration.Exporter;
 import edu.wpi.grip.ui.components.StartStoppableButton;
-import edu.wpi.grip.ui.util.DPIUtility;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -46,7 +45,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
@@ -70,8 +68,6 @@ public class MainWindowController {
   private Region bottomPane;
   @FXML
   private Region pipelineView;
-  @FXML
-  private Pane deployPane;
   @FXML
   private Pane aboutPane;
   @FXML
@@ -343,33 +339,6 @@ public class MainWindowController {
       exportRunner.setDaemon(true);
       exportRunner.start();
     });
-  }
-
-  @FXML
-  protected void deploy() {
-    eventBus.post(new WarningEvent(
-        "Deploy has been deprecated",
-        "The deploy tool has been deprecated and is no longer supported. "
-            + "It will be removed in a future release.\n\n"
-            + "Instead, use code generation to create a Java, C++, or Python class that handles all"
-            + " the OpenCV code and can be easily integrated into a WPILib robot program."));
-
-    ImageView graphic = new ImageView(new Image("/edu/wpi/grip/ui/icons/settings.png"));
-    graphic.setFitWidth(DPIUtility.SMALL_ICON_SIZE);
-    graphic.setFitHeight(DPIUtility.SMALL_ICON_SIZE);
-
-    deployPane.requestFocus();
-
-    Dialog<ButtonType> dialog = new Dialog<>();
-    dialog.setTitle("Deploy");
-    dialog.setHeaderText("Deploy");
-    dialog.setGraphic(graphic);
-    dialog.getDialogPane().getButtonTypes().setAll(ButtonType.CLOSE);
-    dialog.getDialogPane().styleProperty().bind(root.styleProperty());
-    dialog.getDialogPane().getStylesheets().setAll(root.getStylesheets());
-    dialog.getDialogPane().setContent(deployPane);
-    dialog.setResizable(true);
-    dialog.showAndWait();
   }
 
   @Subscribe
